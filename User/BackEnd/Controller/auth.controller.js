@@ -116,6 +116,9 @@ export const verifyForgotOtp = async (req, res) => {
 };
 
 
+
+
+
 export const resetPassword = async (req, res) => {
   try {
     await authService.resetPassword(req.body, req.session);

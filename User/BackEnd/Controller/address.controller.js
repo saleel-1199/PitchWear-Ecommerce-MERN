@@ -1,6 +1,6 @@
 import * as addressService from "../Services/address.service.js";
 
-/* GET /address */
+
 export const addressBookPage = async (req, res) => {
   try {
 
@@ -27,12 +27,12 @@ export const addressBookPage = async (req, res) => {
   }
 };
 
-/* GET /address/new */
+
 export const addAddressPage = (req, res) => {
   return res.render("AddAddress", { user: req.user });
 };
 
-/* POST /address */
+
 export const createAddressController = async (req, res) => {
   try {
     await addressService.createAddress(req.user._id, req.body);
@@ -43,7 +43,7 @@ export const createAddressController = async (req, res) => {
   }
 };
 
-/* GET /address/edit/:id */
+
 export const editAddressPage = async (req, res) => {
   try {
     const address = await addressService.getAddressById(req.params.id, req.user._id);
@@ -62,7 +62,7 @@ export const editAddressPage = async (req, res) => {
   }
 };
 
-/* POST /address/edit/:id */
+
 export const updateAddressController = async (req, res) => {
   try {
     const updated = await addressService.updateAddress(
@@ -82,7 +82,7 @@ export const updateAddressController = async (req, res) => {
   }
 };
 
-/* GET /address/delete/:id */
+
 export const deleteAddressController = async (req, res) => {
   try {
     await addressService.deleteAddress(req.params.id, req.user._id);

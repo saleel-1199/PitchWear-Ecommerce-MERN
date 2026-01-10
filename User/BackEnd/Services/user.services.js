@@ -3,8 +3,7 @@ import { User } from "../Models/user.model.js";
 import { createOrUpdateOtp } from "./Otp.service.js";
 import { Otp } from "../Models/otpModels.js"; 
 
- 
-/* Get user by session */
+
 export const getUserById = async (userId) => {
   if (!userId) return null;
 

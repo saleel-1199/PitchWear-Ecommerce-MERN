@@ -3,7 +3,7 @@ import { User } from "../Models/user.model.js";
 import { Otp } from "../Models/otpModels.js";
 import { createOrUpdateOtp } from "./Otp.service.js";
 
-/* SIGNUP → SEND OTP */
+
 export const signupUser = async (data) => {
   const {
     fullName,
@@ -41,7 +41,7 @@ export const signupUser = async (data) => {
   return true;
 };
 
-/* VERIFY OTP → CREATE USER */
+
 export const verifyOtp = async (email, otp) => {
   const record = await Otp.findOne({ email });
 
@@ -141,7 +141,7 @@ export const resetPassword = async (data, session) => {
     { password: hashed }
   );
 
-  /* cleanup */
+  
   session.resetEmail = null;
   session.isResetVerified = null;
 

@@ -45,7 +45,7 @@ export const updateAddress = async (addressId, userId, data) => {
   const address = await Address.findOne({ _id: addressId, user_id: userId });
   if (!address) return null;
 
-  // if setting new default -> unset others
+ 
   if (data.is_default) {
     await Address.updateMany(
       { user_id: userId },

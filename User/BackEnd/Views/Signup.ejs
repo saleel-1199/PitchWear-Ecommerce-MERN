@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Signup | Vestra</title>
+  <title>Signup | PitchWear</title>
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -39,7 +39,7 @@
     </h2>
 
     <!-- FORM -->
-    <form action="/signup" method="POST" class="flex flex-col">
+    <form id="signupForm" action="/signup" method="POST" class="flex flex-col">
 
       <!-- Full Name -->
       <label class="text-xs lg:text-sm text-gray-600 mb-1">
@@ -72,6 +72,7 @@
         Email
       </label>
       <input
+        id="email"
         type="email"
         name="email"
         placeholder="Enter your email"
@@ -79,6 +80,9 @@
         required
         class="mb-4 rounded-md border border-gray-300 px-3 py-2 text-sm lg:text-base focus:outline-none focus:border-[#d6c37a]"
       />
+
+      <!-- ✅ regex error message (frontend only) -->
+      <p id="emailError" class="text-red-500 text-xs lg:text-sm mb-4 hidden"></p>
 
       <!-- Referral Code -->
       <label class="text-xs lg:text-sm text-gray-600 mb-1">
@@ -147,6 +151,32 @@
     </p>
 
   </div>
+
+  <!-- ✅ ONLY regex validation script (no other changes) -->
+  <script>
+    const form = document.getElementById("signupForm");
+    const emailInput = document.getElementById("email");
+    const emailError = document.getElementById("emailError");
+
+    // ✅ strict email regex
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    form.addEventListener("submit", (e) => {
+      const email = emailInput.value.trim();
+
+      if (!emailRegex.test(email)) {
+        e.preventDefault(); // stop backend request
+        emailError.classList.remove("hidden");
+        emailError.textContent = "Please enter a valid email address (example: abc@gmail.com)";
+        emailInput.focus();
+        return;
+      }
+
+      // clear error if valid
+      emailError.classList.add("hidden");
+      emailError.textContent = "";
+    });
+  </script>
 
 </body>
 </html>

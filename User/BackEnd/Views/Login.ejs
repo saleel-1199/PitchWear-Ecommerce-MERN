@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Login | Vestra</title>
+  <title>Login | PitchWear</title>
   <link rel="stylesheet" href="/css/Main.css" />
 </head>
 <body>
@@ -54,7 +54,15 @@
 
   <div class="divider">OR</div>
 
-  <button class="google-btn">Continue with Google</button>
+<button
+  type="button"
+  onclick="window.location.href='/auth/google'"
+  class="w-full py-4 rounded-lg bg-[#d6c37a] text-black font-semibold text-lg hover:opacity-90 transition"
+>
+  Continue with Google
+</button>
+
+
 
   <p class="login-text">
     Don’t have an account? <a href="/signup">Sign Up</a>

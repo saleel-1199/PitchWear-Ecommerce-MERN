@@ -20,7 +20,7 @@ export const renderUserManagement = async (req, res) => {
       sort,
     });
 
-    // ✅ IMPORTANT FIX
+    
     const { users, totalPages } = result;
 
     return res.render("Admin/UserManagement", {

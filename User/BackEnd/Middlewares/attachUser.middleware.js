@@ -10,8 +10,8 @@ export const attachUser = async (req, res, next) => {
 
     const user = await User.findById(req.session.userId).lean();
 
-    req.user = user;          // ✅ ADD THIS
-    res.locals.user = user;   // ✅ keep this for EJS
+    req.user = user;          
+    res.locals.user = user;   
 
     return next();
   } catch (err) {

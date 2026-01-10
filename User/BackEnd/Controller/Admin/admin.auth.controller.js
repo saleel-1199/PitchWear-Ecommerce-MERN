@@ -9,12 +9,12 @@ export const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // ✅ check admin from .env
+    
     if (
       email === process.env.ADMIN_EMAIL &&
       password === process.env.ADMIN_PASSWORD
     ) {
-      // ✅ store session
+      
       req.session.adminId = "superadmin";
       req.session.adminEmail = email;
 

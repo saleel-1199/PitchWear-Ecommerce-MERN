@@ -2,6 +2,8 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import session from "express-session";
+import passport from "passport";
+import { configurePassport } from "./User/BackEnd/Config/passport.js";
 
 import connectDB from "./User/BackEnd/Config/db.js";
 import authRoutes from "./User/BackEnd/Routes/auth.routes.js";
@@ -32,6 +34,13 @@ app.use(
     saveUninitialized: false
   })
 );
+
+configurePassport();
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 app.use(attachUser)
 
 

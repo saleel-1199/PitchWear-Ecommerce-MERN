@@ -12,7 +12,7 @@ export const fetchUsersService = async ({
 
   const query = {};
 
-  // ✅ search filter
+
   if (search && search.trim() !== "") {
     query.$or = [
       { fullName: { $regex: search, $options: "i" } },
@@ -21,11 +21,11 @@ export const fetchUsersService = async ({
     ];
   }
 
-  // ✅ status filter
+
   if (status === "blocked") query.isBlocked = true;
   if (status === "active") query.isBlocked = false;
 
-  // ✅ sort latest first
+
   const sortQuery = sort === "oldest" ? { createdAt: 1 } : { createdAt: -1 };
 
   const totalUsers = await User.countDocuments(query);

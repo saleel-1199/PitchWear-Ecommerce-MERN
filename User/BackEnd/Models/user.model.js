@@ -43,9 +43,16 @@ const userSchema = new mongoose.Schema(
     profileImage:{
       type:String,
       default:null
-    },phone_no: { 
+    },
+    phone_no: { 
       type: String, 
-      default: null }
+      default: null 
+    },
+    authProvider: {
+   type: String,
+    enum: ["local", "google"],
+   default: "local",
+}
   },
   { timestamps: true }
 );
