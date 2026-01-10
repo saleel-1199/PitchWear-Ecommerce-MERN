@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Change Email | Vestra</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#7da77b',
+            bgLight: '#faf9f6'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-bgLight text-gray-800">
+
+<!-- ================= HEADER ================= -->
+<header class="bg-[#f5f6df] px-16 py-4 flex justify-between items-center">
+  <h1 class="text-lg font-semibold">VESTRA</h1>
+
+  <nav class="flex items-center gap-10 text-sm">
+    <a href="/Home" class="hover:text-primary">Home</a>
+    <a href="#" class="hover:text-primary">Shop</a>
+    <a href="#" class="hover:text-primary">About</a>
+    <a href="#" class="hover:text-primary">Contact</a>
+
+    <img
+      src="<%= user?.profileImage || '/images/user.png' %>"
+      class="w-8 h-8 rounded-full object-cover border"
+      alt="User"
+    />
+  </nav>
+</header>
+
+<!-- ================= MAIN ================= -->
+<main class="px-16 py-14 flex justify-center">
+
+  <div class="bg-white w-full max-w-xl rounded-xl p-10">
+
+    <p class="text-sm text-gray-500 mb-2">My Account / Change Email</p>
+
+    <h2 class="text-2xl font-semibold mb-2">Change Email Address</h2>
+    <p class="text-sm text-gray-500 mb-8">
+      Enter your new email address. We’ll send an OTP to verify it.
+    </p>
+
+    <% if (error) { %>
+      <p class="text-red-500 text-sm mb-4"><%= error %></p>
+    <% } %>
+
+    <form action="/profile/change-email" method="POST" class="space-y-6">
+
+      <div>
+        <label class="block text-sm mb-1">New Email Address</label>
+        <input
+          type="email"
+          name="email"
+          required
+          placeholder="example@email.com"
+          class="w-full border rounded-md px-4 py-2 focus:outline-none focus:border-primary"
+        />
+      </div>
+
+      <div class="flex justify-end gap-4 pt-4">
+        <a
+          href="/profile/edit"
+          class="px-6 py-2 bg-gray-200 rounded-md text-sm"
+        >
+          Cancel
+        </a>
+
+        <button
+          type="submit"
+          class="px-6 py-2 bg-primary text-white rounded-md text-sm hover:opacity-90"
+        >
+          Send OTP →
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+
+</main>
+
+</body>
+</html>

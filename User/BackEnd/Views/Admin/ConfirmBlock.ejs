@@ -1,0 +1,125 @@
+<%
+  const actionText = user?.isBlocked ? "Unblock" : "Block";
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title><%= title || "Confirm Action" %></title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#cfd574",
+            headerTone: "#f5f6df",
+            bgLight: "#faf9f6"
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-bgLight text-gray-800">
+
+  <!-- HEADER -->
+  <header class="bg-headerTone px-10 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-8">
+      <h1 class="font-semibold text-lg">Pitchwear</h1>
+      <p class="text-sm font-medium">Admin Dashboard</p>
+    </div>
+
+    <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center border">
+      <span class="text-gray-700 font-semibold">A</span>
+    </div>
+  </header>
+
+  <main class="flex gap-10 px-10 py-10">
+
+    <!-- SIDEBAR -->
+    <aside class="w-64">
+      <p class="text-sm text-gray-500 mb-6">Pitchwear Admin</p>
+
+      <nav class="space-y-2 text-sm">
+        <a href="/admin/dashboard"
+           class="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white">
+          Dashboard
+        </a>
+
+        <a href="/admin/users"
+           class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white font-medium">
+          User Management
+        </a>
+
+        <a href="/admin/logout" class="text-red-500 font-medium block mt-10 px-4">
+          Logout
+        </a>
+      </nav>
+    </aside>
+
+    <!-- CONTENT -->
+    <section class="flex-1">
+
+      <h2 class="text-2xl font-semibold mb-6">Confirm Action</h2>
+
+      <div class="bg-white border rounded-xl p-8 max-w-xl">
+
+        <p class="text-sm text-gray-500 mb-3">
+          User:
+        </p>
+
+        <div class="flex items-center gap-4 mb-6">
+
+          <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+            <% if (user.profileImage) { %>
+              <img src="<%= user.profileImage %>" class="w-full h-full object-cover" />
+            <% } else { %>
+              <span class="font-semibold text-gray-600 text-lg">
+                <%= user.fullName?.charAt(0)?.toUpperCase() || "U" %>
+              </span>
+            <% } %>
+          </div>
+
+          <div>
+            <p class="font-semibold text-gray-800"><%= user.fullName %></p>
+            <p class="text-sm text-gray-500"><%= user.email %></p>
+          </div>
+
+        </div>
+
+        <p class="text-sm text-gray-600 mb-6">
+          Are you sure you want to
+          <span class="font-semibold text-gray-800"><%= actionText %></span>
+          this user?
+        </p>
+
+        <div class="flex gap-3">
+          <form action="/admin/users/<%= user._id %>/toggle-block" method="POST">
+            <button
+              type="submit"
+              class="px-5 py-2 rounded-md bg-primary text-white font-medium text-sm hover:opacity-90"
+            >
+              Yes, <%= actionText %>
+            </button>
+          </form>
+
+          <a
+            href="/admin/users"
+            class="px-5 py-2 rounded-md bg-white border text-gray-700 font-medium text-sm hover:bg-gray-50"
+          >
+            Cancel
+          </a>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Verify OTP | Vestra</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const inputs = document.querySelectorAll(".otp-input");
+
+      inputs.forEach((input, index) => {
+        input.addEventListener("input", () => {
+          if (input.value.length === 1 && index < inputs.length - 1) {
+            inputs[index + 1].focus();
+          }
+        });
+
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Backspace" && !input.value && index > 0) {
+            inputs[index - 1].focus();
+          }
+        });
+      });
+    });
+  </script>
+</head>
+
+<body class="bg-[#faf9f6] min-h-screen flex items-center justify-center">
+
+  <div class="bg-white w-[420px] px-10 py-12">
+
+    <h2 class="text-2xl font-semibold mb-2">Verify OTP</h2>
+
+    <p class="text-sm text-gray-500 mb-6">
+      OTP sent to <b><%= email %></b>
+    </p>
+
+    <% if (error) { %>
+      <p class="text-red-500 text-sm mb-4"><%= error %></p>
+    <% } %>
+
+    <form action="/VerifyForgotOtp" method="POST">
+
+      <!-- OTP Boxes -->
+      <div class="flex justify-between mb-8">
+        <% for (let i = 0; i < 6; i++) { %>
+          <input
+            type="text"
+            name="otp[]"
+            maxlength="1"
+            required
+            class="otp-input w-12 h-14 border text-center text-lg focus:outline-none focus:border-black"
+          />
+        <% } %>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="w-full bg-[#d6c37a] text-white py-3 font-medium hover:opacity-90 transition"
+      >
+        Verify OTP →
+      </button>
+
+    </form>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Edit Profile | Vestra</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#7da77b',
+            bgLight: '#faf9f6',
+            softGray: '#e5e7eb',
+            headerTone: '#f5f6df'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-bgLight text-gray-800">
+
+<!-- ================= HEADER ================= -->
+<header class="bg-headerTone px-16 py-4 flex justify-between items-center">
+  <h1 class="text-lg font-semibold">VESTRA</h1>
+
+  <nav class="flex items-center gap-10 text-sm">
+    <a href="/Home" class="hover:text-primary">Home</a>
+    <a href="#" class="hover:text-primary">Shop</a>
+    <a href="#" class="hover:text-primary">About</a>
+    <a href="#" class="hover:text-primary">Contact</a>
+  </nav>
+</header>
+
+<!-- ================= MAIN ================= -->
+<main class="px-16 py-14 flex gap-16">
+
+  <!-- SIDEBAR -->
+  <aside class="w-64">
+    <div class="bg-white rounded-lg p-4 mb-6">
+      <p class="text-sm font-medium">My Account</p>
+      <p class="text-xs text-gray-500"><%= user.fullName %></p>
+    </div>
+
+
+
+
+    <ul class="space-y-4 text-sm">
+  <li>
+    <a href="/orders" class="hover:text-primary">My Orders</a>
+  </li>
+
+  <li>
+    <a href="/address" class="hover:text-primary">Address Book</a>
+  </li>
+
+  <li>
+    <a href="/wallet" class="hover:text-primary">Wallet</a>
+  </li>
+</ul>
+
+
+
+    <div class="mt-10 text-sm space-y-4">
+      <p>About Us</p>
+      <p>Contact Us</p>
+      <a href="/logout" class="text-red-500">← Logout</a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <section class="flex-1 bg-white rounded-xl p-10">
+
+    <p class="text-sm text-gray-500 mb-2">My Account / Edit Info</p>
+
+    <h2 class="text-2xl font-semibold mb-2">Edit Customer Profile</h2>
+    <p class="text-sm text-gray-500 mb-8">
+      Manage customer details and account settings.
+    </p>
+
+    <% if (error) { %>
+      <p class="text-red-500 text-sm mb-4"><%= error %></p>
+    <% } %>
+
+    <!-- PROFILE IMAGE + ACTION BUTTONS -->
+    <div class="flex items-center gap-10 mb-12">
+
+      <!-- PROFILE IMAGE -->
+      <% if (user.profileImage) { %>
+        <img
+          src="<%= user.profileImage %>"
+          class="w-28 h-28 rounded-full object-cover border"
+          alt="Profile"
+        />
+      <% } else { %>
+        <div
+          class="w-28 h-28 rounded-full flex items-center justify-center text-white text-4xl font-semibold"
+          style="background-color:#1e3a8a"
+        >
+          <%= user.fullName.charAt(0).toUpperCase() %>
+        </div>
+      <% } %>
+
+      <!-- BUTTONS -->
+      <div class="flex flex-col gap-4">
+
+        <!-- CHANGE EMAIL -->
+        <a
+          href="/profile/change-email"
+          class="px-6 py-2 rounded-md text-sm text-center border border-gray-300
+                 bg-headerTone hover:bg-primary hover:text-white transition"
+        >
+          Change Email
+        </a>
+
+        <!-- CHANGE PHOTO (AUTO UPLOAD) -->
+        <form
+          action="/profile/upload-photo"
+          method="POST"
+          enctype="multipart/form-data"
+        >
+          <input
+            type="file"
+            name="profileImage"
+            accept="image/*"
+            class="hidden"
+            id="profileImageInput"
+            onchange="this.form.submit()"
+          />
+
+          <button
+            type="button"
+            onclick="document.getElementById('profileImageInput').click()"
+            class="px-6 py-2 bg-primary text-white rounded-md text-sm hover:opacity-90 transition"
+          >
+            Change Photo
+          </button>
+        </form>
+
+      </div>
+    </div>
+
+    <!-- EDIT FORM -->
+    <form action="/profile/edit" method="POST" class="space-y-6 max-w-lg">
+
+      <div>
+        <label class="text-sm">Full Name</label>
+        <input
+          type="text"
+          name="fullName"
+          value="<%= user.fullName %>"
+          class="w-full border border-softGray rounded-md px-4 py-2 mt-1
+                 focus:outline-none focus:border-primary"
+          required
+        />
+      </div>
+
+      <div>
+        <label class="text-sm">New Password</label>
+        <input
+          type="password"
+          name="password"
+          class="w-full border border-softGray rounded-md px-4 py-2 mt-1
+                 focus:outline-none focus:border-primary"
+        />
+      </div>
+
+      <div>
+        <label class="text-sm">Confirm Password</label>
+        <input
+          type="password"
+          name="confirmPassword"
+          class="w-full border border-softGray rounded-md px-4 py-2 mt-1
+                 focus:outline-none focus:border-primary"
+        />
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="flex gap-4 pt-4">
+        <button
+          type="submit"
+          class="px-6 py-2 bg-primary text-white rounded-md text-sm hover:opacity-90 transition"
+        >
+          Save Changes
+        </button>
+
+        <a
+          href="/profile"
+          class="px-6 py-2 bg-gray-200 rounded-md text-sm text-center"
+        >
+          Cancel
+        </a>
+      </div>
+
+    </form>
+
+  </section>
+
+</main>
+
+</body>
+</html>

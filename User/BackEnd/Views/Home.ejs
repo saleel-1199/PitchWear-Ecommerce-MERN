@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Home | Vestra</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#7da77b',
+            bgLight: '#faf9f6'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-bgLight text-gray-800">
+
+<!-- ================= HEADER ================= -->
+<header class="bg-white px-16 py-4 flex justify-between items-center">
+  <h1 class="text-xl font-semibold">Vestra</h1>
+
+  <nav class="flex gap-8 text-sm">
+    <a href="#" class="hover:text-primary">Home</a>
+    <a href="#" class="hover:text-primary">Shop</a>
+    <a href="#" class="hover:text-primary">About</a>
+    <a href="#" class="hover:text-primary">Contact Us</a>
+  </nav>
+
+   <a
+      href="/profile"
+      class="w-10 h-10 flex items-center justify-center rounded-full border border-primary text-primary hover:bg-primary hover:text-white transition"
+      title="My Profile"
+    >
+      <!-- User Icon (SVG) -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="w-5 h-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z"
+        />
+      </svg>
+    </a>
+
+  </div>
+</header>
+
+<!-- ================= HERO SECTION ================= -->
+<section class="relative h-[520px]">
+
+  <!-- Background Image -->
+  <div
+    class="absolute inset-0 bg-[url('/Images/photo-1616124619460-ff4ed8f4683c.jpg')] bg-cover bg-center">
+  </div>
+
+  <!-- Dark Overlay -->
+  <div class="absolute inset-0 bg-black/50"></div>
+
+  <!-- Hero Content -->
+  <div class="relative z-10 flex flex-col items-center justify-center h-full text-white text-center">
+
+    <span class="bg-primary px-6 py-2 rounded-full text-xs mb-4">
+      New Arrivals
+    </span>
+
+    <h1 class="text-4xl font-bold leading-tight mb-6">
+      THE NEW 2025/26 <br />
+      JERSEYS
+    </h1>
+
+    <a
+      href="#"
+      class="bg-primary px-8 py-3 rounded-full text-sm font-medium hover:bg-green-700 transition">
+      Shop Now →
+    </a>
+
+  </div>
+</section>
+
+<!-- ================= PRODUCTS ================= -->
+<section class="bg-white px-20 py-16">
+
+  <div class="mb-10 text-center">
+    <h2 class="text-2xl font-semibold">Our Most Selling Jerseys</h2>
+    <p class="text-sm text-gray-500">
+      Fan favorites – top jerseys loved by our community
+    </p>
+  </div>
+
+  <div class="grid grid-cols-4 gap-8">
+
+    <div class="bg-bgLight p-5 rounded-xl text-center">
+      <h4 class="text-sm font-medium">Arsenal Home 25/26</h4>
+      <p class="text-primary text-sm mt-1">$110.00</p>
+    </div>
+
+    <div class="bg-bgLight p-5 rounded-xl text-center">
+      <h4 class="text-sm font-medium">Real Madrid Away 25/26</h4>
+      <p class="text-primary text-sm mt-1">$120.00</p>
+    </div>
+
+    <div class="bg-bgLight p-5 rounded-xl text-center">
+      <h4 class="text-sm font-medium">Juventus Third 25/26</h4>
+      <p class="text-primary text-sm mt-1">$95.00</p>
+    </div>
+
+    <div class="bg-bgLight p-5 r

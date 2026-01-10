@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Edit Address | Vestra</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white">
+
+<header class="bg-[#F6F6D8] px-10 py-4 flex items-center justify-between">
+  <h1 class="font-bold text-lg">VESTRA</h1>
+  <nav class="flex gap-8 text-sm">
+    <a href="/home">Home</a>
+    <a href="/shop">Shop</a>
+    <a href="/about">About</a>
+    <a href="/contact">Contact</a>
+  </nav>
+  <div class="flex gap-4"><span>🔍</span><span>🛒</span><span>👤</span></div>
+</header>
+
+<div class="max-w-6xl mx-auto px-10 py-10 flex gap-10">
+
+  <aside class="w-64">
+    <p class="text-sm text-gray-500">My Account</p>
+    <p class="font-semibold"><%= user.full_name || "User" %></p>
+
+    <ul class="mt-6 space-y-3 text-sm">
+      <li><a href="/orders">My Orders</a></li>
+      <li class="font-semibold bg-gray-100 p-2 rounded">Address Book</li>
+      <li><a href="/wallet">Wallet</a></li>
+    </ul>
+  </aside>
+
+  <main class="flex-1">
+    <h2 class="text-3xl font-bold mb-10 text-center">Edit address</h2>
+
+    <form action="/address/edit/<%= address._id %>" method="POST"
+          class="max-w-xl mx-auto space-y-6">
+
+      <div>
+        <label class="text-sm font-medium">Full name</label>
+        <input name="full_name" value="<%= address.full_name %>"
+               class="w-full border rounded-md px-4 py-2 mt-1" required />
+      </div>
+
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <label class="text-sm font-medium">Phone number</label>
+          <input name="phone_no" value="<%= address.phone_no %>"
+                 class="w-full border rounded-md px-4 py-2 mt-1" required />
+        </div>
+        <div>
+          <label class="text-sm font-medium">Alternative Phone (optional)</label>
+          <input name="alt_phone_no" value="<%= address.alt_phone_no %>"
+                 class="w-full border rounded-md px-4 py-2 mt-1" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <label class="text-sm font-medium">Address line</label>
+          <input name="address_line1" value="<%= address.address_line1 %>"
+                 class="w-full border rounded-md px-4 py-2 mt-1" required />
+        </div>
+        <div>
+          <label class="text-sm font-medium">City</label>
+          <input name="city" value="<%= address.city %>"
+                 class="w-full border rounded-md px-4 py-2 mt-1" required />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <label class="text-sm font-medium">ZIP/Postal Code</label>
+          <input name="pin_code" value="<%= address.pin_code %>"
+                 class="w-full border rounded-md px-4 py-2 mt-1" required />
+        </div>
+        <div>
+          <label class="text-sm font-medium">State</label>
+          <input name="state" value="<%= address.state %>"
+                 class="w-full border rounded-md px-4 py-2 mt-1" required />
+        </div>
+      </div>
+
+      <div>
+        <label class="text-sm font-medium">Address type</label>
+        <select name="type" class="w-full border rounded-md px-4 py-2 mt-1">
+          <option value="Home" <%= address.type === "Home" ? "selected" : "" %>>Home</option>
+          <option value="Work" <%= address.type === "Work" ? "selected" : "" %>>Work</option>
+        </select>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <label class="text-sm font-medium">Default Address</label>
+        <input type="checkbox" name="is_default" class="w-5 h-5"
+          <%= address.is_default ? "checked" : "" %> />
+      </div>
+
+      <div class="flex justify-center gap-4 pt-4">
+        <button class="bg-green-600 text-white px-6 py-2 rounded-md">Save Changes</button>
+        <a href="/address" class="bg-gray-200 px-6 py-2 rounded-md">Cancel</a>
+      </div>
+
+    </form>
+  </main>
+
+</div>
+</body>
+</html>

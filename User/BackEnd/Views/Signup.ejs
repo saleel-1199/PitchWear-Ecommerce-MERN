@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Signup | Vestra</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen flex items-center justify-center bg-[#f6f5f2]">
+
+  <div class="bg-white w-[420px] lg:w-[520px] px-8 py-8 lg:px-12 lg:py-10 rounded-xl shadow-lg">
+
+    <!-- MESSAGE (INFO) -->
+    <% if (message) { %>
+      <div class="mb-4 rounded-md bg-blue-50 px-4 py-2 text-sm text-blue-900 text-center">
+        <%= message %>
+      </div>
+    <% } %>
+
+    <!-- HEADER -->
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-lg lg:text-xl font-semibold text-black">
+        Vestra
+      </h3>
+
+      <a
+        href="/login"
+        class="bg-[#d6c37a] px-4 py-1.5 rounded-md text-sm font-medium text-black hover:bg-[#cbb56a]"
+      >
+        Login
+      </a>
+    </div>
+
+    <!-- TITLE -->
+    <h2 class="text-center text-lg lg:text-xl font-semibold text-[#d6c37a] mb-6">
+      Join PitchWear
+    </h2>
+
+    <!-- FORM -->
+    <form action="/signup" method="POST" class="flex flex-col">
+
+      <!-- Full Name -->
+      <label class="text-xs lg:text-sm text-gray-600 mb-1">
+        Full Name
+      </label>
+      <input
+        type="text"
+        name="fullName"
+        placeholder="Enter your full name"
+        value="<%= formData.fullName || '' %>"
+        required
+        class="mb-4 rounded-md border border-gray-300 px-3 py-2 text-sm lg:text-base focus:outline-none focus:border-[#d6c37a]"
+      />
+
+      <!-- Username -->
+      <label class="text-xs lg:text-sm text-gray-600 mb-1">
+        Username
+      </label>
+      <input
+        type="text"
+        name="username"
+        placeholder="Choose a username"
+        value="<%= formData.username || '' %>"
+        required
+        class="mb-4 rounded-md border border-gray-300 px-3 py-2 text-sm lg:text-base focus:outline-none focus:border-[#d6c37a]"
+      />
+
+      <!-- Email -->
+      <label class="text-xs lg:text-sm text-gray-600 mb-1">
+        Email
+      </label>
+      <input
+        type="email"
+        name="email"
+        placeholder="Enter your email"
+        value="<%= formData.email || '' %>"
+        required
+        class="mb-4 rounded-md border border-gray-300 px-3 py-2 text-sm lg:text-base focus:outline-none focus:border-[#d6c37a]"
+      />
+
+      <!-- Referral Code -->
+      <label class="text-xs lg:text-sm text-gray-600 mb-1">
+        Referral Code (optional)
+      </label>
+      <input
+        type="text"
+        name="referralCode"
+        placeholder="Enter referral code"
+        value="<%= formData.referralCode || '' %>"
+        class="mb-4 rounded-md border border-gray-300 px-3 py-2 text-sm lg:text-base focus:outline-none focus:border-[#d6c37a]"
+      />
+
+      <!-- Password -->
+      <label class="text-xs lg:text-sm text-gray-600 mb-1">
+        Password
+      </label>
+      <input
+        type="password"
+        name="password"
+        placeholder="Create a password"
+        required
+        class="mb-4 rounded-md border border-gray-300 px-3 py-2 text-sm lg:text-base focus:outline-none focus:border-[#d6c37a]"
+      />
+
+      <!-- Confirm Password -->
+      <label class="text-xs lg:text-sm text-gray-600 mb-1">
+        Confirm Password
+      </label>
+      <input
+        type="password"
+        name="confirmPassword"
+        placeholder="Confirm your password"
+        required
+        class="mb-5 rounded-md border border-gray-300 px-3 py-2 text-sm lg:text-base focus:outline-none focus:border-[#d6c37a]"
+      />
+
+      <!-- SIGNUP BUTTON -->
+      <button
+        type="submit"
+        class="mt-2 rounded-lg bg-[#d6c37a] py-3 text-sm lg:text-base font-semibold text-black hover:bg-[#cbb56a]"
+      >
+        Sign Up
+      </button>
+
+    </form>
+
+    <!-- DIVIDER -->
+    <div class="my-5 text-center text-xs text-gray-400">
+      OR
+    </div>
+
+    <!-- GOOGLE BUTTON -->
+    <button
+      class="w-full rounded-lg border border-gray-300 bg-gray-100 py-2.5 text-sm lg:text-base font-medium hover:bg-gray-200"
+    >
+      Continue with Google
+    </button>
+
+    <!-- LOGIN TEXT -->
+    <p class="mt-5 text-center text-xs text-gray-500">
+      Already have an account?
+      <a href="/login" class="font-medium text-[#d6c37a] hover:underline">
+        Login
+      </a>
+    </p>
+
+  </div>
+
+</body>
+</html>

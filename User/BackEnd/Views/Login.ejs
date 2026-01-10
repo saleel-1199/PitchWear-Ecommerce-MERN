@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login | Vestra</title>
+  <link rel="stylesheet" href="/css/Main.css" />
+</head>
+<body>
+
+<div class="signup-container">
+
+  <!-- Header -->
+  <div class="signup-header">
+    <h3>Vestra</h3>
+    <a href="/signup" class="login-btn">Sign Up</a>
+  </div>
+
+  <h2 class="signup-title">Welcome back</h2>
+
+  <!-- ✅ ERROR MESSAGE DISPLAY -->
+  <% if (message) { %>
+    <p style="color:red; font-size:14px; margin:10px 0; text-align:center;">
+      <%= message %>
+    </p>
+  <% } %>
+
+  <form action="/login" method="POST" class="signup-form">
+
+    <label>Username or Email</label>
+    <input
+      type="text"
+      name="identifier"
+      placeholder="Enter your username or email"
+      required
+    />
+
+    <label>Password</label>
+    <input
+      type="password"
+      name="password"
+      placeholder="Enter your password"
+      required
+    />
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <a href="/ForgotPassword" style="font-size:12px; color:#d6c37a; text-decoration:none;">
+        Forgot Password?
+      </a>
+    </div>
+
+    <button type="submit" class="signup-btn">Login</button>
+
+  </form>
+
+  <div class="divider">OR</div>
+
+  <button class="google-btn">Continue with Google</button>
+
+  <p class="login-text">
+    Don’t have an account? <a href="/signup">Sign Up</a>
+  </p>
+
+</div>
+
+</body>
+</html>

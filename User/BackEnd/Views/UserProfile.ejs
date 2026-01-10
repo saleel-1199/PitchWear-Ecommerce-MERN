@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Account | Vestra</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#7da77b',
+            bgLight: '#faf9f6'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-bgLight text-gray-800">
+
+<!-- ================= HEADER ================= -->
+<header class="bg-[#f5f6df] px-16 py-4 flex justify-between items-center">
+  <h1 class="text-lg font-semibold">VESTRA</h1>
+
+  <nav class="flex items-center gap-10 text-sm">
+    <a href="/Home" class="hover:text-primary">Home</a>
+    <a href="#" class="hover:text-primary">Shop</a>
+    <a href="#" class="hover:text-primary">About</a>
+    <a href="#" class="hover:text-primary">Contact</a>
+
+    <% if (user.profileImage) { %>
+      <img
+        src="<%= user.profileImage %>"
+        class="w-8 h-8 rounded-full object-cover border"
+        alt="User"
+      />
+    <% } else { %>
+      <div
+        class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
+        style="background-color:#1e3a8a"
+      >
+        <%= user.fullName.charAt(0).toUpperCase() %>
+      </div>
+    <% } %>
+  </nav>
+</header>
+
+<!-- ================= MAIN ================= -->
+<main class="px-16 py-14 flex gap-16">
+
+  <!-- SIDEBAR -->
+  <aside class="w-64">
+    <div class="bg-white rounded-lg p-4 mb-6">
+      <p class="text-sm font-medium">My Account</p>
+      <p class="text-xs text-gray-500"><%= user.fullName %></p>
+    </div>
+  
+
+
+    <ul class="space-y-4 text-sm">
+  <li>
+    <a href="/orders" class="hover:text-primary">My Orders</a>
+  </li>
+
+  <li>
+    <a href="/address" class="hover:text-primary">Address Book</a>
+  </li>
+
+  <li>
+    <a href="/wallet" class="hover:text-primary">Wallet</a>
+  </li>
+</ul>
+
+
+
+
+
+    <div class="mt-10 text-sm space-y-4">
+      <p>About Us</p>
+      <p>Contact Us</p>
+      <a href="/logout" class="text-red-500">← Logout</a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <section class="flex-1 bg-white rounded-xl p-10">
+
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-2xl font-semibold">My Account</h2>
+      <a
+        href="/profile/edit"
+        class="px-4 py-2 bg-primary text-white rounded-md text-sm"
+      >
+        Edit Profile
+      </a>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="flex items-center gap-8 mb-10">
+
+      <% if (user.profileImage) { %>
+        <img
+          src="<%= user.profileImage %>"
+          class="w-28 h-28 rounded-full object-cover"
+        />
+      <% } else { %>
+        <div
+          class="w-28 h-28 rounded-full flex items-center justify-center text-white text-4xl font-semibold"
+          style="background-color:#1e3a8a"
+        >
+          <%= user.fullName.charAt(0).toUpperCase() %>
+        </div>
+      <% } %>
+
+      <div>
+        <h3 class="text-lg font-semibold"><%= user.fullName %></h3>
+        <p class="text-sm text-gray-500"><%= user.email %></p>
+      </div>
+
+    </div>
+
+    <!-- DETAILS -->
+    <div>
+      <h4 class="font-medium mb-4">Account Details</h4>
+
+      <div class="grid grid-cols-2 gap-6 text-sm">
+        <div>
+          <p class="text-gray-500">Name</p>
+          <p><%= user.fullName %></p>
+        </div>
+        <div>
+          <p class="text-gray-500">Email</p>
+          <p><%= user.email %></p>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+</body>
+</html>
