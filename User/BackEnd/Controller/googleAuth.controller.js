@@ -4,6 +4,7 @@ export const googleCallbackController = (req, res) => {
     if (req.user.isBlocked) {
       return res.render("Login", {
         message: "Your account is blocked. Please contact support.",
+        successMessage:null
       });
     }
 

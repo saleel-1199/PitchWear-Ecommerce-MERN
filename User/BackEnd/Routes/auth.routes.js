@@ -72,5 +72,5 @@ router.post("/address/edit/:id",attachUser, isAuth, addressController.updateAddr
 
 router.get("/address/delete/:id", attachUser,isAuth, addressController.deleteAddressController);
 
-
+router.post("/resend-otp",authController.resendSignupOtp)
 export default router;

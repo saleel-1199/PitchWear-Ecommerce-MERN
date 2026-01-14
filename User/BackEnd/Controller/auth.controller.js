@@ -38,7 +38,8 @@ export const verifyOtp = async (req, res) => {
       const  email  = req.session.email;
       
     await authService.verifyOtp(email,otp);
-
+     
+    req.session.successMessage =  "Signup successful ✅ Please login now"
     res.redirect("/login");
 
   } catch (err) {
@@ -48,30 +49,51 @@ export const verifyOtp = async (req, res) => {
   }
 };
 
+export const resendSignupOtp = async(req,res) =>{
+
+  try {
+    const email = req.session.email;
+    if(!email){
+      return  res.render("Login",{
+        message:"Session expired.Please login again",
+        successMessage:null
+      })
+    }
+    
+    await authService.resendSignupOtp(email);
+    return res.render("VerifyOtp",{
+      message:null
+    })
+  } catch (error) {
+    return res.render("VerifyOtp", {
+      message:null
+    });
+  }
+}
+
 
 export const renderLogin = (req, res) => {
+
+  const successMessage = req.session.successMessage;
+  req.session.successMessage = null;
+
   res.render("Login",{
-    message:null
+    message:null,
+    successMessage
   });
 };
 
 export const login = async (req, res) => {
   try {
-
-    console.log("LOGIN BODY:", req.body);
-
-    const user = await authService.loginUser(req.body);
-    
-    console.log("LOGIN SUCCESS:", user.email);
-
-
+   const user = await authService.loginUser(req.body);
     req.session.userId =  user._id;
 
     res.redirect("/Home");
   } catch (error) {
       console.log("LOGIN ERROR:", error.message);
     res.render("Login",{
-      message:error.message
+      message:error.message,
+      successMessage:null
     })
   }
 };

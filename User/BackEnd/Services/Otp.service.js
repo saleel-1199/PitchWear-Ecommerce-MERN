@@ -5,8 +5,6 @@ import { Otp } from "../Models/otpModels.js";
 const generateOtp = () =>
   Math.floor(100000 + Math.random() * 900000).toString();
 
-
-console.log(process.env.EMAIL, process.env.EMAIL_PASSWORD);
 const transporter = nodemailer.createTransport({
   
   service: "gmail",
@@ -17,14 +15,14 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-const sendOtpMail = async (email, otp) => {
+export const sendOtpMail = async (email, otp) => {
   await transporter.sendMail({
     from: process.env.EMAIL,
     to: email,
     subject: "Email Verification - OTP",
     html: `
       <h3>Your OTP is: <b>${otp}</b></h3>
-      <p>This OTP is valid for 30 seconds.</p>
+     
     `
   });
 };
@@ -37,11 +35,11 @@ export const createOrUpdateOtp = async (signupData) => {
   
   await Otp.deleteMany({ email });
 
-  
+
   await Otp.create({
     email,
     otp,
-    expiresAt: Date.now() + 90 * 1000,
+    expiresAt: Date.now() + 120 * 1000,
     signupData
   });
 

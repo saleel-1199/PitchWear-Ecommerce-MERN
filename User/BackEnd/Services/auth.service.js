@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt";
 import { User } from "../Models/user.model.js";
 import { Otp } from "../Models/otpModels.js";
-import { createOrUpdateOtp } from "./Otp.service.js";
+import { createOrUpdateOtp,sendOtpMail} from "./Otp.service.js";
+
 
 
 export const signupUser = async (data) => {
@@ -93,6 +94,8 @@ export const loginUser = async (data) => {
   return user;
 };
 
+
+
 export const sendForgotPasswordOtp = async (email, session) => {
   if (!email) throw new Error("Email is required");
 
@@ -118,10 +121,26 @@ export const verifyForgotOtp = async (otp, session) => {
   await Otp.deleteOne({ email });
 
   session.isResetVerified = true;
-
+ 
   return true;
 };
 
+
+export const resendSignupOtp = async(email) =>{
+     const record = await Otp.findOne({email});
+
+     if(!record) throw new Error("Session not found.please login");
+       
+     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      
+     record.otp = otp;
+     record.expiresAt = Date.now()+ 2*60*1000;
+     await record.save();
+
+     await sendOtpMail(email,otp);
+
+     return true;
+}
 export const resetPassword = async (data, session) => {
   const { password, confirmPassword } = data;
 

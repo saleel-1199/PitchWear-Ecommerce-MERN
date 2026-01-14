@@ -8,33 +8,37 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="min-h-screen flex items-center justify-center bg-[#f6f5f2]">
+<body class="min-h-screen flex items-center justify-center bg-[#f6f5f2] px-4">
 
-  <div class="bg-white w-[420px] lg:w-[520px] px-8 py-8 lg:px-12 lg:py-10 rounded-xl shadow-lg">
+  <!-- ✅ Bigger Desktop Card -->
+  <div class="bg-white w-full max-w-md sm:max-w-lg lg:max-w-3xl
+              px-6 sm:px-10 lg:px-16
+              py-8 lg:py-12
+              rounded-xl shadow-lg">
 
     <!-- MESSAGE (INFO) -->
     <% if (message) { %>
-      <div class="mb-4 rounded-md bg-blue-50 px-4 py-2 text-sm text-blue-900 text-center">
+      <div class="mb-5 rounded-md bg-blue-50 px-4 py-2 text-sm text-blue-900 text-center">
         <%= message %>
       </div>
     <% } %>
 
     <!-- HEADER -->
-    <div class="flex items-center justify-between mb-6">
-      <h3 class="text-lg lg:text-xl font-semibold text-black">
-        Vestra
+    <div class="flex items-center justify-between mb-8">
+      <h3 class="text-xl lg:text-2xl font-semibold text-black">
+        PitchWear
       </h3>
 
       <a
         href="/login"
-        class="bg-[#d6c37a] px-4 py-1.5 rounded-md text-sm font-medium text-black hover:bg-[#cbb56a]"
+        class="bg-[#d6c37a] px-5 py-2 rounded-md text-sm lg:text-base font-medium text-black hover:bg-[#cbb56a]"
       >
         Login
       </a>
     </div>
 
     <!-- TITLE -->
-    <h2 class="text-center text-lg lg:text-xl font-semibold text-[#d6c37a] mb-6">
+    <h2 class="text-center text-xl lg:text-3xl font-semibold text-[#d6c37a] mb-8">
       Join PitchWear
     </h2>
 
@@ -42,33 +46,43 @@
     <form id="signupForm" action="/signup" method="POST" class="flex flex-col">
 
       <!-- Full Name -->
-      <label class="text-xs lg:text-sm text-gray-600 mb-1">
+      <label class="text-sm lg:text-base text-gray-600 mb-1">
         Full Name
       </label>
       <input
+        id="fullName"
         type="text"
         name="fullName"
         placeholder="Enter your full name"
         value="<%= formData.fullName || '' %>"
         required
-        class="mb-4 rounded-md border border-gray-300 px-3 py-2 text-sm lg:text-base focus:outline-none focus:border-[#d6c37a]"
+        class="mb-3 rounded-md border border-gray-300 px-4 py-3 text-sm lg:text-lg
+               focus:outline-none focus:border-[#d6c37a]"
       />
 
+      <!-- ✅ full name regex error message -->
+      <p id="fullNameError" class="text-red-500 text-xs lg:text-sm mb-5 hidden"></p>
+
       <!-- Username -->
-      <label class="text-xs lg:text-sm text-gray-600 mb-1">
+      <label class="text-sm lg:text-base text-gray-600 mb-1">
         Username
       </label>
       <input
+        id="username"
         type="text"
         name="username"
         placeholder="Choose a username"
         value="<%= formData.username || '' %>"
         required
-        class="mb-4 rounded-md border border-gray-300 px-3 py-2 text-sm lg:text-base focus:outline-none focus:border-[#d6c37a]"
+        class="mb-3 rounded-md border border-gray-300 px-4 py-3 text-sm lg:text-lg
+               focus:outline-none focus:border-[#d6c37a]"
       />
 
+      <!-- ✅ username regex error message -->
+      <p id="usernameError" class="text-red-500 text-xs lg:text-sm mb-5 hidden"></p>
+
       <!-- Email -->
-      <label class="text-xs lg:text-sm text-gray-600 mb-1">
+      <label class="text-sm lg:text-base text-gray-600 mb-1">
         Email
       </label>
       <input
@@ -78,14 +92,15 @@
         placeholder="Enter your email"
         value="<%= formData.email || '' %>"
         required
-        class="mb-4 rounded-md border border-gray-300 px-3 py-2 text-sm lg:text-base focus:outline-none focus:border-[#d6c37a]"
+        class="mb-3 rounded-md border border-gray-300 px-4 py-3 text-sm lg:text-lg
+               focus:outline-none focus:border-[#d6c37a]"
       />
 
-      <!-- ✅ regex error message (frontend only) -->
-      <p id="emailError" class="text-red-500 text-xs lg:text-sm mb-4 hidden"></p>
+      <!-- ✅ email regex error message -->
+      <p id="emailError" class="text-red-500 text-xs lg:text-sm mb-5 hidden"></p>
 
       <!-- Referral Code -->
-      <label class="text-xs lg:text-sm text-gray-600 mb-1">
+      <label class="text-sm lg:text-base text-gray-600 mb-1">
         Referral Code (optional)
       </label>
       <input
@@ -93,11 +108,12 @@
         name="referralCode"
         placeholder="Enter referral code"
         value="<%= formData.referralCode || '' %>"
-        class="mb-4 rounded-md border border-gray-300 px-3 py-2 text-sm lg:text-base focus:outline-none focus:border-[#d6c37a]"
+        class="mb-5 rounded-md border border-gray-300 px-4 py-3 text-sm lg:text-lg
+               focus:outline-none focus:border-[#d6c37a]"
       />
 
       <!-- Password -->
-      <label class="text-xs lg:text-sm text-gray-600 mb-1">
+      <label class="text-sm lg:text-base text-gray-600 mb-1">
         Password
       </label>
       <input
@@ -105,11 +121,12 @@
         name="password"
         placeholder="Create a password"
         required
-        class="mb-4 rounded-md border border-gray-300 px-3 py-2 text-sm lg:text-base focus:outline-none focus:border-[#d6c37a]"
+        class="mb-5 rounded-md border border-gray-300 px-4 py-3 text-sm lg:text-lg
+               focus:outline-none focus:border-[#d6c37a]"
       />
 
       <!-- Confirm Password -->
-      <label class="text-xs lg:text-sm text-gray-600 mb-1">
+      <label class="text-sm lg:text-base text-gray-600 mb-1">
         Confirm Password
       </label>
       <input
@@ -117,33 +134,22 @@
         name="confirmPassword"
         placeholder="Confirm your password"
         required
-        class="mb-5 rounded-md border border-gray-300 px-3 py-2 text-sm lg:text-base focus:outline-none focus:border-[#d6c37a]"
+        class="mb-7 rounded-md border border-gray-300 px-4 py-3 text-sm lg:text-lg
+               focus:outline-none focus:border-[#d6c37a]"
       />
 
       <!-- SIGNUP BUTTON -->
       <button
         type="submit"
-        class="mt-2 rounded-lg bg-[#d6c37a] py-3 text-sm lg:text-base font-semibold text-black hover:bg-[#cbb56a]"
+        class="rounded-lg bg-[#d6c37a] py-3.5 text-sm lg:text-lg font-semibold text-black hover:bg-[#cbb56a]"
       >
         Sign Up
       </button>
 
     </form>
 
-    <!-- DIVIDER -->
-    <div class="my-5 text-center text-xs text-gray-400">
-      OR
-    </div>
-
-    <!-- GOOGLE BUTTON -->
-    <button
-      class="w-full rounded-lg border border-gray-300 bg-gray-100 py-2.5 text-sm lg:text-base font-medium hover:bg-gray-200"
-    >
-      Continue with Google
-    </button>
-
     <!-- LOGIN TEXT -->
-    <p class="mt-5 text-center text-xs text-gray-500">
+    <p class="mt-7 text-center text-xs lg:text-sm text-gray-500">
       Already have an account?
       <a href="/login" class="font-medium text-[#d6c37a] hover:underline">
         Login
@@ -152,27 +158,71 @@
 
   </div>
 
-  <!-- ✅ ONLY regex validation script (no other changes) -->
+  <!-- ✅ FullName + Username + Email regex validation script -->
   <script>
     const form = document.getElementById("signupForm");
+
+    const fullNameInput = document.getElementById("fullName");
+    const fullNameError = document.getElementById("fullNameError");
+
+    const usernameInput = document.getElementById("username");
+    const usernameError = document.getElementById("usernameError");
+
     const emailInput = document.getElementById("email");
     const emailError = document.getElementById("emailError");
 
-    // ✅ strict email regex
+    // ✅ Full Name Regex:
+    // Allows letters + spaces + hyphen (-)
+    // Must contain at least one letter (so "----" not allowed)
+    const fullNameRegex = /^(?=.*[A-Za-z])[A-Za-z -]{3,30}$/;
+
+    // ✅ Username Regex
+    const usernameRegex = /^(?=.*[a-zA-Z0-9])[a-zA-Z0-9_-]{3,15}$/;
+
+    // ✅ Email Regex
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     form.addEventListener("submit", (e) => {
+      const fullName = fullNameInput.value.trim();
+      const username = usernameInput.value.trim();
       const email = emailInput.value.trim();
 
+      // ✅ Full Name validation
+      if (!fullNameRegex.test(fullName)) {
+        e.preventDefault();
+        fullNameError.classList.remove("hidden");
+        fullNameError.textContent =
+          "Full name must be 3-30 chars, can contain letters, spaces and hyphen (-). Only '----' is not allowed.";
+        fullNameInput.focus();
+        return;
+      }
+
+      fullNameError.classList.add("hidden");
+      fullNameError.textContent = "";
+
+      // ✅ Username validation
+      if (!usernameRegex.test(username)) {
+        e.preventDefault();
+        usernameError.classList.remove("hidden");
+        usernameError.textContent =
+          "Username must be 3-15 chars and can contain only letters, numbers, underscore (_) and hyphen (-). It must include at least one letter/number.";
+        usernameInput.focus();
+        return;
+      }
+
+      usernameError.classList.add("hidden");
+      usernameError.textContent = "";
+
+      // ✅ Email validation
       if (!emailRegex.test(email)) {
-        e.preventDefault(); // stop backend request
+        e.preventDefault();
         emailError.classList.remove("hidden");
-        emailError.textContent = "Please enter a valid email address (example: abc@gmail.com)";
+        emailError.textContent =
+          "Please enter a valid email address (example: abc@gmail.com)";
         emailInput.focus();
         return;
       }
 
-      // clear error if valid
       emailError.classList.add("hidden");
       emailError.textContent = "";
     });

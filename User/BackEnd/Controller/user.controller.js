@@ -4,7 +4,7 @@ import * as userService from "../Services/user.services.js";
 export const renderUserProfile = async (req, res) => {
   try {
     const user = await userService.getUserById(req.session.userId);
-
+    console.log(user)
     res.render("UserProfile", {
       user
     });

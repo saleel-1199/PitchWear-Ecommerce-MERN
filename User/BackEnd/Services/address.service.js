@@ -26,7 +26,7 @@ export const createAddress = async (userId, data) => {
     country: data.country || "India",
     is_default: !!data.is_default
   };
-
+ // console.log(payload)
     if (payload.is_default) {
     await Address.updateMany(
       { user_id: userId },
