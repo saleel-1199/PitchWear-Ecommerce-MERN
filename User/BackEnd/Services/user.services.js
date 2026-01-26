@@ -16,7 +16,7 @@ export const updateUserProfile = async (userId, data) => {
   const { fullName, password, confirmPassword } = data;
 
   const updateData = { fullName };
-
+ 
   
   if (password || confirmPassword) {
     if (!password || !confirmPassword) {

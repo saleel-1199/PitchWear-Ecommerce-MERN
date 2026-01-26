@@ -9,14 +9,11 @@ export const renderSignup = (req, res) => {
 
 export const signup = async (req, res) => {
   try {
-    
     const {email} =  req.body;
 
     await authService.signupUser(req.body);
     
     req.session.email = email;
-
-    
     res.render("VerifyOtp",{  
       email:req.body.email,
       message:null
@@ -39,7 +36,7 @@ export const verifyOtp = async (req, res) => {
       
     await authService.verifyOtp(email,otp);
      
-    req.session.successMessage =  "Signup successful ✅ Please login now"
+    req.session.successMessage =  "Signup successful Please login now"
     res.redirect("/login");
 
   } catch (err) {

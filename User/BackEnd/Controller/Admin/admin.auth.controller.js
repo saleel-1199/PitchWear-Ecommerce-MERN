@@ -8,7 +8,6 @@ export const renderAdminLogin = (req, res) => {
 export const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     
     if (
       email === process.env.ADMIN_EMAIL &&
@@ -23,7 +22,7 @@ export const adminLogin = async (req, res) => {
 
     return res.render("Admin/AdminLogin", {
       title: "Admin Login",
-      error: "Invalid admin email or password",
+      error: "Invalid admin email or password"
     });
   } catch (err) {
     console.log("Admin Login Error:", err);

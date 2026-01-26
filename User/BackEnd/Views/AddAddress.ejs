@@ -8,7 +8,7 @@
 <body class="bg-white">
 
 <header class="bg-[#F6F6D8] px-10 py-4 flex items-center justify-between">
-  <h1 class="font-bold text-lg">VESTRA</h1>
+  <h1 class="font-bold text-lg">PitchWear</h1>
   <nav class="flex gap-8 text-sm">
     <a href="/home">Home</a>
     <a href="/shop">Shop</a>
@@ -36,43 +36,109 @@
   <main class="flex-1">
     <h2 class="text-3xl font-bold mb-10 text-center">Add new address</h2>
 
-    <form action="/address" method="POST" class="max-w-xl mx-auto space-y-6">
+    <form id="addressForm" action="/address" method="POST" class="max-w-xl mx-auto space-y-6">
 
       <div>
         <label class="text-sm font-medium">Full name</label>
-        <input name="full_name" class="w-full border rounded-md px-4 py-2 mt-1" placeholder="Enter your full name" required />
+        <input
+          name="full_name"
+          class="w-full border rounded-md px-4 py-2 mt-1"
+          placeholder="Enter your full name"
+          required
+        />
       </div>
 
       <div class="grid grid-cols-2 gap-6">
         <div>
           <label class="text-sm font-medium">Phone number</label>
-          <input name="phone_no" class="w-full border rounded-md px-4 py-2 mt-1" placeholder="Enter your phone number" required />
+          <input
+            id="phone_no"
+            name="phone_no"
+            type="text"
+            inputmode="numeric"
+            minlength="10"
+            maxlength="10"
+            pattern="^[0-9]{10}$"
+            title="Phone number must be exactly 10 digits"
+            class="w-full border rounded-md px-4 py-2 mt-1"
+            placeholder="Enter 10 digit phone number"
+            required
+          />
+          <p id="phoneError" class="text-xs text-red-500 mt-1 hidden">
+            Phone number must be exactly 10 digits.
+          </p>
         </div>
+
         <div>
           <label class="text-sm font-medium">Alternative Phone (optional)</label>
-          <input name="alt_phone_no" class="w-full border rounded-md px-4 py-2 mt-1" placeholder="Enter your second phone" />
+          <input
+            id="alt_phone_no"
+            name="alt_phone_no"
+            type="text"
+            inputmode="numeric"
+            minlength="10"
+            maxlength="10"
+            pattern="^$|^[0-9]{10}$"
+            title="Alternative phone must be exactly 10 digits"
+            class="w-full border rounded-md px-4 py-2 mt-1"
+            placeholder="Enter 10 digit phone (optional)"
+          />
+          <p id="altPhoneError" class="text-xs text-red-500 mt-1 hidden">
+            Alternative phone must be exactly 10 digits.
+          </p>
         </div>
       </div>
 
       <div class="grid grid-cols-2 gap-6">
         <div>
           <label class="text-sm font-medium">Address line</label>
-          <input name="address_line1" class="w-full border rounded-md px-4 py-2 mt-1" placeholder="Enter your address line" required />
+          <input
+            name="address_line1"
+            class="w-full border rounded-md px-4 py-2 mt-1"
+            placeholder="Enter your address line"
+            required
+          />
         </div>
         <div>
           <label class="text-sm font-medium">City</label>
-          <input name="city" class="w-full border rounded-md px-4 py-2 mt-1" placeholder="Enter your city" required />
+          <input
+            name="city"
+            class="w-full border rounded-md px-4 py-2 mt-1"
+            placeholder="Enter your city"
+            required
+          />
         </div>
       </div>
 
       <div class="grid grid-cols-2 gap-6">
         <div>
           <label class="text-sm font-medium">PIN Code</label>
-          <input name="pin_code" class="w-full border rounded-md px-4 py-2 mt-1" placeholder="Enter zip code" required />
+          <input
+            id="pin_code"
+            name="pin_code"
+            type="text"
+            inputmode="numeric"
+            minlength="6"
+            maxlength="6"
+            pattern="^[0-9]{6}$"
+            title="Pincode must be exactly 6 digits"
+            class="w-full border rounded-md px-4 py-2 mt-1"
+            placeholder="Enter 6 digit pincode"
+            required
+          />
+          <p id="pinError" class="text-xs text-red-500 mt-1 hidden">
+            Pincode must be exactly 6 digits.
+          </p>
         </div>
+
         <div>
           <label class="text-sm font-medium">State</label>
-          <input name="state" class="w-full border rounded-md px-4 py-2 mt-1" placeholder="Enter your state" required />
+          <input
+            name="state"
+            class="w-full border rounded-md px-4 py-2 mt-1"
+            placeholder="Enter your state"
+            required
+          />
         </div>
       </div>
 
@@ -99,5 +165,43 @@
   </main>
 
 </div>
+
+<!-- ✅ JS validation + digit only restriction -->
+<script>
+  const phoneInput = document.getElementById("phone_no");
+  const altPhoneInput = document.getElementById("alt_phone_no");
+  const pinInput = document.getElementById("pin_code");
+
+  const phoneError = document.getElementById("phoneError");
+  const altPhoneError = document.getElementById("altPhoneError");
+  const pinError = document.getElementById("pinError");
+
+  function onlyDigitsAndLimit(input, maxLen) {
+    input.addEventListener("input", () => {
+      input.value = input.value.replace(/\D/g, "").slice(0, maxLen);
+    });
+  }
+
+  onlyDigitsAndLimit(phoneInput, 10);
+  onlyDigitsAndLimit(altPhoneInput, 10);
+  onlyDigitsAndLimit(pinInput, 6);
+
+  document.getElementById("addressForm").addEventListener("submit", (e) => {
+    const phoneOk = /^\d{10}$/.test(phoneInput.value.trim());
+    const pinOk = /^\d{6}$/.test(pinInput.value.trim());
+
+    const altVal = altPhoneInput.value.trim();
+    const altOk = altVal === "" || /^\d{10}$/.test(altVal);
+
+    phoneError.classList.toggle("hidden", phoneOk);
+    pinError.classList.toggle("hidden", pinOk);
+    altPhoneError.classList.toggle("hidden", altOk);
+
+    if (!phoneOk || !pinOk || !altOk) {
+      e.preventDefault();
+    }
+  });
+</script>
+
 </body>
 </html>

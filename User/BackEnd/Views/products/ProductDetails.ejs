@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= product.name %> | PitchWear</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#fbfaf7] text-gray-800">
+
+<!-- HEADER -->
+<header class="border-b bg-[#fbfaf7]">
+  <div class="max-w-6xl mx-auto px-6 py-5 flex justify-between items-center">
+    <a href="/home" class="font-bold text-lg">PitchWear</a>
+
+    <nav class="flex gap-8 text-sm">
+      <a href="/home">Home</a>
+      <a href="/shop" class="font-medium">Shop</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+    </nav>
+
+    <div class="flex gap-4 text-lg">
+      <a href="/wishlist">♡</a>
+      <a href="/cart">🛒</a>
+      <a href="/account">👤</a>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-6 py-10">
+
+<!-- BREADCRUMB -->
+<p class="text-sm text-gray-500 mb-6">
+  Home / Shop / <%= product.team %>
+</p>
+
+<!-- PRODUCT SECTION -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+  <!-- LEFT: IMAGES -->
+  <div>
+    <div class="bg-[#f3f1e7] rounded-2xl p-8 flex justify-center">
+      <img
+        src="<%= product.images[0] %>"
+        class="h-[380px] object-contain"
+      />
+    </div>
+
+    <div class="flex gap-3 mt-4">
+      <% product.images.forEach((img) => { %>
+        <img
+          src="<%= img %>"
+          class="w-20 h-20 object-cover rounded-lg border cursor-pointer"
+        />
+      <% }) %>
+    </div>
+  </div>
+
+  <!-- RIGHT: DETAILS -->
+  <div>
+
+    <span class="inline-block bg-green-600 text-white text-xs px-3 py-1 rounded-full mb-3">
+      <%= product.status %>
+    </span>
+
+    <h1 class="text-3xl font-semibold mb-2">
+      <%= product.name %>
+    </h1>
+
+    <p class="text-sm text-gray-500 mb-4">
+      <%= product.team %> • <%= product.kitType %> • <%= product.type %>
+    </p>
+
+    <div class="flex items-center gap-3 mb-4">
+      <span class="text-2xl font-bold">
+        ₹<%= product.variants?.[0]?.price || 0 %>
+      </span>
+      <span class="text-green-700 text-sm">
+        In Stock: <%= product.totalStock %>
+      </span>
+    </div>
+
+    <!-- META -->
+    <div class="grid grid-cols-2 gap-4 text-sm mb-6">
+      <p><b>Fit Type:</b> Regular Fit</p>
+      <p><b>Sleeve:</b> <%= product.kitType %></p>
+      <p><b>Kit Type:</b> <%= product.type %></p>
+      <p><b>Material:</b> 100% Polyester</p>
+    </div>
+
+    <!-- SIZE SELECT (UPDATED) -->
+   <!-- SIZE SELECT -->
+<div class="mb-6">
+  <p class="text-sm font-medium mb-2">Select Size</p>
+
+  <div class="flex gap-3 flex-wrap">
+    <% product.variants.forEach((v) => { 
+         const inStock = v.stock > 0;
+    %>
+      <button
+        type="button"
+        class="
+          px-4 py-2 rounded-lg text-sm border transition
+          <%= inStock 
+            ? 'bg-white shadow-md border-green-600 text-gray-800 hover:scale-105' 
+            : 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed' 
+          %>
+        "
+        <%= inStock ? '' : 'disabled' %>
+      >
+        <%= v.size %>
+      </button>
+    <% }) %>
+  </div>
+</div>
+
+
+    <!-- QUANTITY -->
+    <div class="mb-6">
+      <p class="text-sm font-medium mb-2">Quantity</p>
+      <div class="flex items-center gap-4 border rounded-lg w-fit px-4 py-2">
+        <button>-</button>
+        <span>1</span>
+        <button>+</button>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="flex items-center gap-4 mb-8">
+      <button class="bg-[#5f7550] text-white px-8 py-3 rounded-lg">
+        Add to Cart
+      </button>
+      <button class="border px-5 py-3 rounded-lg">
+        ♡ Wishlist
+      </button>
+    </div>
+
+    <!-- ICONS -->
+    <div class="grid grid-cols-4 gap-4 text-center text-xs text-gray-600">
+      <div>✔ Official Replica</div>
+      <div>✔ Premium Fabric</div>
+      <div>✔ Secure Payments</div>
+      <div>✔ Easy Returns</div>
+    </div>
+
+    <!-- CARE -->
+    <div class="bg-white border rounded-lg p-4 mt-6 text-sm">
+      <b>Care Instructions</b>
+      <p class="text-gray-500 mt-1">
+        Machine wash cold, do not iron print, tumble dry low.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="mt-16">
+  <h2 class="text-xl font-semibold mb-6">Customer Reviews</h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="bg-white p-6 rounded-xl border">
+      <p class="text-4xl font-bold">4.7</p>
+      <p class="text-sm text-gray-500">Based on 128 reviews</p>
+    </div>
+
+    <div class="md:col-span-2 space-y-4">
+      <% ["Alex M.", "Sarah K.", "David R."].forEach((name) => { %>
+        <div class="bg-white p-5 rounded-xl border">
+          <p class="font-medium"><%= name %></p>
+          <p class="text-sm text-gray-500 mt-1">
+            Amazing quality jersey. Fits perfectly and looks even better in person.
+          </p>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<!-- RELATED PRODUCTS -->
+<section class="mt-20">
+  <div class="flex justify-between mb-6">
+    <h2 class="text-xl font-semibold">Related Jerseys</h2>
+    <a href="/shop" class="text-sm text-gray-500">View Collection</a>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+    <% (relatedProducts || []).forEach((rp) => { %>
+      <a href="/product/<%= rp._id %>" class="bg-[#f3f1e7] rounded-xl p-4 block">
+        <img src="<%= rp.images[0] %>" class="h-36 mx-auto object-contain"/>
+        <p class="mt-3 text-sm font-medium"><%= rp.team %></p>
+        <p class="text-sm font-semibold mt-1">₹<%= rp.variants?.[0]?.price || 0 %></p>
+      </a>
+    <% }) %>
+  </div>
+</section>
+
+</main>
+
+<!-- SIZE SELECTION SCRIPT -->
+<script>
+  const sizeButtons = document.querySelectorAll(".size-btn");
+
+  sizeButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      sizeButtons.forEach(b =>
+        b.classList.remove("ring-2", "ring-green-600")
+      );
+      btn.classList.add("ring-2", "ring-green-600");
+    });
+  });
+</script>
+
+</body>
+</html>

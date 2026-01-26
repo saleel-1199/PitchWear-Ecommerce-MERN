@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title || "Edit Product" %></title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .image-slot {
+      border: 2px dashed #d1d5db;
+      border-radius: 14px;
+      height: 180px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fafafa;
+      position: relative;
+    }
+    .image-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+    .placeholder {
+      color: #6b7280;
+      text-align: center;
+      font-size: 14px;
+    }
+    .plus {
+      font-size: 34px;
+    }
+  </style>
+</head>
+
+<body class="bg-[#f8f8f4] text-gray-800">
+
+<header class="bg-[#eff2c8] px-10 py-5 flex justify-between items-center">
+  <div class="flex gap-8 items-center">
+    <h1 class="font-bold text-lg">Pitchwear</h1>
+    <p class="text-sm font-semibold">Admin Dashboard</p>
+  </div>
+</header>
+
+<main class="flex px-10 py-10 gap-10">
+
+<aside class="w-64">
+  <nav class="space-y-2 text-sm">
+    <a href="/admin/dashboard" class="block px-4 py-2 rounded-lg hover:bg-white">🏠 Dashboard</a>
+    <a href="/admin/products" class="block px-4 py-2 rounded-lg bg-white font-medium">👕 Product Management</a>
+    <a href="/admin/logout" class="block px-4 py-2 rounded-lg text-red-600 mt-6">⛔ Logout</a>
+  </nav>
+</aside>
+
+<section class="flex-1">
+
+  <div class="mb-6 text-sm text-gray-500">
+    Products / <span class="text-gray-700 font-medium">Edit Product</span>
+  </div>
+
+  <h2 class="text-3xl font-bold mb-8">Edit Product</h2>
+
+  <% if (error) { %>
+    <div class="mb-6 bg-red-100 text-red-700 px-4 py-3 rounded-lg">
+      <%= error %>
+    </div>
+  <% } %>
+
+<form
+  action="/admin/products/<%= product._id %>/edit"
+  method="POST"
+  enctype="multipart/form-data"
+  class="space-y-10"
+>
+
+<!-- BASIC INFO -->
+<div class="bg-white border rounded-xl p-8">
+  <h3 class="font-semibold mb-6">Basic Information</h3>
+
+  <div class="grid grid-cols-2 gap-6">
+    <div>
+      <label class="text-sm font-medium">Product Name</label>
+      <input name="name" value="<%= product.name %>" required
+        class="w-full mt-2 border rounded-lg px-4 py-2"/>
+    </div>
+
+    <div>
+      <label class="text-sm font-medium">Team</label>
+      <input name="team" value="<%= product.team %>" required
+        class="w-full mt-2 border rounded-lg px-4 py-2"/>
+    </div>
+  </div>
+
+  <div class="mt-6">
+    <label class="text-sm font-medium">Description</label>
+    <textarea name="description" rows="4"
+      class="w-full mt-2 border rounded-lg px-4 py-2"><%= product.description %></textarea>
+  </div>
+
+  <div class="grid grid-cols-3 gap-6 mt-6">
+    <div>
+      <label class="text-sm font-medium">Type</label>
+      <select name="type" class="w-full mt-2 border rounded-lg px-4 py-2">
+        <option value="Home" <%= product.type === "Home" ? "selected" : "" %>>Home</option>
+        <option value="Away" <%= product.type === "Away" ? "selected" : "" %>>Away</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="text-sm font-medium">Kit Type</label>
+      <select name="kitType" class="w-full mt-2 border rounded-lg px-4 py-2">
+        <option value="Half Sleeve" <%= product.kitType === "Half Sleeve" ? "selected" : "" %>>Half Sleeve</option>
+        <option value="Full Sleeve" <%= product.kitType === "Full Sleeve" ? "selected" : "" %>>Full Sleeve</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="text-sm font-medium">Status</label>
+      <select name="status" class="w-full mt-2 border rounded-lg px-4 py-2">
+        <option value="Inactive" <%= product.status === "Inactive" ? "selected" : "" %>>Inactive</option>
+        <option value="Active" <%= product.status === "Active" ? "selected" : "" %>>Active</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- INVENTORY LINK -->
+<div class="bg-white border rounded-xl p-8">
+  <h3 class="font-semibold mb-4">Inventory</h3>
+  <p class="text-sm text-gray-500 mb-4">
+    Size, price and stock are managed separately.
+  </p>
+
+  <a
+    href="/admin/products/<%= product._id %>/inventory"
+    class="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold"
+  >
+    Manage Inventory
+  </a>
+</div>
+
+<!-- IMAGES -->
+<div class="bg-white border rounded-xl p-8">
+  <h3 class="font-semibold mb-6">Product Images</h3>
+
+  <div class="grid grid-cols-3 gap-6">
+    <% for(let i=0;i<3;i++){ %>
+    <label class="image-slot">
+      <input type="file" name="images" accept="image/*" hidden>
+      <% if (product.images[i]) { %>
+        <img src="<%= product.images[i] %>"/>
+      <% } else { %>
+        <div class="placeholder">
+          <span class="plus">＋</span><br/>Add Image
+        </div>
+      <% } %>
+    </label>
+    <% } %>
+  </div>
+</div>
+
+<div class="flex justify-end gap-4">
+  <a href="/admin/products" class="px-8 py-2 border rounded-lg bg-white font-semibold">
+    Cancel
+  </a>
+  <button class="px-8 py-2 bg-[#b36890] text-white rounded-lg font-semibold">
+    Save Changes
+  </button>
+</div>
+
+</form>
+</section>
+</main>
+
+</body>
+</html>

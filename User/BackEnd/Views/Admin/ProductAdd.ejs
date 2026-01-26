@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Product</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- CropperJS -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css"
+  />
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"
+    defer
+  ></script>
+
+  <style>
+    .image-slot {
+      border: 2px dashed #d1d5db;
+      border-radius: 16px;
+      height: 180px;
+      background: #fafafa;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .image-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+
+<body class="bg-[#f8f8f4] text-gray-800">
+
+<!-- HEADER -->
+<header class="bg-[#eff2c8] px-10 py-5 flex justify-between items-center">
+  <div class="flex gap-8 items-center">
+    <h1 class="font-bold text-lg">Pitchwear</h1>
+    <p class="text-sm font-semibold">Admin Dashboard</p>
+  </div>
+</header>
+
+<main class="flex px-10 py-10 gap-10">
+
+<!-- SIDEBAR -->
+<aside class="w-64">
+  <nav class="space-y-2 text-sm">
+    <a href="/admin/dashboard" class="block px-4 py-2 rounded-lg hover:bg-white">🏠 Dashboard</a>
+    <a href="/admin/products" class="block px-4 py-2 rounded-lg bg-white font-medium">👕 Product Management</a>
+    <a href="/admin/logout" class="block px-4 py-2 rounded-lg text-red-600 mt-6">⛔ Logout</a>
+  </nav>
+</aside>
+
+<!-- CONTENT -->
+<section class="flex-1">
+
+<h2 class="text-3xl font-bold mb-8">Add Product</h2>
+
+<% if (error) { %>
+  <div class="mb-6 bg-red-100 text-red-700 px-4 py-3 rounded">
+    <%= error %>
+  </div>
+<% } %>
+
+<form action="/admin/products/add" method="POST" enctype="multipart/form-data" class="space-y-8">
+
+<!-- BASIC INFO -->
+<div class="bg-white border rounded-xl p-8">
+  <h3 class="font-semibold mb-6">Basic Information</h3>
+
+  <div class="grid grid-cols-2 gap-6">
+    <div>
+      <label class="text-sm font-medium">Product Name</label>
+      <input name="name" required class="w-full mt-2 border rounded-lg px-4 py-2"/>
+    </div>
+
+    <div>
+      <label class="text-sm font-medium">Team</label>
+      <input name="team" required class="w-full mt-2 border rounded-lg px-4 py-2"/>
+    </div>
+  </div>
+
+  <div class="mt-6">
+    <label class="text-sm font-medium">Description</label>
+    <textarea name="description" rows="4"
+      class="w-full mt-2 border rounded-lg px-4 py-2"></textarea>
+  </div>
+
+  <div class="grid grid-cols-2 gap-6 mt-6">
+    <div>
+      <label class="text-sm font-medium">Type</label>
+      <select name="type" class="w-full mt-2 border rounded-lg px-4 py-2">
+        <option value="">Select</option>
+        <option value="Home">Home</option>
+        <option value="Away">Away</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="text-sm font-medium">Kit Type</label>
+      <select name="kitType" class="w-full mt-2 border rounded-lg px-4 py-2">
+        <option value="">Select</option>
+        <option value="Half Sleeve">Half Sleeve</option>
+        <option value="Full Sleeve">Full Sleeve</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- IMAGES -->
+<div class="bg-white border rounded-xl p-8">
+  <h3 class="font-semibold mb-6">Product Images (3 required)</h3>
+
+  <div class="grid grid-cols-3 gap-6">
+    <% for (let i = 0; i < 3; i++) { %>
+  <label class="image-slot flex items-center justify-center text-gray-400">
+    <input
+      type="file"
+      accept="image/*"
+      hidden
+      data-index="<%= i %>"
+      onchange="selectImage(event, this.dataset.index)"
+    >
+    <span>Add Image</span>
+  </label>
+<% } %>
+  </div>
+
+  <input type="file" name="images" id="finalImages" hidden multiple required>
+</div>
+
+<div class="flex justify-end gap-4">
+  <a href="/admin/products" class="px-8 py-2 border rounded-lg">Cancel</a>
+  <button class="px-8 py-2 bg-[#b36890] text-white rounded-lg">Save Product</button>
+</div>
+
+</form>
+</section>
+</main>
+
+<script>
+let files = [null, null, null];
+
+async function selectImage(e, index) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const modal = document.createElement("div");
+  modal.className = "fixed inset-0 bg-black/50 flex items-center justify-center z-50";
+  modal.innerHTML = `
+    <div class="bg-white p-6 rounded-xl w-[600px]">
+      <img id="cropImg" class="max-h-[350px] mx-auto"/>
+      <div class="flex justify-end gap-3 mt-4">
+        <button id="cancel">Cancel</button>
+        <button id="done" class="bg-green-600 text-white px-4 py-2 rounded">Done</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+
+  const img = modal.querySelector("#cropImg");
+  img.src = URL.createObjectURL(file);
+
+  let cropper;
+  img.onload = () => cropper = new Cropper(img, { aspectRatio: 1 });
+
+  modal.querySelector("#cancel").onclick = () => {
+    cropper.destroy();
+    modal.remove();
+  };
+
+  modal.querySelector("#done").onclick = () => {
+    cropper.getCroppedCanvas({ width: 900, height: 900 }).toBlob(blob => {
+      files[index] = new File([blob], `image-${Date.now()}.jpg`, { type: "image/jpeg" });
+
+      const slot = document.querySelectorAll(".image-slot")[index];
+      slot.innerHTML = `<img src="${URL.createObjectURL(files[index])}"/>`;
+
+      const dt = new DataTransfer();
+      files.forEach(f => f && dt.items.add(f));
+      document.getElementById("finalImages").files = dt.files;
+
+      cropper.destroy();
+      modal.remove();
+    }, "image/jpeg", 0.9);
+  };
+}
+</script>
+
+</body>
+</html>

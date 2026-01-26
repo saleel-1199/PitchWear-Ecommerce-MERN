@@ -1,191 +1,185 @@
-<%
-  const title = "Admin Dashboard";
-  const active = "dashboard";
-%>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title><%= title || "Admin Dashboard" %></title>
-
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: "#cfd574",
-            headerTone: "#f5f6df",
-            bgLight: "#faf9f6"
-          }
-        }
-      }
-    }
-  </script>
 </head>
 
-<body class="bg-bgLight text-gray-800">
+<body class="bg-[#f8f8f4] text-gray-800">
 
-  <!-- Header -->
-  <header class="bg-headerTone px-10 py-4 flex justify-between items-center">
-    <div class="flex items-center gap-8">
-      <h1 class="font-semibold text-lg">Pitchwear</h1>
-      <p class="text-sm font-medium">Admin Dashboard</p>
+  <!-- Top bar -->
+  <header class="bg-[#eff2c8] px-10 py-5 flex items-center justify-between">
+    <div class="flex items-center gap-10">
+      <h1 class="font-bold text-lg">Pitchwear</h1>
+      <p class="text-sm font-semibold">Admin Dashboard</p>
     </div>
-
-    <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center border">
-      <span class="text-gray-700 font-semibold">A</span>
+    <div class="w-11 h-11 rounded-xl bg-white flex items-center justify-center border">
+      <span class="text-lg">👤</span>
     </div>
   </header>
 
-  <main class="flex gap-10 px-10 py-10">
+  <main class="flex px-10 py-10 gap-10">
 
     <!-- Sidebar -->
     <aside class="w-64">
-      <p class="text-sm text-gray-500 mb-4">Pitchwear Admin</p>
+      <p class="text-sm text-gray-500 mb-5">LookIt Admin</p>
 
       <nav class="space-y-2 text-sm">
-
-        <a href="/admin/dashboard"
-           class="flex items-center gap-2 px-4 py-2 rounded-lg <%= active === 'dashboard' ? 'bg-white font-medium' : 'hover:bg-white' %>">
-          Dashboard
+        <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white font-medium">
+          🏠 Dashboard
         </a>
 
-        <a href="/admin/products"
-           class="flex items-center gap-2 px-4 py-2 rounded-lg <%= active === 'products' ? 'bg-white font-medium' : 'hover:bg-white' %>">
-          Product Management
+        <a href="/admin/products" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+          👕 Product Management
         </a>
 
-        <a href="/admin/orders"
-           class="flex items-center gap-2 px-4 py-2 rounded-lg <%= active === 'orders' ? 'bg-white font-medium' : 'hover:bg-white' %>">
-          Order Management
+        <a href="/admin/orders" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+          📦 Order Management
         </a>
 
-        <a href="/admin/users"
-           class="flex items-center gap-2 px-4 py-2 rounded-lg <%= active === 'users' ? 'bg-white font-medium' : 'hover:bg-white' %>">
-          User Management
+        <a href="/admin/users" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+          👥 User Management
         </a>
 
-        <a href="/admin/analytics"
-           class="flex items-center gap-2 px-4 py-2 rounded-lg <%= active === 'analytics' ? 'bg-white font-medium' : 'hover:bg-white' %>">
-          Analytics
+        <a href="/admin/analytics" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+          📈 Analytics
         </a>
 
+        <a href="/admin/coupons" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+          🧾 Coupons
+        </a>
+
+        <a href="/admin/banner" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+          🏷️ Banner
+        </a>
+
+        <a href="/admin/offers" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+          🎁 Offers
+        </a>
+
+        <a href="/admin/settings" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+          ⚙️ Settings
+        </a>
+
+        <a href="/admin/logout" class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-600 font-medium mt-6">
+          ⛔ Logout
+        </a>
       </nav>
-
-      <div class="mt-8 text-sm space-y-3">
-        <a href="/admin/logout" class="text-red-500 font-medium">Logout</a>
-      </div>
     </aside>
 
     <!-- Content -->
     <section class="flex-1">
 
-      <!-- PAGE TITLE -->
-      <h2 class="text-2xl font-semibold mb-6">Dashboard</h2>
+      <!-- Heading -->
+      <div class="flex justify-between items-center">
+        <h2 class="text-3xl font-bold">Dashboard</h2>
 
-      <!-- QUICK STATS -->
-      <div class="grid grid-cols-4 gap-6 mb-8">
+        <a href="/admin/products/add"
+           class="bg-[#cdd47b] hover:opacity-90 text-white px-6 py-2 rounded-lg text-sm font-semibold">
+          + Add Product
+        </a>
+      </div>
 
-        <div class="bg-white rounded-xl p-5 border">
+      <!-- Stats -->
+      <div class="grid grid-cols-4 gap-6 mt-8">
+
+        <div class="bg-white rounded-xl p-6 border">
           <p class="text-xs text-gray-500">Total Sales</p>
-          <p class="text-xl font-bold mt-2">₹25,450</p>
-          <p class="text-xs text-green-600 mt-1">+12%</p>
+          <p class="text-2xl font-bold mt-2">₹25,450</p>
+          <p class="text-xs text-green-600 mt-2">+12%</p>
         </div>
 
-        <div class="bg-white rounded-xl p-5 border">
+        <div class="bg-white rounded-xl p-6 border">
           <p class="text-xs text-gray-500">Total Orders</p>
-          <p class="text-xl font-bold mt-2">1,235</p>
-          <p class="text-xs text-green-600 mt-1">+8%</p>
+          <p class="text-2xl font-bold mt-2">1,235</p>
+          <p class="text-xs text-green-600 mt-2">+8%</p>
         </div>
 
-        <div class="bg-white rounded-xl p-5 border">
+        <div class="bg-white rounded-xl p-6 border">
           <p class="text-xs text-gray-500">Avg Order Value</p>
-          <p class="text-xl font-bold mt-2">₹1,980</p>
-          <p class="text-xs text-green-600 mt-1">+5%</p>
+          <p class="text-2xl font-bold mt-2">₹1,980</p>
+          <p class="text-xs text-green-600 mt-2">+5%</p>
         </div>
 
-        <div class="bg-white rounded-xl p-5 border">
+        <div class="bg-white rounded-xl p-6 border">
           <p class="text-xs text-gray-500">Pending Orders</p>
-          <p class="text-xl font-bold mt-2">25</p>
-          <p class="text-xs text-red-600 mt-1">-2%</p>
+          <p class="text-2xl font-bold mt-2">25</p>
+          <p class="text-xs text-red-500 mt-2">-2%</p>
         </div>
 
       </div>
 
-      <!-- QUICK ACTIONS -->
-      <div class="bg-white rounded-xl p-6 border mb-8">
-        <h3 class="font-semibold mb-4">Quick Actions</h3>
+      <!-- Quick Actions -->
+      <div class="bg-white rounded-xl border p-8 mt-8">
+        <h3 class="font-semibold mb-5">Quick Actions</h3>
 
         <div class="flex gap-4">
-          <a href="/admin/products"
-             class="px-4 py-2 rounded-md bg-primary text-white font-medium text-sm">
+          <a href="/admin/products/add"
+             class="bg-[#cdd47b] hover:opacity-90 text-white px-6 py-2 rounded-lg text-sm font-semibold">
             Add New Product
           </a>
 
-          <!-- ✅ THIS BUTTON TAKES YOU TO USER MANAGEMENT -->
           <a href="/admin/users"
-             class="px-4 py-2 rounded-md bg-white border text-gray-700 font-medium text-sm hover:bg-gray-50">
+             class="bg-white border px-6 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50">
             User Management
           </a>
         </div>
       </div>
 
-      <!-- RECENT ACTIVITY -->
-      <div class="bg-white rounded-xl border overflow-hidden">
-        <div class="p-5 border-b">
+      <!-- Recent Activity Table -->
+      <div class="bg-white rounded-xl border overflow-hidden mt-8">
+        <div class="px-6 py-5 border-b">
           <h3 class="font-semibold">Recent Activity</h3>
         </div>
 
         <table class="w-full text-sm">
           <thead class="bg-gray-50 text-gray-500">
             <tr>
-              <th class="text-left px-5 py-3">Order ID</th>
-              <th class="text-left px-5 py-3">Customer</th>
-              <th class="text-left px-5 py-3">Date</th>
-              <th class="text-left px-5 py-3">Status</th>
-              <th class="text-left px-5 py-3">Total</th>
+              <th class="text-left px-6 py-4">Order ID</th>
+              <th class="text-left px-6 py-4">Customer</th>
+              <th class="text-left px-6 py-4">Date</th>
+              <th class="text-left px-6 py-4">Status</th>
+              <th class="text-left px-6 py-4">Total</th>
             </tr>
           </thead>
 
           <tbody>
             <tr class="border-t">
-              <td class="px-5 py-4">#12345</td>
-              <td class="px-5 py-4">Sophia Clark</td>
-              <td class="px-5 py-4 text-gray-500">2024-07-26</td>
-              <td class="px-5 py-4">
-                <span class="px-3 py-1 rounded-full bg-blue-500 text-white text-xs">Shipped</span>
+              <td class="px-6 py-5">#12345</td>
+              <td class="px-6 py-5">Sophia Clark</td>
+              <td class="px-6 py-5 text-gray-500">2024-07-26</td>
+              <td class="px-6 py-5">
+                <span class="bg-blue-600 text-white px-5 py-1.5 rounded-lg text-xs font-semibold">Shipped</span>
               </td>
-              <td class="px-5 py-4">$35</td>
+              <td class="px-6 py-5">$35</td>
             </tr>
 
             <tr class="border-t">
-              <td class="px-5 py-4">#12346</td>
-              <td class="px-5 py-4">Liam Walker</td>
-              <td class="px-5 py-4 text-gray-500">2024-07-25</td>
-              <td class="px-5 py-4">
-                <span class="px-3 py-1 rounded-full bg-yellow-500 text-white text-xs">Processing</span>
+              <td class="px-6 py-5">#12346</td>
+              <td class="px-6 py-5">Liam Walker</td>
+              <td class="px-6 py-5 text-gray-500">2024-07-25</td>
+              <td class="px-6 py-5">
+                <span class="bg-yellow-500 text-white px-5 py-1.5 rounded-lg text-xs font-semibold">Processing</span>
               </td>
-              <td class="px-5 py-4">$75</td>
+              <td class="px-6 py-5">$75</td>
             </tr>
 
             <tr class="border-t">
-              <td class="px-5 py-4">#12347</td>
-              <td class="px-5 py-4">Ava Harris</td>
-              <td class="px-5 py-4 text-gray-500">2024-07-24</td>
-              <td class="px-5 py-4">
-                <span class="px-3 py-1 rounded-full bg-green-600 text-white text-xs">Delivered</span>
+              <td class="px-6 py-5">#12347</td>
+              <td class="px-6 py-5">Ava Harris</td>
+              <td class="px-6 py-5 text-gray-500">2024-07-24</td>
+              <td class="px-6 py-5">
+                <span class="bg-green-600 text-white px-5 py-1.5 rounded-lg text-xs font-semibold">Delivered</span>
               </td>
-              <td class="px-5 py-4">$40</td>
+              <td class="px-6 py-5">$40</td>
             </tr>
           </tbody>
         </table>
       </div>
 
     </section>
-
   </main>
 
 </body>

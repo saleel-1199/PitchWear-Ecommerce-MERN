@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title || "Shop | PitchWear" %></title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: "#fbfaf7",
+            borderTone: "#d9d6c8",
+            card: "#f3f1e7",
+            primaryBtn: "#b36a8d",
+            primaryBtnHover: "#9b5576",
+            badgeDark: "#2f2f2f",
+            badgeGreen: "#5f7550",
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-bg text-gray-800">
+
+  <!-- HEADER -->
+  <header class="w-full bg-bg border-b border-borderTone">
+    <div class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+      <a href="/home" class="font-bold text-lg tracking-wide">PitchWear</a>
+
+      <nav class="hidden md:flex gap-10 text-sm text-gray-700">
+        <a href="/home" class="hover:underline">Home</a>
+        <a href="/shop" class="hover:underline font-medium">Shop</a>
+        <a href="/about" class="hover:underline">About</a>
+        <a href="/contact" class="hover:underline">Contact</a>
+      </nav>
+
+      <div class="flex items-center gap-5 text-lg">
+        <a href="/wishlist" title="Wishlist" class="hover:opacity-70">♡</a>
+        <a href="/cart" title="Cart" class="relative hover:opacity-70">
+          🛒
+          <% if (cartCount && cartCount > 0) { %>
+            <span class="absolute -top-2 -right-2 bg-green-700 text-white text-[10px] px-1.5 py-[1px] rounded-full">
+              <%= cartCount %>
+            </span>
+          <% } %>
+        </a>
+        <a href="/account" title="Account" class="hover:opacity-70">👤</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-8">
+
+    <!-- HERO -->
+    <section class="border border-borderTone bg-[#f7f6f0] px-6 py-10 text-center">
+      <p class="text-xs tracking-widest text-gray-500 mb-2">Official Store</p>
+      <h2 class="text-3xl font-semibold mb-2">
+        Match-Day Jerseys • Home & Away Kits
+      </h2>
+      <p class="text-sm text-gray-500">
+        Authentic quality for the true fan. Wear your colors with pride.
+      </p>
+    </section>
+
+    <!-- SEARCH + SORT -->
+    <section class="mt-8 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+
+      <!-- Search -->
+      <form action="/shop" method="GET" class="w-full md:w-[420px]">
+        <!-- keep sort + filters -->
+        <input type="hidden" name="sort" value="<%= sort || '' %>">
+
+        <% (selectedTeams || []).forEach((t) => { %>
+          <input type="hidden" name="teams" value="<%= t %>">
+        <% }) %>
+        <% (selectedTypes || []).forEach((t) => { %>
+          <input type="hidden" name="types" value="<%= t %>">
+        <% }) %>
+        <% (selectedKits || []).forEach((k) => { %>
+          <input type="hidden" name="kits" value="<%= k %>">
+        <% }) %>
+
+        <div class="bg-white border border-borderTone rounded-lg px-4 py-3 flex items-center gap-2">
+          <span class="text-gray-400">🔍</span>
+
+          <input
+            type="text"
+            name="search"
+            value="<%= search || '' %>"
+            placeholder="Search by team or jersey name"
+            class="w-full outline-none text-sm bg-transparent"
+          />
+
+          <% if (search && search.trim() !== "") { %>
+            <a href="/shop" class="text-gray-400 hover:text-gray-700 font-semibold" title="Clear">✕</a>
+          <% } %>
+        </div>
+      </form>
+
+      <!-- Sort -->
+      <form action="/shop" method="GET" class="flex items-center gap-3 justify-end">
+        <input type="hidden" name="search" value="<%= search || '' %>">
+
+        <% (selectedTeams || []).forEach((t) => { %>
+          <input type="hidden" name="teams" value="<%= t %>">
+        <% }) %>
+        <% (selectedTypes || []).forEach((t) => { %>
+          <input type="hidden" name="types" value="<%= t %>">
+        <% }) %>
+        <% (selectedKits || []).forEach((k) => { %>
+          <input type="hidden" name="kits" value="<%= k %>">
+        <% }) %>
+
+        <label class="text-sm text-gray-600">Sort by</label>
+        <select
+          name="sort"
+          onchange="this.form.submit()"
+          class="bg-white border border-borderTone rounded-lg px-4 py-2 text-sm"
+        >
+          <!-- <option value="popularity" <%= sort === "popularity" ? "selected" : "" %>>Popularity</option> -->
+          <option value="priceLow" <%= sort === "priceLow" ? "selected" : "" %>>Price low to high</option>
+          <option value="priceHigh" <%= sort === "priceHigh" ? "selected" : "" %>>Price high to low</option>
+          <option value="az" <%= sort === "az" ? "selected" : "" %>>A - Z</option>
+          <option value="za" <%= sort === "za" ? "selected" : "" %>>Z - A</option>
+          <option value="latest" <%= sort === "latest" ? "selected" : "" %>>Latest</option>
+        </select>
+      </form>
+    </section>
+
+    <!-- LAYOUT -->
+    <section class="mt-10 flex gap-10">
+
+      <!-- FILTER SIDEBAR -->
+      <aside class="w-64 hidden md:block">
+        <h3 class="text-xl font-semibold mb-6">Filter By</h3>
+
+        <form action="/shop" method="GET" class="space-y-5">
+          <input type="hidden" name="search" value="<%= search || '' %>">
+          <input type="hidden" name="sort" value="<%= sort || '' %>">
+
+          <!-- Teams dropdown -->
+          <div class="relative">
+            <button type="button"
+              onclick="toggleDropdown('teamsBox')"
+              class="w-full bg-white border border-borderTone rounded-xl px-4 py-3 flex justify-between items-center text-sm"
+            >
+              <span>Teams</span>
+              <span class="text-gray-400">⌄</span>
+            </button>
+
+            <div id="teamsBox" class="hidden mt-2 bg-white border border-borderTone rounded-xl p-4 space-y-3">
+              <% (teams || []).forEach((t) => { %>
+                <label class="flex items-center gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    name="teams"
+                    value="<%= t %>"
+                    <%= (selectedTeams || []).includes(t) ? "checked" : "" %>
+                    class="w-4 h-4"
+                  />
+                  <span><%= t %></span>
+                </label>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- Home/Away dropdown -->
+          <div class="relative">
+            <button type="button"
+              onclick="toggleDropdown('typeBox')"
+              class="w-full bg-white border border-borderTone rounded-xl px-4 py-3 flex justify-between items-center text-sm"
+            >
+              <span>Home/Away</span>
+              <span class="text-gray-400">⌄</span>
+            </button>
+
+            <div id="typeBox" class="hidden mt-2 bg-white border border-borderTone rounded-xl p-4 space-y-3">
+              <% (types || ["Home","Away"]).forEach((t) => { %>
+                <label class="flex items-center gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    name="types"
+                    value="<%= t %>"
+                    <%= (selectedTypes || []).includes(t) ? "checked" : "" %>
+                    class="w-4 h-4"
+                  />
+                  <span><%= t %></span>
+                </label>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- Kit Type dropdown -->
+          <div class="relative">
+            <button type="button"
+              onclick="toggleDropdown('kitBox')"
+              class="w-full bg-white border border-borderTone rounded-xl px-4 py-3 flex justify-between items-center text-sm"
+            >
+              <span>Kit Type</span>
+              <span class="text-gray-400">⌄</span>
+            </button>
+
+            <div id="kitBox" class="hidden mt-2 bg-white border border-borderTone rounded-xl p-4 space-y-3">
+              <% (kits || ["Half Sleeve","Full Sleeve"]).forEach((k) => { %>
+                <label class="flex items-center gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    name="kits"
+                    value="<%= k %>"
+                    <%= (selectedKits || []).includes(k) ? "checked" : "" %>
+                    class="w-4 h-4"
+                  />
+                  <span><%= k %></span>
+                </label>
+              <% }) %>
+            </div>
+          </div>
+          
+          <!-- Price Range -->
+<div class="bg-white border border-borderTone rounded-xl p-4">
+  <p class="text-sm font-medium mb-3">Price Range</p>
+
+  <div class="flex gap-3">
+    <input
+      type="number"
+      name="minPrice"
+      placeholder="Min"
+      value="<%= minPrice || '' %>"
+      class="w-full border rounded-lg px-3 py-2 text-sm"
+    />
+
+    <input
+      type="number"
+      name="maxPrice"
+      placeholder="Max"
+      value="<%= maxPrice || '' %>"
+      class="w-full border rounded-lg px-3 py-2 text-sm"
+    />
+  </div>
+</div>
+
+
+          <!-- Buttons -->
+          <div class="pt-6 flex flex-col gap-3">
+            <a
+              href="/shop"
+              class="bg-[#e9e7dc] text-gray-800 px-4 py-2 rounded-lg text-sm font-medium text-center hover:opacity-90"
+            >
+              Clear All
+            </a>
+
+            <button
+              type="submit"
+              class="bg-primaryBtn hover:bg-primaryBtnHover text-white px-4 py-2 rounded-lg text-sm font-medium"
+            >
+              Apply Filters
+            </button>
+          </div>
+        </form>
+      </aside>
+
+      <!-- PRODUCTS -->
+      <div class="flex-1">
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-7">
+          <% if (!products || products.length === 0) { %>
+            <div class="col-span-4 text-center py-20 text-gray-400">
+              No products found
+            </div>
+          <% } else { %>
+            <% products.forEach((p) => { %>
+              <a href="/product/<%= p._id %>" class="block">
+                <div class="bg-card rounded-2xl overflow-hidden border border-[#efeedd] hover:shadow-sm transition">
+
+                  <div class="relative px-6 pt-6 pb-3 flex items-center justify-center">
+                    <img
+                      src="<%= (p.images && p.images[0]) ? p.images[0] : '/images/no-image.png' %>"
+                      class="h-[150px] object-contain"
+                      alt="<%= p.name %>"
+                    />
+
+                    <!-- badges -->
+                    <div class="absolute top-3 left-3 flex flex-col gap-2">
+                      <% if (p.isNew) { %>
+                        <span class="bg-badgeDark text-white text-[10px] px-2 py-1 rounded-full w-fit">New</span>
+                      <% } %>
+                      <% if (p.type) { %>
+                        <span class="bg-badgeGreen text-white text-[10px] px-2 py-1 rounded-full w-fit">
+                          <%= p.type %>
+                        </span>
+                      <% } %>
+                    </div>
+                  </div>
+
+                  <div class="px-5 pb-5">
+                    <h4 class="text-sm font-semibold leading-tight">
+                      <%= p.team || p.name %>
+                    </h4>
+                    <p class="text-xs text-gray-500 mt-1">
+                      <%= p.kitType || "-" %>
+                    </p>
+                    <p class="text-sm font-semibold mt-3">
+                          $<%= Number(p.displayPrice || 0).toFixed(2) %>
+                    </p>
+                  </div>
+
+                </div>
+              </a>
+            <% }) %>
+          <% } %>
+        </div>
+
+        <!-- Pagination -->
+        <% if (totalPages && totalPages > 1) { %>
+          <div class="flex justify-center items-center gap-3 mt-10 text-sm">
+
+            <% const baseUrl =
+              `/shop?search=${encodeURIComponent(search || '')}` +
+              `&sort=${encodeURIComponent(sort || '')}` +
+              (selectedTeams || []).map(t => `&teams=${encodeURIComponent(t)}`).join("") +
+              (selectedTypes || []).map(t => `&types=${encodeURIComponent(t)}`).join("") +
+              (selectedKits || []).map(k => `&kits=${encodeURIComponent(k)}`).join("");
+            %>
+
+            <% if (page > 1) { %>
+              <a href="<%= baseUrl %>&page=<%= page - 1 %>"
+                 class="w-9 h-9 rounded-lg bg-gray-200 flex items-center justify-center hover:bg-gray-300">
+                ‹
+              </a>
+            <% } else { %>
+              <span class="w-9 h-9 rounded-lg bg-gray-100 text-gray-400 flex items-center justify-center">‹</span>
+            <% } %>
+
+            <% for (let p = 1; p <= totalPages; p++) { %>
+              <a href="<%= baseUrl %>&page=<%= p %>"
+                 class="w-9 h-9 flex items-center justify-center rounded-lg border
+                 <%= p === page ? 'bg-[#5f7550] text-white border-[#5f7550]' : 'bg-transparent border-transparent hover:bg-gray-200' %>">
+                <%= p %>
+              </a>
+            <% } %>
+
+            <% if (page < totalPages) { %>
+              <a href="<%= baseUrl %>&page=<%= page + 1 %>"
+                 class="w-9 h-9 rounded-lg bg-gray-200 flex items-center justify-center hover:bg-gray-300">
+                ›
+              </a>
+            <% } else { %>
+              <span class="w-9 h-9 rounded-lg bg-gray-100 text-gray-400 flex items-center justify-center">›</span>
+            <% } %>
+
+          </div>
+        <% } %>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <<script>
+  function toggleDropdown(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle("hidden");
+  }
+
+  // ✅ Single select + auto close + auto submit
+  function handleSingleSelect(boxId, input) {
+    const box = document.getElementById(boxId);
+
+    // uncheck others
+    box.querySelectorAll("input[type='checkbox']").forEach(cb => {
+      if (cb !== input) cb.checked = false;
+    });
+
+    // close dropdown
+    box.classList.add("hidden");
+
+    // auto submit form
+    input.closest("form").submit();
+  }
+
+  // Attach handlers AFTER page load
+  document.addEventListener("DOMContentLoaded", () => {
+
+    // Home / Away
+    document.querySelectorAll("#typeBox input").forEach(input => {
+      input.addEventListener("change", () => {
+        handleSingleSelect("typeBox", input);
+      });
+    });
+
+    // Kit Type
+    document.querySelectorAll("#kitBox input").forEach(input => {
+      input.addEventListener("change", () => {
+        handleSingleSelect("kitBox", input);
+      });
+    });
+
+    // Teams → NO auto close / NO auto submit (manual Apply)
+  });
+</script>
+
+
+</body>
+</html>

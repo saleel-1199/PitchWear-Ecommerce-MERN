@@ -4,7 +4,7 @@ import Address from "../Models/address.model.js"
 export const getAddressesByUser = async (userId) => {
   return Address.find({
     user_id: new mongoose.Types.ObjectId(userId)
-  }).sort({ is_default: -1, createdAt: -1 });
+  });
 };
 
 export const getAddressById = async (addressId, userId) => {
