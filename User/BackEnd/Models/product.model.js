@@ -29,6 +29,13 @@ const productSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+     slug: {
+    type: String,
+    unique: true,
+    lowercase: true,
+    trim: true,
+    index: true
+  },
 
     team: {
       type: String,

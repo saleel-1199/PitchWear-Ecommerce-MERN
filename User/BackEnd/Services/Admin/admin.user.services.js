@@ -12,7 +12,6 @@ export const fetchUsersService = async ({
 
   const query = {};
 
-  //query.isBlocked = false;
 
   if (search && search.trim() !== "") {
     query.$or = [

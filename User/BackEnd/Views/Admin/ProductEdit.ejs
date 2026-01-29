@@ -9,22 +9,23 @@
 
   <style>
     .image-slot {
-      border: 2px dashed #d1d5db;
-      border-radius: 14px;
-      height: 180px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #fafafa;
-      position: relative;
-    }
+  border: 2px dashed #d1d5db;
+  border-radius: 14px;
+  aspect-ratio: 1 / 1;
+  cursor: pointer;
+  display: block;
+  background: #fafafa;
+  position: relative;
+  overflow: hidden;
+}
+
     .image-slot img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 12px;
-    }
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
     .placeholder {
       color: #6b7280;
       text-align: center;
@@ -33,7 +34,76 @@
     .plus {
       font-size: 34px;
     }
-  </style>
+  </style> 
+  
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css"
+/>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"
+  defer
+></script>
+
+<script>
+  let files = [null, null, null];
+
+  function selectImage(e, index) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const modal = document.createElement("div");
+    modal.className = "fixed inset-0 bg-black/50 flex items-center justify-center z-50";
+    modal.innerHTML = `
+      <div class="bg-white p-6 rounded-xl w-[600px]">
+        <img id="cropImg" class="max-h-[350px] mx-auto"/>
+        <div class="flex justify-end gap-3 mt-4">
+          <button id="cancel">Cancel</button>
+          <button id="done" class="bg-green-600 text-white px-4 py-2 rounded">Done</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const img = modal.querySelector("#cropImg");
+    img.src = URL.createObjectURL(file);
+
+    let cropper;
+    img.onload = () => {
+      cropper = new Cropper(img, { aspectRatio: 1 });
+    };
+
+    modal.querySelector("#cancel").onclick = () => {
+      cropper.destroy();
+      modal.remove();
+    };
+
+    modal.querySelector("#done").onclick = () => {
+      cropper.getCroppedCanvas({ width: 900, height: 900 }).toBlob(blob => {
+        const newFile = new File([blob], `image-${Date.now()}.jpg`, {
+          type: "image/jpeg"
+        });
+
+        files[index] = newFile;
+
+        // Update preview
+        document.querySelectorAll(".image-slot img")[index].src =
+          URL.createObjectURL(newFile);
+
+        // Sync hidden input
+        const dt = new DataTransfer();
+        files.forEach(f => f && dt.items.add(f));
+        document.getElementById("finalImages").files = dt.files;
+
+        cropper.destroy();
+        modal.remove();
+      });
+    };
+  }
+</script>
+
+
 </head>
 
 <body class="bg-[#f8f8f4] text-gray-800">
@@ -57,9 +127,34 @@
 
 <section class="flex-1">
 
-  <div class="mb-6 text-sm text-gray-500">
-    Products / <span class="text-gray-700 font-medium">Edit Product</span>
-  </div>
+  <nav class="mb-6 text-sm" aria-label="Breadcrumb">
+  <ol class="flex items-center space-x-2 text-gray-500">
+
+    <li>
+      <a href="/admin/dashboard"
+         class="hover:text-gray-700 font-medium">
+        Dashboard
+      </a>
+    </li>
+
+    <li>/</li>
+
+    <li>
+      <a href="/admin/products"
+         class="hover:text-gray-700 font-medium">
+        Products
+      </a>
+    </li>
+
+    <li>/</li>
+
+    <li class="text-gray-700 font-semibold">
+      Edit Product
+    </li>
+
+  </ol>
+</nav>
+
 
   <h2 class="text-3xl font-bold mb-8">Edit Product</h2>
 
@@ -70,10 +165,9 @@
   <% } %>
 
 <form
-  action="/admin/products/<%= product._id %>/edit"
+  action="/admin/products/<%= product._id %>?_method=PATCH"
   method="POST"
   enctype="multipart/form-data"
-  class="space-y-10"
 >
 
 <!-- BASIC INFO -->
@@ -82,13 +176,17 @@
 
   <div class="grid grid-cols-2 gap-6">
     <div>
-      <label class="text-sm font-medium">Product Name</label>
+      <label class="text-sm font-medium">
+  Product Name <span class="text-red-500">*</span>
+</label>
       <input name="name" value="<%= product.name %>" required
         class="w-full mt-2 border rounded-lg px-4 py-2"/>
     </div>
 
     <div>
-      <label class="text-sm font-medium">Team</label>
+      <label class="text-sm font-medium">
+  Team <span class="text-red-500">*</span>
+</label>
       <input name="team" value="<%= product.team %>" required
         class="w-full mt-2 border rounded-lg px-4 py-2"/>
     </div>
@@ -102,7 +200,9 @@
 
   <div class="grid grid-cols-3 gap-6 mt-6">
     <div>
-      <label class="text-sm font-medium">Type</label>
+      <label class="text-sm font-medium">
+  Type <span class="text-red-500">*</span>
+</label>
       <select name="type" class="w-full mt-2 border rounded-lg px-4 py-2">
         <option value="Home" <%= product.type === "Home" ? "selected" : "" %>>Home</option>
         <option value="Away" <%= product.type === "Away" ? "selected" : "" %>>Away</option>
@@ -110,7 +210,9 @@
     </div>
 
     <div>
-      <label class="text-sm font-medium">Kit Type</label>
+     <label class="text-sm font-medium">
+  Kit Type <span class="text-red-500">*</span>
+</label>
       <select name="kitType" class="w-full mt-2 border rounded-lg px-4 py-2">
         <option value="Half Sleeve" <%= product.kitType === "Half Sleeve" ? "selected" : "" %>>Half Sleeve</option>
         <option value="Full Sleeve" <%= product.kitType === "Full Sleeve" ? "selected" : "" %>>Full Sleeve</option>
@@ -144,22 +246,34 @@
 
 <!-- IMAGES -->
 <div class="bg-white border rounded-xl p-8">
-  <h3 class="font-semibold mb-6">Product Images</h3>
+  <h3 class="font-semibold mb-6">
+  Product Images <span class="text-red-500">*</span>
+</h3>
 
   <div class="grid grid-cols-3 gap-6">
     <% for(let i=0;i<3;i++){ %>
-    <label class="image-slot">
-      <input type="file" name="images" accept="image/*" hidden>
-      <% if (product.images[i]) { %>
-        <img src="<%= product.images[i] %>"/>
-      <% } else { %>
-        <div class="placeholder">
-          <span class="plus">＋</span><br/>Add Image
-        </div>
-      <% } %>
-    </label>
+    <label class="image-slot cursor-pointer">
+  <input
+    type="file"
+    accept="image/*"
+    hidden
+    onchange="selectImage(event, <%= i %>)"
+  >
+
+  <% if (product.images[i]) { %>
+    <img src="<%= product.images[i] %>" />
+  <% } else { %>
+    <div class="placeholder absolute inset-0 flex flex-col items-center justify-center">
+      <span class="plus">＋</span><br/>Add Image
+    </div>
+  <% } %>
+</label>
     <% } %>
   </div>
+
+    <input type="file" name="images" id="finalImages" hidden multiple>
+
+    
 </div>
 
 <div class="flex justify-end gap-4">

@@ -17,7 +17,6 @@ export const fetchShopProductsService = async ({
     status: "Active",
   };
 
-  // 🔍 SEARCH
   if (search && search.trim()) {
     match.$or = [
       { name: { $regex: search, $options: "i" } },
@@ -25,42 +24,43 @@ export const fetchShopProductsService = async ({
     ];
   }
 
-  // 🎯 FILTERS
   if (selectedTeams.length) match.team = { $in: selectedTeams };
   if (selectedTypes.length) match.type = { $in: selectedTypes };
   if (selectedKits.length) match.kitType = { $in: selectedKits };
 
-  // 🔃 SORT
   let sortStage = { createdAt: -1 };
   if (sort === "az") sortStage = { name: 1 };
   if (sort === "za") sortStage = { name: -1 };
   if (sort === "priceLow") sortStage = { displayPrice: 1 };
   if (sort === "priceHigh") sortStage = { displayPrice: -1 };
 
-  // 🧠 PIPELINE START
   const pipeline = [
     { $match: match },
 
-    // ✅ only variants with stock
     {
       $addFields: {
-        availableVariants: {
+        validVariants: {
           $filter: {
             input: "$variants",
             as: "v",
-            cond: { $gt: ["$$v.stock", 0] },
+            cond: {
+              $and: [
+                { $gt: ["$$v.stock", 0] },
+                { $gt: ["$$v.price", 0] },
+              ],
+            },
           },
         },
       },
     },
 
-    // ✅ calculate display price
+
     {
       $addFields: {
         displayPrice: {
           $cond: [
-            { $gt: [{ $size: "$availableVariants" }, 0] },
-            { $min: "$availableVariants.price" },
+            { $gt: [{ $size: "$validVariants" }, 0] },
+            { $min: "$validVariants.price" },
             0,
           ],
         },
@@ -68,7 +68,7 @@ export const fetchShopProductsService = async ({
     },
   ];
 
-  // 💰 PRICE RANGE FILTER (AFTER price exists)
+  
   if (minPrice || maxPrice) {
     pipeline.push({
       $match: {
@@ -80,18 +80,27 @@ export const fetchShopProductsService = async ({
     });
   }
 
-  // 🔚 FINAL STEPS
   pipeline.push(
     { $sort: sortStage },
     { $skip: (page - 1) * limit },
     { $limit: limit }
   );
 
-  const products = await Product.aggregate(pipeline);
-  const total = await Product.countDocuments(match);
+  const countPipeline = pipeline.filter(
+  stage => !("$skip" in stage) && !("$limit" in stage)
+);
 
-  return {
-    products,
-    totalPages: Math.ceil(total / limit),
-  };
+countPipeline.push({ $count: "total" });
+
+const [products, countResult] = await Promise.all([
+  Product.aggregate(pipeline),
+  Product.aggregate(countPipeline),
+]);
+
+const total = countResult[0]?.total || 0;
+
+return {
+  products,
+  totalPages: Math.ceil(total / limit),
+};
 };

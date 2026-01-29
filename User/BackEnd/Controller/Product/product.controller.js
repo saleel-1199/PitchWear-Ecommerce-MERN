@@ -5,9 +5,9 @@ import {
 
 export const getProductDetailsController = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { slug } = req.params; // ✅ CHANGED
 
-    const product = await fetchProductDetailsService(id);
+    const product = await fetchProductDetailsService(slug); // ✅ CHANGED
 
     if (
       !product ||
@@ -19,7 +19,6 @@ export const getProductDetailsController = async (req, res) => {
 
     let relatedProducts = await fetchRelatedProductsService(product);
 
-    // ✅ GUARANTEED exclusion
     relatedProducts = relatedProducts.filter(
       (p) => String(p._id) !== String(product._id)
     );

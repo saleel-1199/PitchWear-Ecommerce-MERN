@@ -30,7 +30,7 @@
 
   <!-- HEADER -->
   <header class="w-full bg-bg border-b border-borderTone">
-    <div class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+       <div class="max-w-6xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
       <a href="/home" class="font-bold text-lg tracking-wide">PitchWear</a>
 
       <nav class="hidden md:flex gap-10 text-sm text-gray-700">
@@ -50,17 +50,17 @@
             </span>
           <% } %>
         </a>
-        <a href="/account" title="Account" class="hover:opacity-70">👤</a>
+        <a href="/profile" title="Account" class="hover:opacity-70">👤</a>
       </div>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-6 py-8">
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 
     <!-- HERO -->
     <section class="border border-borderTone bg-[#f7f6f0] px-6 py-10 text-center">
       <p class="text-xs tracking-widest text-gray-500 mb-2">Official Store</p>
-      <h2 class="text-3xl font-semibold mb-2">
+<h2 class="text-2xl sm:text-3xl font-semibold mb-2">
         Match-Day Jerseys • Home & Away Kits
       </h2>
       <p class="text-sm text-gray-500">
@@ -72,8 +72,7 @@
     <section class="mt-8 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
 
       <!-- Search -->
-      <form action="/shop" method="GET" class="w-full md:w-[420px]">
-        <!-- keep sort + filters -->
+      <form action="/shop" method="GET" class="w-full md:w-[420px]" id="searchForm">
         <input type="hidden" name="sort" value="<%= sort || '' %>">
 
         <% (selectedTeams || []).forEach((t) => { %>
@@ -92,9 +91,11 @@
           <input
             type="text"
             name="search"
+            id="searchInput"
             value="<%= search || '' %>"
             placeholder="Search by team or jersey name"
             class="w-full outline-none text-sm bg-transparent"
+            autofocus
           />
 
           <% if (search && search.trim() !== "") { %>
@@ -123,7 +124,6 @@
           onchange="this.form.submit()"
           class="bg-white border border-borderTone rounded-lg px-4 py-2 text-sm"
         >
-          <!-- <option value="popularity" <%= sort === "popularity" ? "selected" : "" %>>Popularity</option> -->
           <option value="priceLow" <%= sort === "priceLow" ? "selected" : "" %>>Price low to high</option>
           <option value="priceHigh" <%= sort === "priceHigh" ? "selected" : "" %>>Price high to low</option>
           <option value="az" <%= sort === "az" ? "selected" : "" %>>A - Z</option>
@@ -134,7 +134,7 @@
     </section>
 
     <!-- LAYOUT -->
-    <section class="mt-10 flex gap-10">
+<section class="mt-10 flex flex-col md:flex-row gap-10">
 
       <!-- FILTER SIDEBAR -->
       <aside class="w-64 hidden md:block">
@@ -221,44 +221,23 @@
               <% }) %>
             </div>
           </div>
-          
+
           <!-- Price Range -->
-<div class="bg-white border border-borderTone rounded-xl p-4">
-  <p class="text-sm font-medium mb-3">Price Range</p>
-
-  <div class="flex gap-3">
-    <input
-      type="number"
-      name="minPrice"
-      placeholder="Min"
-      value="<%= minPrice || '' %>"
-      class="w-full border rounded-lg px-3 py-2 text-sm"
-    />
-
-    <input
-      type="number"
-      name="maxPrice"
-      placeholder="Max"
-      value="<%= maxPrice || '' %>"
-      class="w-full border rounded-lg px-3 py-2 text-sm"
-    />
-  </div>
-</div>
-
+          <div class="bg-white border border-borderTone rounded-xl p-4">
+            <p class="text-sm font-medium mb-3">Price Range</p>
+            <div class="flex gap-3">
+              <input type="number" name="minPrice" placeholder="Min" value="<%= minPrice || '' %>" class="w-full border rounded-lg px-3 py-2 text-sm" />
+              <input type="number" name="maxPrice" placeholder="Max" value="<%= maxPrice || '' %>" class="w-full border rounded-lg px-3 py-2 text-sm" />
+            </div>
+          </div>
 
           <!-- Buttons -->
           <div class="pt-6 flex flex-col gap-3">
-            <a
-              href="/shop"
-              class="bg-[#e9e7dc] text-gray-800 px-4 py-2 rounded-lg text-sm font-medium text-center hover:opacity-90"
-            >
+            <a href="/shop" class="bg-[#e9e7dc] text-gray-800 px-4 py-2 rounded-lg text-sm font-medium text-center hover:opacity-90">
               Clear All
             </a>
 
-            <button
-              type="submit"
-              class="bg-primaryBtn hover:bg-primaryBtnHover text-white px-4 py-2 rounded-lg text-sm font-medium"
-            >
+            <button type="submit" class="bg-primaryBtn hover:bg-primaryBtnHover text-white px-4 py-2 rounded-lg text-sm font-medium">
               Apply Filters
             </button>
           </div>
@@ -268,64 +247,41 @@
       <!-- PRODUCTS -->
       <div class="flex-1">
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-7">
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5 sm:gap-7">
           <% if (!products || products.length === 0) { %>
             <div class="col-span-4 text-center py-20 text-gray-400">
               No products found
             </div>
           <% } else { %>
             <% products.forEach((p) => { %>
-              <a href="/product/<%= p._id %>" class="block">
+              <a href="/product/<%= p.slug %>" class="block">
                 <div class="bg-card rounded-2xl overflow-hidden border border-[#efeedd] hover:shadow-sm transition">
-
                   <div class="relative px-6 pt-6 pb-3 flex items-center justify-center">
-                    <img
-                      src="<%= (p.images && p.images[0]) ? p.images[0] : '/images/no-image.png' %>"
-                      class="h-[150px] object-contain"
-                      alt="<%= p.name %>"
-                    />
-
-                    <!-- badges -->
-                    <div class="absolute top-3 left-3 flex flex-col gap-2">
-                      <% if (p.isNew) { %>
-                        <span class="bg-badgeDark text-white text-[10px] px-2 py-1 rounded-full w-fit">New</span>
-                      <% } %>
-                      <% if (p.type) { %>
-                        <span class="bg-badgeGreen text-white text-[10px] px-2 py-1 rounded-full w-fit">
-                          <%= p.type %>
-                        </span>
-                      <% } %>
-                    </div>
+                    <img src="<%= (p.images && p.images[0]) ? p.images[0] : '/images/no-image.png' %>" class="h-[130px] sm:h-[150px] object-contain"
+              alt="<%= p.name %>" />
                   </div>
-
                   <div class="px-5 pb-5">
-                    <h4 class="text-sm font-semibold leading-tight">
-                      <%= p.team || p.name %>
-                    </h4>
-                    <p class="text-xs text-gray-500 mt-1">
-                      <%= p.kitType || "-" %>
-                    </p>
-                    <p class="text-sm font-semibold mt-3">
-                          $<%= Number(p.displayPrice || 0).toFixed(2) %>
-                    </p>
+                    <h4 class="text-sm font-semibold leading-tight"><%= p.team || p.name %></h4>
+                    <p class="text-xs text-gray-500 mt-1"><%= p.kitType || "-" %></p>
+                    <p class="text-sm font-semibold mt-3">$<%= Number(p.displayPrice || 0).toFixed(2) %></p>
                   </div>
-
                 </div>
               </a>
             <% }) %>
           <% } %>
         </div>
-
-        <!-- Pagination -->
-        <% if (totalPages && totalPages > 1) { %>
-          <div class="flex justify-center items-center gap-3 mt-10 text-sm">
+        
+          <% if (totalPages && totalPages > 1) { %>
+              <div class="flex flex-wrap justify-center items-center gap-2 sm:gap-3 mt-10 text-sm">
 
             <% const baseUrl =
               `/shop?search=${encodeURIComponent(search || '')}` +
               `&sort=${encodeURIComponent(sort || '')}` +
               (selectedTeams || []).map(t => `&teams=${encodeURIComponent(t)}`).join("") +
               (selectedTypes || []).map(t => `&types=${encodeURIComponent(t)}`).join("") +
-              (selectedKits || []).map(k => `&kits=${encodeURIComponent(k)}`).join("");
+              (selectedKits || []).map(k => `&kits=${encodeURIComponent(k)}`).join("") +
+              (minPrice ? `&minPrice=${encodeURIComponent(minPrice)}` : "") +
+              (maxPrice ? `&maxPrice=${encodeURIComponent(maxPrice)}` : "");
             %>
 
             <% if (page > 1) { %>
@@ -340,7 +296,9 @@
             <% for (let p = 1; p <= totalPages; p++) { %>
               <a href="<%= baseUrl %>&page=<%= p %>"
                  class="w-9 h-9 flex items-center justify-center rounded-lg border
-                 <%= p === page ? 'bg-[#5f7550] text-white border-[#5f7550]' : 'bg-transparent border-transparent hover:bg-gray-200' %>">
+                 <%= p === page
+                   ? 'bg-[#5f7550] text-white border-[#5f7550]'
+                   : 'bg-transparent border-transparent hover:bg-gray-200' %>">
                 <%= p %>
               </a>
             <% } %>
@@ -356,56 +314,70 @@
 
           </div>
         <% } %>
-
       </div>
-
+  
     </section>
 
   </main>
 
-  <<script>
-  function toggleDropdown(id) {
-    const el = document.getElementById(id);
-    el.classList.toggle("hidden");
+  <script>
+    function toggleDropdown(id) {
+      const el = document.getElementById(id);
+      el.classList.toggle("hidden");
+    }
+
+    function handleSingleSelect(boxId, input) {
+      const box = document.getElementById(boxId);
+
+      box.querySelectorAll("input[type='checkbox']").forEach(cb => {
+        if (cb !== input) cb.checked = false;
+      });
+
+      box.classList.add("hidden");
+      input.closest("form").submit();
+    }
+
+    function debounce(fn, delay) {
+      let timer;
+      return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+      };
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.getElementById("searchInput");
+  const searchForm = document.getElementById("searchForm");
+
+  // ✅ NEW: keep cursor at end after reload
+  if (searchInput) {
+    const len = searchInput.value.length;
+    searchInput.focus();
+    searchInput.setSelectionRange(len, len);
   }
 
-  // ✅ Single select + auto close + auto submit
-  function handleSingleSelect(boxId, input) {
-    const box = document.getElementById(boxId);
+  if (searchInput && searchForm) {
+    const debouncedSubmit = debounce(() => {
+      searchForm.submit();
+    }, 500);
 
-    // uncheck others
-    box.querySelectorAll("input[type='checkbox']").forEach(cb => {
-      if (cb !== input) cb.checked = false;
-    });
-
-    // close dropdown
-    box.classList.add("hidden");
-
-    // auto submit form
-    input.closest("form").submit();
+    searchInput.addEventListener("input", debouncedSubmit);
   }
 
-  // Attach handlers AFTER page load
-  document.addEventListener("DOMContentLoaded", () => {
-
-    // Home / Away
-    document.querySelectorAll("#typeBox input").forEach(input => {
-      input.addEventListener("change", () => {
-        handleSingleSelect("typeBox", input);
-      });
+  document.querySelectorAll("#typeBox input").forEach(input => {
+    input.addEventListener("change", () => {
+      handleSingleSelect("typeBox", input);
     });
-
-    // Kit Type
-    document.querySelectorAll("#kitBox input").forEach(input => {
-      input.addEventListener("change", () => {
-        handleSingleSelect("kitBox", input);
-      });
-    });
-
-    // Teams → NO auto close / NO auto submit (manual Apply)
   });
-</script>
 
+  document.querySelectorAll("#kitBox input").forEach(input => {
+    input.addEventListener("change", () => {
+      handleSingleSelect("kitBox", input);
+    });
+  });
+});
+
+  </script>
 
 </body>
 </html>

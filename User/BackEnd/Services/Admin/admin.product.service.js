@@ -1,8 +1,8 @@
 import { Product } from "../../Models/product.model.js";
 import { Team } from "../../Models/team.model.js";
 import { saveProductImages } from "../../Utils/saveProductImages.js";
+import slugify from "slugify";
 
-/* ================= LIST (PAGINATION + SEARCH) ================= */
 export const getAllProducts = async (search = "", page = 1, limit = 4) => {
   const query = { isDeleted: false };
 
@@ -10,20 +10,19 @@ export const getAllProducts = async (search = "", page = 1, limit = 4) => {
     query.$or = [
       { name: { $regex: search, $options: "i" } },
       { team: { $regex: search, $options: "i" } },
-      { type: { $regex: search, $options: "i" } },
-      { kitType: { $regex: search, $options: "i" } },
+      
     ];
   }
 
   const totalProducts = await Product.countDocuments(query);
 
   const products = await Product.find(query)
-    .sort({ createdAt: -1 }) // newest first
+    .sort({ createdAt: -1 }) 
     .skip((page - 1) * limit)
     .limit(limit)
     .lean();
 
-  // ✅ FIX: ALWAYS calculate full stock from variants
+
   const productsWithStock = products.map((p) => {
     const totalStock = (p.variants || []).reduce(
       (sum, v) => sum + Number(v.stock || 0),
@@ -43,40 +42,71 @@ export const getAllProducts = async (search = "", page = 1, limit = 4) => {
   };
 };
 
-/* ================= ADD PRODUCT ================= */
+
 export const createProduct = async (data, files) => {
+  // 🔒 IMAGE VALIDATION
   if (!files || files.length < 3) {
     throw new Error("MIN_IMAGES");
   }
 
-  const images = await saveProductImages(files);
-  const teamName = data.team.trim();
+  // 🔒 NAME VALIDATION (FIX)
+  if (!data.name || !data.name.trim()) {
+    throw new Error("INVALID_NAME");
+  }
 
+  const productName = data.name.trim();
+  const teamName = data.team?.trim();
+
+  // 🔒 TEAM VALIDATION (OPTIONAL BUT GOOD)
+  if (!teamName) {
+    throw new Error("INVALID_TEAM");
+  }
+
+  // 📸 SAVE IMAGES
+  const images = await saveProductImages(files);
+
+  // ⚽ ENSURE TEAM EXISTS (UPSERT)
   await Team.findOneAndUpdate(
     { name: teamName },
     { name: teamName },
-    { upsert: true, new: true }
+    { upsert: true }
   );
 
+  // 📦 VARIANTS
+  const incomingVariants = Object.values(data.variants || []);
+
+  const variants = incomingVariants.map(v => ({
+    size: v.size,
+    price: Number(v.price || 0),
+    stock: Number(v.stock || 0),
+  }));
+
+  const totalStock = variants.reduce(
+    (sum, v) => sum + v.stock,
+    0
+  );
+
+  // ✅ CREATE PRODUCT
   return Product.create({
-    name: data.name,
+    name: productName,
+    slug: slugify(productName, { lower: true, strict: true }),
     team: teamName,
-    description: data.description || "",
+    description: data.description?.trim() || "",
     type: data.type,
     kitType: data.kitType,
     images,
-    status: "Inactive",
-    variants: [],
-    totalStock: 0,
+    variants,
+    totalStock,
+    status: totalStock > 0 ? "Active" : "Inactive",
   });
 };
 
-/* ================= GET SINGLE ================= */
+
+
+
 export const getProductById = async (id) => {
   return Product.findById(id);
 };
-
-/* ================= UPDATE BASIC INFO ================= */
 export const updateProductBasic = async (product, data, files) => {
   let images = product.images || [];
 
@@ -91,7 +121,7 @@ export const updateProductBasic = async (product, data, files) => {
   product.type = data.type;
   product.kitType = data.kitType;
 
-  // ✅ THIS WAS MISSING
+
   if (data.status) {
     product.status = data.status;
   }
@@ -101,21 +131,20 @@ export const updateProductBasic = async (product, data, files) => {
   return product.save();
 };
 
-/* ================= INVENTORY ================= */
+
 export const updateInventory = async (product, incomingVariants) => {
 
-  // Ensure array
   if (!Array.isArray(incomingVariants)) {
     incomingVariants = [];
   }
 
-  // Map existing variants by size
+
   const existingMap = new Map();
   product.variants.forEach(v => {
     existingMap.set(v.size, v);
   });
 
-  // Merge logic
+
   incomingVariants.forEach(v => {
     if (!v.size) return;
 
@@ -125,12 +154,12 @@ export const updateInventory = async (product, incomingVariants) => {
     if (existingMap.has(v.size)) {
       const existing = existingMap.get(v.size);
 
-      // ✅ ONLY update if value is provided
+      
       if (hasPrice) existing.price = Number(v.price);
       if (hasStock) existing.stock = Number(v.stock);
 
     } else {
-      // ✅ ADD new size only if stock or price exists
+      
       product.variants.push({
         size: v.size,
         price: hasPrice ? Number(v.price) : 0,
@@ -139,13 +168,12 @@ export const updateInventory = async (product, incomingVariants) => {
     }
   });
 
-  // Recalculate total stock
   product.totalStock = product.variants.reduce(
     (sum, v) => sum + Number(v.stock || 0),
     0
   );
 
-  // Update status
+
   product.status = product.totalStock > 0 ? "Active" : "Inactive";
 
   return product.save();
@@ -153,7 +181,7 @@ export const updateInventory = async (product, incomingVariants) => {
 
 
 
-/* ================= DELETE ================= */
+
 export const softDeleteProduct = async (id) => {
   return Product.findByIdAndUpdate(id, { isDeleted: true });
 };

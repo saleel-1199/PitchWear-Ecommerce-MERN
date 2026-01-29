@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Team Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#f8f8f4] text-gray-800">
+
+<header class="bg-[#eff2c8] px-10 py-5 flex items-center justify-between">
+  <div class="flex items-center gap-10">
+    <h1 class="font-bold text-lg">Pitchwear</h1>
+    <p class="text-sm font-semibold">Admin Dashboard</p>
+  </div>
+  <div class="w-11 h-11 rounded-xl bg-white flex items-center justify-center border">
+    👤
+  </div>
+</header>
+
+<main class="flex px-10 py-10 gap-10">
+
+  <!-- SIDEBAR -->
+  <aside class="w-64">
+    <p class="text-sm text-gray-500 mb-5">Pitchwear Admin</p>
+
+    <nav class="space-y-2 text-sm">
+      <a href="/admin/dashboard"
+         class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+        🏠 Dashboard
+      </a>
+
+      <a href="/admin/products"
+         class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+        👕 Product Management
+      </a>
+
+      <a href="/admin/teams"
+         class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white font-medium">
+        ⚽ Team Management
+      </a>
+
+      <a href="/admin/logout"
+         class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-600 font-medium mt-6">
+        ⛔ Logout
+      </a>
+    </nav>
+  </aside>
+
+  <!-- CONTENT -->
+  <section class="flex-1">
+
+    <!-- Breadcrumb -->
+<nav class="mb-6 text-sm" aria-label="Breadcrumb">
+  <ol class="flex items-center space-x-2 text-gray-500">
+
+    <li>
+      <a href="/admin/dashboard"
+         class="hover:text-gray-700 font-medium">
+        Dashboard
+      </a>
+    </li>
+
+    <li>/</li>
+
+    <li class="text-gray-700 font-semibold">
+      Teams
+    </li>
+
+  </ol>
+</nav>
+
+
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-3xl font-bold">Team Management</h2>
+
+      <button onclick="openModal()"
+              class="bg-green-600 text-white px-5 py-2 rounded-lg font-semibold">
+        + Add Team
+      </button>
+    </div>
+
+    <!-- TEAMS TABLE -->
+    <div class="bg-white border rounded-xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-100 text-gray-600">
+          <tr>
+            <th class="px-6 py-4 text-left">Team Name</th>
+            <th class="px-6 py-4 text-center">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% if (teams.length === 0) { %>
+            <tr>
+              <td colspan="2" class="text-center py-10 text-gray-400">
+                No teams found
+              </td>
+            </tr>
+          <% } %>
+
+          <% teams.forEach(team => { %>
+            <tr class="border-t">
+              <td class="px-6 py-4 font-medium">
+                <%= team.name %>
+              </td>
+
+              <td class="px-6 py-4 text-center">
+                <form action="/admin/teams/<%= team._id %>/delete"
+                      method="POST"
+                      class="inline">
+                  <!-- <button
+                    onclick="return confirm('Delete this team?')"
+                    class="bg-red-600 text-white px-4 py-1.5 rounded text-xs font-semibold">
+                    Delete
+                  </button> -->
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+</main>
+
+<!-- ADD TEAM MODAL -->
+<div id="teamModal"
+     class="fixed inset-0 bg-black/40 hidden items-center justify-center">
+
+  <div class="bg-white p-6 rounded-xl w-[400px]">
+    <h3 class="text-lg font-semibold mb-4">Add Team</h3>
+
+    <form action="/admin/teams/add" method="POST" class="space-y-4">
+      <input
+        type="text"
+        name="name"
+        required
+        placeholder="Enter team name"
+        class="w-full border rounded px-3 py-2"
+      />
+
+      <div class="flex justify-end gap-3">
+        <button type="button" onclick="closeModal()" class="border px-4 py-2 rounded">
+          Cancel
+        </button>
+        <button class="bg-green-600 text-white px-4 py-2 rounded">
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function openModal() {
+    document.getElementById("teamModal").classList.remove("hidden");
+    document.getElementById("teamModal").classList.add("flex");
+  }
+
+  function closeModal() {
+    document.getElementById("teamModal").classList.add("hidden");
+    document.getElementById("teamModal").classList.remove("flex");
+  }
+</script>
+
+</body>
+</html>

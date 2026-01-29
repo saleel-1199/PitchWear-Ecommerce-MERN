@@ -41,14 +41,44 @@
 <!-- Content -->
 <section class="flex-1">
 
+
+  <nav class="mb-6 text-sm" aria-label="Breadcrumb">
+  <ol class="flex items-center space-x-2 text-gray-500">
+
+    <li>
+      <a href="/admin/dashboard"
+         class="hover:text-gray-700 font-medium">
+        Dashboard
+      </a>
+    </li>
+
+    <li>/</li>
+
+    <li class="text-gray-700 font-semibold">
+      Products
+    </li>
+
+  </ol>
+</nav>
+
+
   <div class="flex justify-between items-center">
-    <h2 class="text-3xl font-bold">Product Management</h2>
+  <h2 class="text-3xl font-bold">Product Management</h2>
+
+  <div class="flex gap-3">
+    <!-- Manage Teams -->
+    <a href="/admin/teams"
+       class="bg-white border border-gray-300 text-gray-700 px-5 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50">
+      ⚽ Manage Teams
+    </a>
+
+    <!-- Add Product -->
     <a href="/admin/products/add"
        class="bg-[#cdd47b] hover:opacity-90 text-white px-6 py-2 rounded-lg text-sm font-semibold">
       + Add Product
     </a>
   </div>
-
+</div>
   <!-- Search Bar -->
   <div class="mt-8">
     <div class="bg-white rounded-xl border px-6 py-3 flex items-center gap-3">
@@ -136,15 +166,14 @@
     Add Stock
   </a>
 
-  <form action="/admin/products/<%= p._id %>/delete"
-        method="POST"
-        class="inline">
-    <button
-      onclick="return confirm('Are you sure you want to delete this product?')"
-      class="bg-red-600 text-white px-6 py-2 rounded-lg text-xs font-semibold">
-      Delete
-    </button>
-  </form>
+ <form action="/admin/products/<%= p._id %>?_method=DELETE"
+      method="POST"
+      class="inline">
+  <button
+    class="bg-red-600 text-white px-6 py-2 rounded-lg text-xs font-semibold">
+    Delete
+  </button>
+</form>
 
 </td>
 
@@ -185,36 +214,29 @@
   const searchInput = document.getElementById("searchInput");
   let debounceTimer;
 
+  // 🔹 Restore cursor position after reload
+  window.addEventListener("load", () => {
+    if (searchInput && searchInput.value) {
+      searchInput.focus();
+      const length = searchInput.value.length;
+      searchInput.setSelectionRange(length, length);
+    }
+  });
+
+  // 🔹 Debounced search
   searchInput.addEventListener("input", () => {
     clearTimeout(debounceTimer);
 
     debounceTimer = setTimeout(() => {
       const value = searchInput.value.trim();
-      const url = new URL(window.location.href);
 
-      if (value) {
-        url.searchParams.set("search", value);
-        url.searchParams.set("page", 1);
-      } else {
-        url.searchParams.delete("search");
-        url.searchParams.set("page", 1);
-      }
+      const url = value
+        ? `/admin/products?search=${encodeURIComponent(value)}&page=1`
+        : `/admin/products?page=1`;
 
-      history.replaceState({}, "", url);
+      window.location.href = url;
     }, 500);
   });
-
-  searchInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const value = searchInput.value.trim();
-
-      window.location.href = value
-        ? `/admin/products?search=${encodeURIComponent(value)}`
-        : `/admin/products`;
-    }
-  });
 </script>
-
 </body>
 </html>

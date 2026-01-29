@@ -7,7 +7,7 @@ import {
   softDeleteProduct,
 } from "../../Services/Admin/admin.product.service.js";
 
-/* ================= LIST ================= */
+
 export const productsPage = async (req, res) => {
   try {
     const search = req.query.search || "";
@@ -29,27 +29,49 @@ export const productsPage = async (req, res) => {
   }
 };
 
-/* ================= ADD ================= */
-export const addProductPage = (req, res) => {
-  res.render("Admin/ProductAdd", { title: "Add Product", error: "" });
+
+import { Team } from "../../Models/team.model.js";
+
+export const addProductPage = async (req, res) => {
+  const teams = await Team.find({ isDeleted: false }).lean();
+
+  res.render("Admin/ProductAdd", {
+    title: "Add Product",
+    error: "",
+    teams
+  });
 };
 
 export const addProduct = async (req, res) => {
   try {
     await createProduct(req.body, req.files);
-    res.redirect("/admin/products");
+    return res.redirect("/admin/products");
   } catch (err) {
-    if (err.message === "MIN_IMAGES") {
-      return res.render("Admin/ProductAdd", {
-        title: "Add Product",
-        error: "Minimum 3 images required",
-      });
+    console.error("Add product error:", err.message);
+
+    let errorMessage = "Something went wrong. Please try again.";
+
+    // 🔴 CUSTOM VALIDATION ERRORS
+    if (err.message === "INVALID_NAME") {
+      errorMessage = "Product name cannot be empty or spaces only.";
+    } else if (err.message === "INVALID_TEAM") {
+      errorMessage = "Please select a valid team.";
+    } else if (err.message === "MIN_IMAGES") {
+      errorMessage = "Please upload at least 3 product images.";
     }
-    res.status(500).send("Server Error");
+
+    // 🔁 Re-render page with required data
+    const teams = await Team.find({ isDeleted: false });
+
+    return res.status(400).render("Admin/ProductAdd", {
+      title: "Add Product",
+      error: errorMessage,
+      teams,
+    });
   }
 };
 
-/* ================= EDIT ================= */
+
 export const editProductPage = async (req, res) => {
   const product = await getProductById(req.params.id);
   if (!product) return res.redirect("/admin/products");
@@ -69,7 +91,7 @@ export const editProduct = async (req, res) => {
   res.redirect("/admin/products");
 };
 
-/* ================= INVENTORY ================= */
+
 export const inventoryPage = async (req, res) => {
   const product = await getProductById(req.params.id);
   if (!product) return res.redirect("/admin/products");
@@ -90,7 +112,6 @@ export const saveInventory = async (req, res) => {
   res.redirect("/admin/products");
 };
 
-/* ================= DELETE ================= */
 export const deleteProduct = async (req, res) => {
   await softDeleteProduct(req.params.id);
   res.redirect("/admin/products");

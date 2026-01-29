@@ -21,19 +21,45 @@
     .image-slot {
       border: 2px dashed #d1d5db;
       border-radius: 16px;
-      height: 180px;
+      aspect-ratio: 1 / 1;
+      height: auto;
       background: #fafafa;
       cursor: pointer;
       position: relative;
       overflow: hidden;
+       display: block;
     }
     .image-slot img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
   </style>
 </head>
+
+
+<!-- VALIDATION MODAL -->
+<div id="errorModal"
+     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-xl p-6 w-[420px] text-center">
+    <h3 class="text-lg font-semibold text-red-600 mb-3">
+      Invalid Input
+    </h3>
+
+    <p id="modalMessage" class="text-sm text-gray-600 mb-6"></p>
+
+    <button
+      onclick="closeModal()"
+      class="px-6 py-2 bg-[#cdd47b] text-white rounded-lg font-semibold">
+      OK
+    </button>
+  </div>
+</div>
+
+
+
 
 <body class="bg-[#f8f8f4] text-gray-800">
 
@@ -59,6 +85,36 @@
 <!-- CONTENT -->
 <section class="flex-1">
 
+
+  <nav class="mb-6 text-sm" aria-label="Breadcrumb">
+  <ol class="flex items-center space-x-2 text-gray-500">
+
+    <li>
+      <a href="/admin/dashboard"
+         class="hover:text-gray-700 font-medium">
+        Dashboard
+      </a>
+    </li>
+
+    <li>/</li>
+
+    <li>
+      <a href="/admin/products"
+         class="hover:text-gray-700 font-medium">
+        Products
+      </a>
+    </li>
+
+    <li>/</li>
+
+    <li class="text-gray-700 font-semibold">
+      Add Product
+    </li>
+
+  </ol>
+</nav>
+
+
 <h2 class="text-3xl font-bold mb-8">Add Product</h2>
 
 <% if (error) { %>
@@ -75,13 +131,24 @@
 
   <div class="grid grid-cols-2 gap-6">
     <div>
-      <label class="text-sm font-medium">Product Name</label>
+      <label class="text-sm font-medium">
+  Product Name <span class="text-red-500">*</span>
+</label>
       <input name="name" required class="w-full mt-2 border rounded-lg px-4 py-2"/>
     </div>
 
     <div>
-      <label class="text-sm font-medium">Team</label>
-      <input name="team" required class="w-full mt-2 border rounded-lg px-4 py-2"/>
+      <label class="text-sm font-medium">
+  Team <span class="text-red-500">*</span>
+</label>
+
+<select name="team" required
+  class="w-full mt-2 border rounded-lg px-4 py-2">
+  <option value="">Select Team</option>
+  <% teams.forEach(team => { %>
+    <option value="<%= team.name %>"><%= team.name %></option>
+  <% }) %>
+</select>
     </div>
   </div>
 
@@ -93,7 +160,9 @@
 
   <div class="grid grid-cols-2 gap-6 mt-6">
     <div>
-      <label class="text-sm font-medium">Type</label>
+     <label class="text-sm font-medium">
+  Type <span class="text-red-500">*</span>
+</label>
       <select name="type" class="w-full mt-2 border rounded-lg px-4 py-2">
         <option value="">Select</option>
         <option value="Home">Home</option>
@@ -102,7 +171,9 @@
     </div>
 
     <div>
-      <label class="text-sm font-medium">Kit Type</label>
+      <label class="text-sm font-medium">
+  Kit Type <span class="text-red-500">*</span>
+</label>
       <select name="kitType" class="w-full mt-2 border rounded-lg px-4 py-2">
         <option value="">Select</option>
         <option value="Half Sleeve">Half Sleeve</option>
@@ -114,8 +185,10 @@
 
 <!-- IMAGES -->
 <div class="bg-white border rounded-xl p-8">
-  <h3 class="font-semibold mb-6">Product Images (3 required)</h3>
-
+<h3 class="font-semibold mb-6">
+  Product Images <span class="text-red-500">*</span>
+  <span class="text-sm text-gray-400">(3 required)</span>
+</h3>
   <div class="grid grid-cols-3 gap-6">
     <% for (let i = 0; i < 3; i++) { %>
   <label class="image-slot flex items-center justify-center text-gray-400">
@@ -133,6 +206,56 @@
 
   <input type="file" name="images" id="finalImages" hidden multiple required>
 </div>
+ 
+
+
+
+
+
+<div class="bg-white border rounded-xl p-8 mt-8">
+  <h3 class="font-semibold mb-6">Size, Price & Stock</h3>
+
+  <table class="w-full border text-sm">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="border px-4 py-2">Size</th>
+        <th class="border px-4 py-2">Price</th>
+        <th class="border px-4 py-2">Stock</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% const sizes = ["S","M","L","XL","XXL"]; %>
+      <% sizes.forEach((size, index) => { %>
+        <tr>
+          <td class="border px-4 py-2 font-medium"><%= size %></td>
+
+          <td class="border px-4 py-2">
+            <input type="number"
+              name="variants[<%= index %>][price]"
+              class="w-full border rounded px-2 py-1"
+              min="0" />
+          </td>
+
+          <td class="border px-4 py-2">
+            <input type="number"
+              name="variants[<%= index %>][stock]"
+              class="w-full border rounded px-2 py-1"
+              min="0" />
+          </td>
+
+          <input type="hidden"
+            name="variants[<%= index %>][size]"
+            value="<%= size %>" />
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+
+
+
+
 
 <div class="flex justify-end gap-4">
   <a href="/admin/products" class="px-8 py-2 border rounded-lg">Cancel</a>
@@ -178,7 +301,9 @@ async function selectImage(e, index) {
       files[index] = new File([blob], `image-${Date.now()}.jpg`, { type: "image/jpeg" });
 
       const slot = document.querySelectorAll(".image-slot")[index];
-      slot.innerHTML = `<img src="${URL.createObjectURL(files[index])}"/>`;
+      const previewUrl = URL.createObjectURL(files[index]);
+      slot.innerHTML = `<img src="${previewUrl}" alt="Product Image" />`;
+     slot.classList.remove("text-gray-400");
 
       const dt = new DataTransfer();
       files.forEach(f => f && dt.items.add(f));
@@ -190,6 +315,62 @@ async function selectImage(e, index) {
   };
 }
 </script>
+
+
+<script>
+  const form = document.querySelector("form");
+  const modal = document.getElementById("errorModal");
+  const modalMessage = document.getElementById("modalMessage");
+
+  function showModal(msg) {
+    modalMessage.textContent = msg;
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
+
+  function closeModal() {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+
+  form.addEventListener("submit", (e) => {
+    const name = form.querySelector("input[name='name']").value.trim();
+    const team = form.querySelector("select[name='team']").value.trim();
+    const type = form.querySelector("select[name='type']").value.trim();
+    const kitType = form.querySelector("select[name='kitType']").value.trim();
+
+    if (!name) {
+      e.preventDefault();
+      showModal("Product name cannot be empty or spaces.");
+      return;
+    }
+
+    if (!team) {
+      e.preventDefault();
+      showModal("Please select a team.");
+      return;
+    }
+
+    if (!type) {
+      e.preventDefault();
+      showModal("Please select a product type.");
+      return;
+    }
+
+    if (!kitType) {
+      e.preventDefault();
+      showModal("Please select a kit type.");
+      return;
+    }
+
+    if (files.filter(Boolean).length < 3) {
+      e.preventDefault();
+      showModal("Please upload all 3 product images.");
+      return;
+    }
+  });
+</script>
+
 
 </body>
 </html>

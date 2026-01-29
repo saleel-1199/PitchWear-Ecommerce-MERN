@@ -15,6 +15,12 @@ import adminProductRoutes from "./User/BackEnd/Routes/Admin/admin.product.routes
 
 
 import {attachUser} from "./User/BackEnd/Middlewares/attachUser.middleware.js"
+
+  import methodOverride from "method-override";
+
+
+
+
 const app = express();
 
 
@@ -27,6 +33,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, "User/BackEnd/Public")));
+
+
+app.use(methodOverride("_method"));
 
 
 

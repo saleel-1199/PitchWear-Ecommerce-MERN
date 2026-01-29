@@ -5,14 +5,12 @@ export const saveProductImages = async (files) => {
   const urls = [];
 
   for (const file of files) {
-   
-    const resizedBuffer = await sharp(file.buffer)
+    const resized = await sharp(file.buffer)
       .resize(900, 900, { fit: "cover" })
       .jpeg({ quality: 80 })
       .toBuffer();
 
-    
-    const url = await uploadToCloudinary(resizedBuffer, "pitchwear/products");
+    const url = await uploadToCloudinary(resized);
     urls.push(url);
   }
 

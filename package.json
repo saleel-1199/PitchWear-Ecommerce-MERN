@@ -16,12 +16,14 @@
     "cloudinary": "^2.9.0",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "method-override": "^3.0.0",
     "moongose": "^1.0.0",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.12",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "slugify": "^1.6.6"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

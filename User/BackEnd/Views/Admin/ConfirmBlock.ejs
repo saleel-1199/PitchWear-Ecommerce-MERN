@@ -98,14 +98,20 @@
         </p>
 
         <div class="flex gap-3">
-          <form action="/admin/users/<%= user._id %>/toggle-block" method="POST">
-            <button
-              type="submit"
-              class="px-5 py-2 rounded-md bg-primary text-white font-medium text-sm hover:opacity-90"
-            >
-              Yes, <%= actionText %>
-            </button>
-          </form>
+          <form action="/admin/users/<%= user._id %>" method="POST">
+  <input
+    type="hidden"
+    name="_method"
+    value="<%= user.isBlocked ? 'PATCH' : 'PATCH' %>"
+  >
+
+  <button
+    type="submit"
+    class="px-5 py-2 rounded-md bg-primary text-white font-medium text-sm hover:opacity-90"
+  >
+    Yes, <%= actionText %>
+  </button>
+</form>
 
           <a
             href="/admin/users"

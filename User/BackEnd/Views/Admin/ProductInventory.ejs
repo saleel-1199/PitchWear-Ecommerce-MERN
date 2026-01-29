@@ -1,61 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Add Inventory</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Inventory</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-[#f8f8f4] px-10 py-10">
+<body class="bg-[#f8f8f4] text-gray-800 px-10 py-10">
 
-<h2 class="text-2xl font-bold mb-6">
-  Add Stock – <%= product.team %> <%= product.type %>
-</h2>
+  <!-- PAGE TITLE -->
+  <h2 class="text-2xl font-bold mb-6">
+    Manage Inventory – <%= product.team %> <%= product.type %>
+  </h2>
 
-<form method="POST" class="bg-white p-6 rounded-xl w-[600px] space-y-6">
+  <!-- INVENTORY FORM -->
+  <form
+    method="POST"
+    class="bg-white p-6 rounded-xl w-[600px] space-y-6"
+  >
 
-  <% const sizes = ["S","M","L","XL","XXL"]; %>
+    <% const sizes = ["S","M","L","XL","XXL"]; %>
 
-  <% sizes.forEach((size, index) => { %>
-    <div class="border rounded-lg p-4">
-      <h4 class="font-semibold mb-3">Size <%= size %></h4>
+    <% sizes.forEach((size, index) => { %>
+      <% const variant = product.variants.find(v => v.size === size) || {}; %>
 
-      <!-- SIZE (hidden) -->
-      <input type="hidden" name="variants[<%= index %>][size]" value="<%= size %>">
+      <div class="border rounded-lg p-4">
+        <h4 class="font-semibold mb-3">Size <%= size %></h4>
 
-      <!-- PRICE -->
-      <div class="mb-3">
-        <label class="text-sm font-medium">Price</label>
+        <!-- SIZE (hidden) -->
         <input
-          type="number"
-          name="variants[<%= index %>][price]"
-          class="w-full border px-3 py-2 rounded"
-          placeholder="Enter price"
-        />
-      </div>
+          type="hidden"
+          name="variants[<%= index %>][size]"
+          value="<%= size %>"
+        >
 
-      <!-- STOCK -->
-      <div>
-        <label class="text-sm font-medium">Stock</label>
-        <input
-          type="number"
-          name="variants[<%= index %>][stock]"
-          class="w-full border px-3 py-2 rounded"
-          placeholder="Enter stock"
-        />
+        <!-- PRICE -->
+        <div class="mb-3">
+          <label class="text-sm font-medium">
+            Price
+          </label>
+          <input
+            type="number"
+            name="variants[<%= index %>][price]"
+            value="<%= variant.price ?? '' %>"
+            class="w-full border px-3 py-2 rounded mt-1"
+            min="0"
+            placeholder="Enter price"
+          />
+        </div>
+
+        <!-- STOCK -->
+        <div>
+          <label class="text-sm font-medium">
+            Stock
+          </label>
+          <input
+            type="number"
+            name="variants[<%= index %>][stock]"
+            value="<%= variant.stock ?? '' %>"
+            class="w-full border px-3 py-2 rounded mt-1"
+            min="0"
+            placeholder="Enter stock"
+          />
+        </div>
       </div>
+    <% }) %>
+
+    <!-- ACTION BUTTONS -->
+    <div class="flex justify-end gap-3 pt-4">
+      <a
+        href="/admin/products"
+        class="px-5 py-2 border rounded-lg bg-white font-medium"
+      >
+        Cancel
+      </a>
+
+      <button
+        type="submit"
+        class="px-5 py-2 bg-green-700 text-white rounded-lg font-semibold"
+      >
+        Save Inventory
+      </button>
     </div>
-  <% }) %>
 
-  <div class="flex justify-end gap-3 pt-4">
-    <a href="/admin/products"
-       class="px-5 py-2 border rounded">Cancel</a>
-
-    <button class="px-5 py-2 bg-green-700 text-white rounded">
-      Save Inventory
-    </button>
-  </div>
-
-</form>
+  </form>
 
 </body>
 </html>
