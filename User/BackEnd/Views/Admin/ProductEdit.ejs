@@ -251,25 +251,26 @@
 </h3>
 
   <div class="grid grid-cols-3 gap-6">
-    <% for(let i=0;i<3;i++){ %>
+  <% for (let i = 0; i < 3; i++) { %>
     <label class="image-slot cursor-pointer">
-  <input
-    type="file"
-    accept="image/*"
-    hidden
-    onchange="selectImage(event, <%= i %>)"
-  >
+      <input
+        type="file"
+        accept="image/*"
+        hidden
+        onchange="selectImage(event, <%= i %>)"
+      />
 
-  <% if (product.images[i]) { %>
-    <img src="<%= product.images[i] %>" />
-  <% } else { %>
-    <div class="placeholder absolute inset-0 flex flex-col items-center justify-center">
-      <span class="plus">＋</span><br/>Add Image
-    </div>
+      <% if (product.images[i]) { %>
+        <img src="<%= product.images[i] %>" />
+      <% } else { %>
+        <div class="placeholder absolute inset-0 flex flex-col items-center justify-center">
+          <span class="plus">+</span><br />Add Image
+        </div>
+      <% } %>
+    </label>
   <% } %>
-</label>
-    <% } %>
-  </div>
+</div>
+
 
     <input type="file" name="images" id="finalImages" hidden multiple>
 

@@ -51,7 +51,7 @@ export const addProduct = async (req, res) => {
 
     let errorMessage = "Something went wrong. Please try again.";
 
-    // 🔴 CUSTOM VALIDATION ERRORS
+    
     if (err.message === "INVALID_NAME") {
       errorMessage = "Product name cannot be empty or spaces only.";
     } else if (err.message === "INVALID_TEAM") {
@@ -60,12 +60,11 @@ export const addProduct = async (req, res) => {
       errorMessage = "Please upload at least 3 product images.";
     }
 
-    // 🔁 Re-render page with required data
     const teams = await Team.find({ isDeleted: false });
 
     return res.status(400).render("Admin/ProductAdd", {
       title: "Add Product",
-      error: errorMessage,
+      error: errorMessage, 
       teams,
     });
   }

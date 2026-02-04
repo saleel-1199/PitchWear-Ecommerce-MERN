@@ -36,7 +36,6 @@ export const fetchShopProductsService = async ({
 
   const pipeline = [
     { $match: match },
-
     {
       $addFields: {
         validVariants: {
@@ -53,7 +52,7 @@ export const fetchShopProductsService = async ({
         },
       },
     },
-
+    
 
     {
       $addFields: {
@@ -75,6 +74,7 @@ export const fetchShopProductsService = async ({
         displayPrice: {
           ...(minPrice && { $gte: Number(minPrice) }),
           ...(maxPrice && { $lte: Number(maxPrice) }),
+          
         },
       },
     });

@@ -27,7 +27,7 @@ const router = express.Router();
 router.get("/admin/products", productsPage);
 
 
-router.get("/admin/products/add", addProductPage);
+router.get("/admin/products/add",addProductPage);
 router.post("/admin/products/add",uploadProducts.array("images", 10),addProduct);
 
 

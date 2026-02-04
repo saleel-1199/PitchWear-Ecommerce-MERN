@@ -123,7 +123,7 @@
   </div>
 <% } %>
 
-<form action="/admin/products/add" method="POST" enctype="multipart/form-data" class="space-y-8">
+<form action="/admin/products/add" method="POST" enctype="multipart/form-data" class="space-y-8"  novalidate>
 
 <!-- BASIC INFO -->
 <div class="bg-white border rounded-xl p-8">
@@ -134,7 +134,7 @@
       <label class="text-sm font-medium">
   Product Name <span class="text-red-500">*</span>
 </label>
-      <input name="name" required class="w-full mt-2 border rounded-lg px-4 py-2"/>
+      <input name="name"  class="w-full mt-2 border rounded-lg px-4 py-2"/>
     </div>
 
     <div>
@@ -142,7 +142,7 @@
   Team <span class="text-red-500">*</span>
 </label>
 
-<select name="team" required
+<select name="team"
   class="w-full mt-2 border rounded-lg px-4 py-2">
   <option value="">Select Team</option>
   <% teams.forEach(team => { %>
@@ -204,7 +204,7 @@
 <% } %>
   </div>
 
-  <input type="file" name="images" id="finalImages" hidden multiple required>
+  <input type="file" name="images" id="finalImages" hidden multiple >
 </div>
  
 

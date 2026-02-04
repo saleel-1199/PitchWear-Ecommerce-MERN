@@ -44,12 +44,12 @@ export const getAllProducts = async (search = "", page = 1, limit = 4) => {
 
 
 export const createProduct = async (data, files) => {
-  // 🔒 IMAGE VALIDATION
+ 
   if (!files || files.length < 3) {
     throw new Error("MIN_IMAGES");
   }
-
-  // 🔒 NAME VALIDATION (FIX)
+  
+ 
   if (!data.name || !data.name.trim()) {
     throw new Error("INVALID_NAME");
   }
@@ -57,22 +57,21 @@ export const createProduct = async (data, files) => {
   const productName = data.name.trim();
   const teamName = data.team?.trim();
 
-  // 🔒 TEAM VALIDATION (OPTIONAL BUT GOOD)
+
   if (!teamName) {
     throw new Error("INVALID_TEAM");
   }
 
-  // 📸 SAVE IMAGES
   const images = await saveProductImages(files);
 
-  // ⚽ ENSURE TEAM EXISTS (UPSERT)
+ 
   await Team.findOneAndUpdate(
     { name: teamName },
     { name: teamName },
     { upsert: true }
   );
 
-  // 📦 VARIANTS
+
   const incomingVariants = Object.values(data.variants || []);
 
   const variants = incomingVariants.map(v => ({
@@ -86,7 +85,7 @@ export const createProduct = async (data, files) => {
     0
   );
 
-  // ✅ CREATE PRODUCT
+  
   return Product.create({
     name: productName,
     slug: slugify(productName, { lower: true, strict: true }),
@@ -96,14 +95,9 @@ export const createProduct = async (data, files) => {
     kitType: data.kitType,
     images,
     variants,
-    totalStock,
-    status: totalStock > 0 ? "Active" : "Inactive",
+    totalStock
   });
 };
-
-
-
-
 export const getProductById = async (id) => {
   return Product.findById(id);
 };
@@ -174,7 +168,7 @@ export const updateInventory = async (product, incomingVariants) => {
   );
 
 
-  product.status = product.totalStock > 0 ? "Active" : "Inactive";
+  product.status = "Active";
 
   return product.save();
 };

@@ -78,7 +78,7 @@ const productSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["Active", "Inactive"],
-      default: "Inactive",
+      default:"Active"
     },
 
     isDeleted: {
@@ -89,7 +89,7 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-/* ✅ AUTO CALCULATE TOTAL STOCK */
+
 productSchema.pre("save", function (next) {
   this.totalStock = this.variants.reduce(
     (sum, v) => sum + (v.stock || 0),

@@ -90,6 +90,15 @@
       <p><b>Kit Type:</b> <%= product.type %></p>
     </div>
 
+   <% if (product.totalStock === 0) { %>
+  <span class="text-red-600 font-semibold">
+    Currently unavailable
+  </span>
+<% } else { %>
+  <span class="text-green-600">
+    In stock
+  </span>
+<% } %>
     <!-- SIZE -->
     <div class="mb-6">
       <p class="text-sm font-medium mb-2">Select Size</p>
@@ -126,9 +135,15 @@
 
     <!-- ACTIONS -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
-      <button class="bg-[#5f7550] text-white px-8 py-3 rounded-lg w-full sm:w-auto">
-        Add to Cart
-      </button>
+     <button>
+      class="px-8 py-3 rounded-lg w-full sm:w-auto text-white
+    <%= product.totalStock === 0
+      ? 'bg-gray-400 cursor-not-allowed'
+      : 'bg-[#5f7550] hover:bg-[#4e6343]' %>"
+  <%= product.totalStock === 0 ? 'disabled' : '' %>
+>
+  <%= product.totalStock === 0 ? 'Currently Unavailable' : 'Add to Cart' %>
+     </button>
       <button class="border px-5 py-3 rounded-lg w-full sm:w-auto">
         ♡ Wishlist
       </button>
@@ -147,8 +162,98 @@
         Machine wash cold, do not iron print, tumble dry low.
       </p>
     </div>
+      
 
+    <!-- REVIEWS SECTION -->
+<div class="mt-10 bg-white border rounded-2xl p-6">
+  <h2 class="text-lg font-semibold mb-4">Customer Reviews</h2>
+
+  <!-- Average Rating -->
+  <div class="flex items-center gap-3 mb-6">
+    <div class="flex text-yellow-500 text-lg">
+      ★★★★☆
+    </div>
+    <span class="text-sm text-gray-600">4.2 out of 5 (23 reviews)</span>
   </div>
+
+  <!-- Dummy Reviews -->
+  <div class="space-y-5">
+    <div class="border-b pb-4">
+      <div class="flex items-center justify-between mb-1">
+        <p class="font-medium text-sm">Rahul S.</p>
+        <span class="text-yellow-500 text-sm">★★★★☆</span>
+      </div>
+      <p class="text-sm text-gray-600">
+        Great quality jersey! Fabric feels premium and size fits perfectly.
+      </p>
+    </div>
+
+    <div class="border-b pb-4">
+      <div class="flex items-center justify-between mb-1">
+        <p class="font-medium text-sm">Arjun K.</p>
+        <span class="text-yellow-500 text-sm">★★★★★</span>
+      </div>
+      <p class="text-sm text-gray-600">
+        Loved the design. Looks exactly like the original team kit.
+      </p>
+    </div>
+
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <p class="font-medium text-sm">Mohammed A.</p>
+        <span class="text-yellow-500 text-sm">★★★☆☆</span>
+      </div>
+      <p class="text-sm text-gray-600">
+        Good product overall, but delivery was slightly delayed.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- RELATED PRODUCTS -->
+<div class="mt-12">
+  <h2 class="text-xl font-semibold mb-6">
+    Related Products
+  </h2>
+    
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5 sm:gap-7">
+  <% if (!relatedProducts || relatedProducts.length === 0) { %>
+    <div class="col-span-4 text-center py-20 text-gray-400">
+      No related products found
+    </div>
+  <% } else { %>
+    <% relatedProducts.forEach((p) => { %>
+      <a href="/product/<%= p.slug %>" class="block">
+        <div class="bg-card rounded-2xl overflow-hidden border border-[#efeedd] hover:shadow-sm transition">
+          <div class="relative px-6 pt-6 pb-3 flex items-center justify-center">
+            <img
+              src="<%= (p.images && p.images[0]) ? p.images[0] : '/images/no-image.png' %>"
+              class="h-[130px] sm:h-[150px] object-contain"
+              alt="<%= p.name %>"
+            />
+          </div>
+          <div class="px-5 pb-5">
+            <h4 class="text-sm font-semibold leading-tight">
+              <%= p.team || p.name %>
+            </h4>
+            <p class="text-xs text-gray-500 mt-1">
+              <%= p.kitType || "-" %>
+            </p>
+            <p class="text-sm font-semibold mt-3">
+              ₹<%= Number(p.displayPrice || 0).toFixed(2) %>
+            </p>
+          </div>
+        </div>
+      </a>
+    <% }) %>
+  <% } %>
+</div>
+</div>
+
+        
+</div>
+</div>
+
 </section>
 
 </main>

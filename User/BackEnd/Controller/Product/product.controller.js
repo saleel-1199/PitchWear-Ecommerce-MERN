@@ -5,9 +5,9 @@ import {
 
 export const getProductDetailsController = async (req, res) => {
   try {
-    const { slug } = req.params; // ✅ CHANGED
+    const { slug } = req.params; 
 
-    const product = await fetchProductDetailsService(slug); // ✅ CHANGED
+    const product = await fetchProductDetailsService(slug); 
 
     if (
       !product ||

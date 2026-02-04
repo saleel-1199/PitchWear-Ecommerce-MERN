@@ -22,7 +22,6 @@ export const fetchProductDetailsService = async (slug) => {
     (sum, v) => sum + Number(v.stock || 0),
     0
   );
-
   return product;
 };
 

@@ -263,7 +263,18 @@
                   <div class="px-5 pb-5">
                     <h4 class="text-sm font-semibold leading-tight"><%= p.team || p.name %></h4>
                     <p class="text-xs text-gray-500 mt-1"><%= p.kitType || "-" %></p>
-                    <p class="text-sm font-semibold mt-3">$<%= Number(p.displayPrice || 0).toFixed(2) %></p>
+
+                    <% if (p.totalStock === 0) { %>
+                         <p class="text-sm font-medium mt-3 text-gray-400">
+                        Out of Stock
+                     </p>
+                 <% } else { %>
+                    <p class="text-sm font-semibold mt-3">
+                       $<%= Number(p.displayPrice).toFixed(2) %>
+                    </p>
+                <% } %>
+
+
                   </div>
                 </div>
               </a>
