@@ -12,8 +12,7 @@ import {
 
 import {
   teamsPage,
-  addTeam,
-  deleteTeam
+  addTeam
 } from "../../Controller/Admin/admin.team.controller.js";
 
 
@@ -24,24 +23,24 @@ import uploadProducts from "../../Middlewares/uploadProducts.js";
 const router = express.Router();
 
 
-router.get("/admin/products", productsPage);
+router.get("/admin/products",adminAuth,productsPage);
 
 
-router.get("/admin/products/add",addProductPage);
-router.post("/admin/products/add",uploadProducts.array("images", 10),addProduct);
+router.get("/admin/products/add",adminAuth,addProductPage);
+router.post("/admin/products/add",adminAuth,uploadProducts.array("images", 10),addProduct);
 
 
-router.get("/admin/products/:id/edit", editProductPage);
-router.patch("/admin/products/:id",uploadProducts.array("images", 10),editProduct);
+router.get("/admin/products/:id/edit",adminAuth, editProductPage);
+router.patch("/admin/products/:id",adminAuth,uploadProducts.array("images", 10),editProduct);
 
-router.get("/admin/products/:id/inventory", inventoryPage);
-router.post("/admin/products/:id/inventory", saveInventory);
+router.get("/admin/products/:id/inventory", adminAuth,inventoryPage);
+router.post("/admin/products/:id/inventory",adminAuth, saveInventory);
 
 
-router.delete("/admin/products/:id", deleteProduct);
+router.delete("/admin/products/:id", adminAuth,deleteProduct);
 
-router.get("/admin/teams", teamsPage);
-router.post("/admin/teams/add", addTeam);
+router.get("/admin/teams",adminAuth,teamsPage);
+router.post("/admin/teams/add",adminAuth,addTeam);
 
 
 

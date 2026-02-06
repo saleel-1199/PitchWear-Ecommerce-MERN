@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
 const teamSchema = new mongoose.Schema({
-  name: { type: String, unique: true, trim: true },
-  isDeleted: { type: Boolean, default: false }
+  name: { type: String, unique: true, trim: true }
+  
 }, { timestamps: true });
 
 export const Team = mongoose.model("Team", teamSchema);

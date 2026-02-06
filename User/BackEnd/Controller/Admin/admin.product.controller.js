@@ -33,7 +33,7 @@ export const productsPage = async (req, res) => {
 import { Team } from "../../Models/team.model.js";
 
 export const addProductPage = async (req, res) => {
-  const teams = await Team.find({ isDeleted: false }).lean();
+  const teams = await Team.find().lean();
 
   res.render("Admin/ProductAdd", {
     title: "Add Product",
@@ -49,7 +49,7 @@ export const addProduct = async (req, res) => {
   } catch (err) {
     console.error("Add product error:", err.message);
 
-    let errorMessage = "Something went wrong. Please try again.";
+    let errorMessage = "Something went wrong.Please try again.";
 
     
     if (err.message === "INVALID_NAME") {
@@ -60,7 +60,7 @@ export const addProduct = async (req, res) => {
       errorMessage = "Please upload at least 3 product images.";
     }
 
-    const teams = await Team.find({ isDeleted: false });
+    const teams = await Team.find();
 
     return res.status(400).render("Admin/ProductAdd", {
       title: "Add Product",

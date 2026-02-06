@@ -2,7 +2,8 @@ import { Team } from "../../Models/team.model.js";
 
 
 export const getAllTeams = async () => {
-  return await Team.find({ isDeleted: false }).sort({ name: 1 });
+  return await Team.find().sort({"name":1})
+ 
 };
 
 
@@ -13,14 +14,11 @@ export const createTeam = async (name) => {
 
   const teamName = name.trim();
 
-  return await Team.findOneAndUpdate(
-    { name: teamName },
-    { name: teamName, isDeleted: false }, 
-    { upsert: true, new: true }
-  );
-};
+   const existing = await Team.findOne({name:teamName})
 
+   if(existing){
+      throw new Error ("Team already exists")
+   }
 
-export const softDeleteTeam = async (id) => {
-  return await Team.findByIdAndUpdate(id, { isDeleted: true });
+   return await Team.create({name:teamName})
 };

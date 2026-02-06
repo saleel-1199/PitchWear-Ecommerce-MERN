@@ -31,7 +31,6 @@
 </header>
 
 <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-
 <!-- BREADCRUMB -->
 <p class="text-sm text-gray-500 mb-6">
   Home / Shop / <%= product.team %>
@@ -135,19 +134,21 @@
 
     <!-- ACTIONS -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
-     <button>
-      class="px-8 py-3 rounded-lg w-full sm:w-auto text-white
-    <%= product.totalStock === 0
-      ? 'bg-gray-400 cursor-not-allowed'
-      : 'bg-[#5f7550] hover:bg-[#4e6343]' %>"
-  <%= product.totalStock === 0 ? 'disabled' : '' %>
->
-  <%= product.totalStock === 0 ? 'Currently Unavailable' : 'Add to Cart' %>
-     </button>
-      <button class="border px-5 py-3 rounded-lg w-full sm:w-auto">
-        ♡ Wishlist
-      </button>
-    </div>
+  <button
+    class="px-8 py-3 rounded-lg w-full sm:w-auto text-white
+      <%= product.totalStock === 0
+        ? 'bg-gray-400 cursor-not-allowed'
+        : 'bg-[#5f7550] hover:bg-[#4e6343]' %>"
+    <%= product.totalStock === 0 ? 'disabled' : '' %>
+  >
+    <%= product.totalStock === 0 ? 'Currently Unavailable' : 'Add to Cart' %>
+  </button>
+
+  <button class="border px-5 py-3 rounded-lg w-full sm:w-auto">
+    ♡ Wishlist
+  </button>
+</div>
+
 
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center text-xs text-gray-600">
       <div>✔ Official Replica</div>

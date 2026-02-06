@@ -127,12 +127,20 @@
 
 <!-- ADD TEAM MODAL -->
 <div id="teamModal"
-     class="fixed inset-0 bg-black/40 hidden items-center justify-center">
+     class="fixed inset-0 bg-black/40
+            <%= showModal ? 'flex' : 'hidden' %>
+            items-center justify-center">
 
   <div class="bg-white p-6 rounded-xl w-[400px]">
     <h3 class="text-lg font-semibold mb-4">Add Team</h3>
+        
+   <div id="teamError"
+     class="mb-3 text-sm text-red-600 bg-red-50 px-3 py-2 rounded
+            <%= error ? '' : 'hidden' %>">
+  <%= error || '' %>
+</div>
 
-    <form action="/admin/teams/add" method="POST" class="space-y-4">
+    <form id="addTeamForm" action="/admin/teams/add" method="POST" class="space-y-4" novalidate>
       <input
         type="text"
         name="name"
@@ -163,6 +171,32 @@
     document.getElementById("teamModal").classList.add("hidden");
     document.getElementById("teamModal").classList.remove("flex");
   }
+</script>
+
+<script>
+  const teamForm = document.getElementById("addTeamForm");
+  const teamError = document.getElementById("teamError");
+  const teamNameInput = teamForm.querySelector("input[name='name']");
+
+  // ✅ Validate on submit
+  teamForm.addEventListener("submit", (e) => {
+    const name = teamNameInput.value.trim();
+
+    if (!name) {
+      e.preventDefault();
+      teamError.textContent = "Team name cannot be empty or spaces.";
+      teamError.classList.remove("hidden");
+      return;
+    }
+  });
+
+  // ✅ Clear error when user types
+ teamNameInput.addEventListener("input", () => {
+  if (teamError.textContent) {
+    teamError.classList.add("hidden");
+    teamError.textContent = "";
+  }
+});
 </script>
 
 </body>

@@ -1,38 +1,33 @@
 import {
   getAllTeams,
-  createTeam,
-  softDeleteTeam
+  createTeam
 } from "../../Services/Admin/admin.team.service.js";
 
-/* GET TEAMS PAGE */
+
 export const teamsPage = async (req, res) => {
+  
   try {
     const teams = await getAllTeams();
-    res.render("Admin/Teams", { teams });
+    res.render("Admin/Teams", { 
+      teams,
+      error:req.query.error || null,
+      showModal:!!req.query.error
+     });
   } catch (error) {
     console.error("teamsPage error:", error);
     res.status(500).send("Server Error");
   }
 };
 
-/* ADD TEAM */
+
 export const addTeam = async (req, res) => {
   try {
     await createTeam(req.body.name);
     res.redirect("/admin/teams");
   } catch (error) {
-    console.error("addTeam error:", error);
-    res.redirect("/admin/teams");
+    res.redirect(
+      `/admin/teams?error=${encodeURIComponent(error.message)}`
+    );
   }
 };
 
-/* SOFT DELETE TEAM */
-export const deleteTeam = async (req, res) => {
-  try {
-    await softDeleteTeam(req.params.id);
-    res.redirect("/admin/teams");
-  } catch (error) {
-    console.error("deleteTeam error:", error);
-    res.redirect("/admin/teams");
-  }
-};

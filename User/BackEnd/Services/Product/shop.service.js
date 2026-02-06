@@ -35,7 +35,10 @@ export const fetchShopProductsService = async ({
   if (sort === "priceHigh") sortStage = { displayPrice: -1 };
 
   const pipeline = [
-    { $match: match },
+    
+    {
+      $match:match
+    },
     {
       $addFields: {
         validVariants: {
@@ -46,7 +49,7 @@ export const fetchShopProductsService = async ({
               $and: [
                 { $gt: ["$$v.stock", 0] },
                 { $gt: ["$$v.price", 0] },
-              ],
+              ]
             },
           },
         },

@@ -28,8 +28,8 @@ export const shopPageController = async (req, res) => {
        minPrice,
        maxPrice,
     });
-
-    const teams = await Product.distinct("team", {
+   
+    const teams = await Product.distinct("team", { 
       isDeleted: false,
       status: "Active",
     });

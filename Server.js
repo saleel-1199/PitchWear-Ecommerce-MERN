@@ -1,3 +1,4 @@
+
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -16,10 +17,7 @@ import adminProductRoutes from "./User/BackEnd/Routes/Admin/admin.product.routes
 
 import {attachUser} from "./User/BackEnd/Middlewares/attachUser.middleware.js"
 
-  import methodOverride from "method-override";
-
-
-
+import methodOverride from "method-override";
 
 const app = express();
 
