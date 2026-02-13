@@ -262,7 +262,7 @@
 <!-- IMAGE ZOOM MODAL -->
 <div
   id="imageZoomModal"
-  class="fixed inset-0 bg-black bg-opacity-80 hidden z-50 flex items-center justify-center px-4"
+  class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center overflow-hidden"
 >
   <button
     onclick="closeImageZoom()"
@@ -276,12 +276,12 @@
     <button onclick="zoomIn()" class="bg-white px-4 py-2 rounded">+</button>
   </div>
 
-  <img
-    id="zoomImage"
-    src=""
-    class="max-h-[80vh] sm:max-h-[90vh] max-w-full transition-transform duration-200"
-    style="transform: scale(1)"
-  />
+<img
+  id="zoomImage"
+  src=""
+  class="max-h-[90vh] max-w-[90vw] object-contain cursor-grab select-none"
+  draggable="false"
+/>
 </div>
 
 <!-- EXISTING SIZE SCRIPT -->
@@ -304,41 +304,122 @@
   });
 </script>
 
-<!-- IMAGE ZOOM SCRIPT -->
+
+  <!-- zoom -->
+
+
 <script>
-  let currentScale = 1;
+  const modal = document.getElementById("imageZoomModal");
+  const img = document.getElementById("zoomImage");
+
+  let scale = 1;
+  let posX = 0;
+  let posY = 0;
+  let startX = 0;
+  let startY = 0;
+  let isDragging = false;
+
+  const MIN_SCALE = 1;
+  const MAX_SCALE = 4;
 
   function openImageZoom(src) {
-    const modal = document.getElementById("imageZoomModal");
-    const img = document.getElementById("zoomImage");
+    scale = 1;
+    posX = 0;
+    posY = 0;
 
-    currentScale = 1;
-    img.style.transform = "scale(1)";
     img.src = src;
+    updateTransform();
 
     modal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
   }
 
   function closeImageZoom() {
-    document.getElementById("imageZoomModal").classList.add("hidden");
+    modal.classList.add("hidden");
     document.body.style.overflow = "";
   }
 
+  function updateTransform() {
+    img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+  }
+
   function zoomIn() {
-    currentScale += 0.2;
-    document.getElementById("zoomImage").style.transform =
-      `scale(${currentScale})`;
+    if (scale < MAX_SCALE) {
+      scale += 0.25;
+      updateTransform();
+    }
   }
 
   function zoomOut() {
-    if (currentScale > 1) {
-      currentScale -= 0.2;
-      document.getElementById("zoomImage").style.transform =
-        `scale(${currentScale})`;
+    if (scale > MIN_SCALE) {
+      scale -= 0.25;
+      if (scale < 1) scale = 1;
+
+      if (scale === 1) {
+        posX = 0;
+        posY = 0;
+      }
+
+      updateTransform();
     }
   }
+
+  /* ✅ Mouse Wheel Zoom (NO JUMP) */
+  modal.addEventListener("wheel", (e) => {
+    e.preventDefault();
+
+    const delta = e.deltaY < 0 ? 1.15 : 0.85;
+    const newScale = scale * delta;
+
+    if (newScale < MIN_SCALE || newScale > MAX_SCALE) return;
+
+    scale = newScale;
+    updateTransform();
+  });
+
+  /* ✅ Drag / Pan */
+  img.addEventListener("mousedown", (e) => {
+    if (scale === 1) return;
+
+    isDragging = true;
+    startX = e.clientX - posX;
+    startY = e.clientY - posY;
+
+    img.classList.remove("cursor-grab");
+    img.classList.add("cursor-grabbing");
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
+
+    posX = e.clientX - startX;
+    posY = e.clientY - startY;
+
+    updateTransform();
+  });
+
+  document.addEventListener("mouseup", () => {
+    isDragging = false;
+
+    img.classList.remove("cursor-grabbing");
+    img.classList.add("cursor-grab");
+  });
+
+  /* ✅ ESC Close */
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeImageZoom();
+  });
+
+  /* ✅ Click Outside Close */
+  modal.addEventListener("click", (e) => {
+    if (e.target.id === "imageZoomModal") {
+      closeImageZoom();
+    }
+  });
 </script>
+
+
+
 
 </body>
 </html>

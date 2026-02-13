@@ -1,4 +1,6 @@
 import { Product } from "../../Models/product.model.js";
+import {Team}  from"../../Models/team.model.js"
+
 
 export const fetchShopProductsService = async ({
   page = 1,
@@ -12,9 +14,15 @@ export const fetchShopProductsService = async ({
   maxPrice = "",
 }) => {
 
+
+  const activeTeams = await Team.find({ isDeleted: false })
+  .distinct("name");
+
+  
   const match = {
     isDeleted: false,
     status: "Active",
+    team:{$in:activeTeams}
   };
 
   if (search && search.trim()) {

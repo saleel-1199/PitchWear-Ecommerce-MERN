@@ -12,7 +12,11 @@ import {
 
 import {
   teamsPage,
-  addTeam
+  addTeam,
+  editTeamPage,
+  updateTeamName,
+  deleteTeam,
+  
 } from "../../Controller/Admin/admin.team.controller.js";
 
 
@@ -30,19 +34,22 @@ router.get("/admin/products/add",adminAuth,addProductPage);
 router.post("/admin/products/add",adminAuth,uploadProducts.array("images", 10),addProduct);
 
 
-router.get("/admin/products/:id/edit",adminAuth, editProductPage);
+router.get("/admin/products/:id/edit",adminAuth,editProductPage);
 router.patch("/admin/products/:id",adminAuth,uploadProducts.array("images", 10),editProduct);
 
-router.get("/admin/products/:id/inventory", adminAuth,inventoryPage);
+router.get("/admin/products/:id/inventory",adminAuth, inventoryPage);
 router.post("/admin/products/:id/inventory",adminAuth, saveInventory);
 
 
-router.delete("/admin/products/:id", adminAuth,deleteProduct);
+router.delete("/admin/products/:id",adminAuth,deleteProduct);
 
 router.get("/admin/teams",adminAuth,teamsPage);
 router.post("/admin/teams/add",adminAuth,addTeam);
 
+router.get("/admin/teams/:id/edit",adminAuth,editTeamPage);
+router.post("/admin/teams/:id/edit",adminAuth,updateTeamName)
 
+router.delete("/admin/teams/:id",adminAuth,deleteTeam)
 
 
 

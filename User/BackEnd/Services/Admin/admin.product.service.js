@@ -4,8 +4,14 @@ import { saveProductImages } from "../../Utils/saveProductImages.js";
 import slugify from "slugify";
 
 export const getAllProducts = async (search = "", page = 1, limit = 4) => {
+   const activeTeams = await Team.find({
+    isDeleted:false
+   })
+
+   const activeTeamNames = activeTeams.map(t=> t.name)
   const query = { 
-    isDeleted: false 
+    isDeleted: false,
+    team:{$in:activeTeamNames}
   };
 
   if (search && search.trim() !== "") {

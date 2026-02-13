@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { Product } from "../../Models/product.model.js";
+import {Team} from "../../Models/team.model.js"
 
 export const fetchProductDetailsService = async (slug) => {
   const product = await Product.findOne({
@@ -8,7 +9,16 @@ export const fetchProductDetailsService = async (slug) => {
     status: "Active",
   }).lean();
 
-  if (!product) return null;
+   if (!product) return null;
+
+
+  const teamExist = await Team.findOne({
+    name:product.team,
+    isDeleted:false
+  })
+
+  if(!teamExist)  return null;
+
 
   const validVariants = (product.variants || []).filter(
     v => v.stock > 0 && v.price > 0
@@ -27,7 +37,7 @@ export const fetchProductDetailsService = async (slug) => {
 
 export const fetchRelatedProductsService = async (product) => {
   if (!product || !product.team) return [];
-
+  
   const relatedProducts = await Product.find({
     team: product.team,
     status: "Active",

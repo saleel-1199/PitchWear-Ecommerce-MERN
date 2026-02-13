@@ -50,27 +50,23 @@
   <!-- CONTENT -->
   <section class="flex-1">
 
+    <% const safeSearch = search || ""; %>
+    <% const safePage = currentPage || 1; %>
+
     <!-- Breadcrumb -->
-<nav class="mb-6 text-sm" aria-label="Breadcrumb">
-  <ol class="flex items-center space-x-2 text-gray-500">
+    <nav class="mb-6 text-sm" aria-label="Breadcrumb">
+      <ol class="flex items-center space-x-2 text-gray-500">
+        <li>
+          <a href="/admin/dashboard" class="hover:text-gray-700 font-medium">
+            Dashboard
+          </a>
+        </li>
+        <li>/</li>
+        <li class="text-gray-700 font-semibold">Teams</li>
+      </ol>
+    </nav>
 
-    <li>
-      <a href="/admin/dashboard"
-         class="hover:text-gray-700 font-medium">
-        Dashboard
-      </a>
-    </li>
-
-    <li>/</li>
-
-    <li class="text-gray-700 font-semibold">
-      Teams
-    </li>
-
-  </ol>
-</nav>
-
-
+    <!-- TITLE + SEARCH + ADD -->
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-3xl font-bold">Team Management</h2>
 
@@ -79,6 +75,25 @@
         + Add Team
       </button>
     </div>
+
+    <!-- SEARCH BAR -->
+    <form method="GET" action="/admin/teams" class="mb-6 flex gap-3">
+      <input
+        type="text"
+        id="searchInput"
+        name="search"
+        value="<%= safeSearch %>"
+        placeholder="Search teams..."
+        class="w-64 border rounded-lg px-4 py-2"
+        autofocus
+      />
+
+      <button
+        type="button"
+        class="bg-green-600 text-white px-5 py-2 rounded-lg font-semibold">
+        Search
+      </button>
+    </form>
 
     <!-- TEAMS TABLE -->
     <div class="bg-white border rounded-xl overflow-hidden">
@@ -105,16 +120,27 @@
                 <%= team.name %>
               </td>
 
-              <td class="px-6 py-4 text-center">
-                <form action="/admin/teams/<%= team._id %>/delete"
-                      method="POST"
-                      class="inline">
-                  <!-- <button
-                    onclick="return confirm('Delete this team?')"
-                    class="bg-red-600 text-white px-4 py-1.5 rounded text-xs font-semibold">
-                    Delete
-                  </button> -->
-                </form>
+              <td class="px-6 py-4 text-center space-x-3">
+                <a
+                  href="/admin/teams/<%= team._id %>/edit?page=<%= safePage %>&search=<%= safeSearch %>"
+                  class="inline-flex items-center gap-2
+                         px-4 py-2 text-sm font-semibold
+                         text-red-600 border border-red-600 rounded-lg
+                         hover:bg-red-600 hover:text-white transition">
+                  ✏ Edit
+                </a>
+
+                <form
+  action="/admin/teams/<%= team._id %>?_method=DELETE&page=<%= safePage %>&search=<%= safeSearch %>"
+  method="POST"
+  class="inline"
+>
+  <button
+    class="bg-red-600 text-white px-6 py-2 rounded-lg text-xs font-semibold">
+    Delete
+  </button>
+</form>
+
               </td>
             </tr>
           <% }) %>
@@ -122,23 +148,54 @@
       </table>
     </div>
 
+    <!-- PAGINATION -->
+    <% if (totalPages > 1) { %>
+      <div class="flex justify-center gap-2 mt-8">
+
+        <% if (safePage > 1) { %>
+          <a
+            href="/admin/teams?page=<%= safePage - 1 %>&search=<%= safeSearch %>"
+            class="px-4 py-2 border rounded-lg">
+            Prev
+          </a>
+        <% } %>
+
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <a
+            href="/admin/teams?page=<%= i %>&search=<%= safeSearch %>"
+            class="px-4 py-2 border rounded-lg
+            <%= i === safePage ? 'bg-green-600 text-white' : '' %>">
+            <%= i %>
+          </a>
+        <% } %>
+
+        <% if (safePage < totalPages) { %>
+          <a
+            href="/admin/teams?page=<%= safePage + 1 %>&search=<%= safeSearch %>"
+            class="px-4 py-2 border rounded-lg">
+            Next
+          </a>
+        <% } %>
+
+      </div>
+    <% } %>
+
   </section>
 </main>
 
-<!-- ADD TEAM MODAL -->
+<!-- ADD TEAM MODAL (UNCHANGED) -->
 <div id="teamModal"
      class="fixed inset-0 bg-black/40
             <%= showModal ? 'flex' : 'hidden' %>
             items-center justify-center">
-
   <div class="bg-white p-6 rounded-xl w-[400px]">
     <h3 class="text-lg font-semibold mb-4">Add Team</h3>
-        
-   <div id="teamError"
-     class="mb-3 text-sm text-red-600 bg-red-50 px-3 py-2 rounded
-            <%= error ? '' : 'hidden' %>">
-  <%= error || '' %>
-</div>
+
+    <div id="teamError"
+      class="mb-3 text-sm text-red-600 bg-red-50 px-3 py-2 rounded
+             <%= error ? '' : 'hidden' %>">
+      <%= error || '' %>
+    </div>
 
     <form id="addTeamForm" action="/admin/teams/add" method="POST" class="space-y-4" novalidate>
       <input
@@ -163,13 +220,13 @@
 
 <script>
   function openModal() {
-    document.getElementById("teamModal").classList.remove("hidden");
-    document.getElementById("teamModal").classList.add("flex");
+    teamModal.classList.remove("hidden");
+    teamModal.classList.add("flex");
   }
 
   function closeModal() {
-    document.getElementById("teamModal").classList.add("hidden");
-    document.getElementById("teamModal").classList.remove("flex");
+    teamModal.classList.add("hidden");
+    teamModal.classList.remove("flex");
   }
 </script>
 
@@ -178,26 +235,43 @@
   const teamError = document.getElementById("teamError");
   const teamNameInput = teamForm.querySelector("input[name='name']");
 
-  // ✅ Validate on submit
   teamForm.addEventListener("submit", (e) => {
-    const name = teamNameInput.value.trim();
-
-    if (!name) {
+    if (!teamNameInput.value.trim()) {
       e.preventDefault();
-      teamError.textContent = "Team name cannot be empty or spaces.";
+      teamError.textContent = "Team name cannot be empty.";
       teamError.classList.remove("hidden");
-      return;
     }
   });
 
-  // ✅ Clear error when user types
- teamNameInput.addEventListener("input", () => {
-  if (teamError.textContent) {
+  teamNameInput.addEventListener("input", () => {
     teamError.classList.add("hidden");
     teamError.textContent = "";
-  }
-});
+  });
 </script>
+
+<script>
+  const searchInput = document.getElementById("searchInput");
+
+  let debounceTimer;
+
+  searchInput.addEventListener("input", function () {
+    clearTimeout(debounceTimer);
+
+    debounceTimer = setTimeout(() => {
+      const value = searchInput.value.trim();
+
+      // Always reset to page 1 when searching
+      const url = new URL(window.location.href);
+      url.searchParams.set("search", value);
+      url.searchParams.set("page", 1);
+
+      window.location.href = url.toString();
+    }, 500); // 500ms debounce delay
+  });
+</script>
+
+
+
 
 </body>
 </html>

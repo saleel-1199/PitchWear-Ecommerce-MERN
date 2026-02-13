@@ -8,6 +8,8 @@ import {
 } from "../../Services/Admin/admin.product.service.js";
 
 
+import { Team } from "../../Models/team.model.js";
+
 export const productsPage = async (req, res) => {
   try {
     const search = req.query.search || "";
@@ -30,10 +32,9 @@ export const productsPage = async (req, res) => {
 };
 
 
-import { Team } from "../../Models/team.model.js";
 
 export const addProductPage = async (req, res) => {
-  const teams = await Team.find().lean();
+  const teams = await Team.find({isDeleted:false}).lean();
 
   res.render("Admin/ProductAdd", {
     title: "Add Product",
@@ -52,7 +53,7 @@ export const addProduct = async (req, res) => {
     let errorMessage = "Something went wrong.Please try again.";
 
     
-    if (err.message === "INVALID_NAME") {
+    if (err.message === "INVALID_NAME") { 
       errorMessage = "Product name cannot be empty or spaces only.";
     } else if (err.message === "INVALID_TEAM") {
       errorMessage = "Please select a valid team.";

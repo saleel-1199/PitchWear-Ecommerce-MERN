@@ -1,6 +1,7 @@
 import { fetchShopProductsService } from "../../Services/Product/shop.service.js";
 import { Product } from "../../Models/product.model.js";
-
+import {Team}   from "../../Models/team.model.js";
+ 
 export const shopPageController = async (req, res) => {
   try {
     const page = Number(req.query.page) || 1;
@@ -29,10 +30,9 @@ export const shopPageController = async (req, res) => {
        maxPrice,
     });
    
-    const teams = await Product.distinct("team", { 
-      isDeleted: false,
-      status: "Active",
-    });
+    const teams = await Team.find({
+      isDeleted:false
+    }).distinct("name")
 
     res.render("products/shop", {
       title: "Shop",
