@@ -1,5 +1,5 @@
 import { Team } from "../../Models/team.model.js";
-
+import {Product} from "../../Models/product.model.js"
 
 export const getAllTeams = async (search = "", page = 1, limit = 4) => {
   const query = {
@@ -14,7 +14,7 @@ export const getAllTeams = async (search = "", page = 1, limit = 4) => {
   const totalTeams = await Team.countDocuments(query);
 
   const teams = await Team.find(query)
-    .sort({ createdAt: -1 })
+    .sort({name:1})
     .skip((page - 1) * limit)
     .limit(limit)
     .lean();
@@ -63,7 +63,7 @@ export const updateTeamNameService = async (teamId, newName) => {
     throw new Error("TEAM_NOT_FOUND");
   }
 
-  team.name = newName;
+  team.name = newName.trim().toUpperCase();
   await team.save();
 
   return team;
@@ -71,5 +71,12 @@ export const updateTeamNameService = async (teamId, newName) => {
 
 
 export const softDeleteTeam = async (id) => {
+
+  const productsUsingTeam = await Product.exists({ team: id });   
+
+  if (productsUsingTeam) {
+    throw new Error("Cannot delete team with products");  
+  }
+
   return Team.findByIdAndUpdate(id, { isDeleted: true });
 };

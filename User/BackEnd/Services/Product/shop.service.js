@@ -1,6 +1,5 @@
 import { Product } from "../../Models/product.model.js";
-import {Team}  from"../../Models/team.model.js"
-
+import { Team } from "../../Models/team.model.js";
 
 export const fetchShopProductsService = async ({
   page = 1,
@@ -14,25 +13,24 @@ export const fetchShopProductsService = async ({
   maxPrice = "",
 }) => {
 
-
-  const activeTeams = await Team.find({ isDeleted: false })
-  .distinct("name");
-
   
+  const activeTeamIds = await Team.find({ isDeleted: false }).distinct("_id");
+
   const match = {
     isDeleted: false,
     status: "Active",
-    team:{$in:activeTeams}
+    team: { $in: activeTeamIds },
   };
 
-  if (search && search.trim()) {
-    match.$or = [
-      { name: { $regex: search, $options: "i" } },
-      { team: { $regex: search, $options: "i" } },
-    ];
+  
+  if (selectedTeams.length) {
+    const selectedTeamIds = await Team.find({
+      name: { $in: selectedTeams }
+    }).distinct("_id");
+
+    match.team = { $in: selectedTeamIds };
   }
 
-  if (selectedTeams.length) match.team = { $in: selectedTeams };
   if (selectedTypes.length) match.type = { $in: selectedTypes };
   if (selectedKits.length) match.kitType = { $in: selectedKits };
 
@@ -43,10 +41,32 @@ export const fetchShopProductsService = async ({
   if (sort === "priceHigh") sortStage = { displayPrice: -1 };
 
   const pipeline = [
+    { $match: match },
+
     
     {
-      $match:match
+      $lookup: {
+        from: "teams",
+        localField: "team",
+        foreignField: "_id",
+        as: "teamData",
+      },
     },
+    { $unwind: "$teamData" },
+
+
+    ...(search && search.trim()
+      ? [{
+          $match: {
+            $or: [
+              { name: { $regex: search, $options: "i" } },
+              { "teamData.name": { $regex: search, $options: "i" } },
+            ],
+          },
+        }]
+      : []),
+
+
     {
       $addFields: {
         validVariants: {
@@ -57,13 +77,13 @@ export const fetchShopProductsService = async ({
               $and: [
                 { $gt: ["$$v.stock", 0] },
                 { $gt: ["$$v.price", 0] },
-              ]
+              ],
             },
           },
         },
       },
     },
-    
+
 
     {
       $addFields: {
@@ -74,6 +94,7 @@ export const fetchShopProductsService = async ({
             0,
           ],
         },
+        totalStock: { $sum: "$variants.stock" },
       },
     },
   ];
@@ -85,7 +106,6 @@ export const fetchShopProductsService = async ({
         displayPrice: {
           ...(minPrice && { $gte: Number(minPrice) }),
           ...(maxPrice && { $lte: Number(maxPrice) }),
-          
         },
       },
     });
@@ -98,20 +118,20 @@ export const fetchShopProductsService = async ({
   );
 
   const countPipeline = pipeline.filter(
-  stage => !("$skip" in stage) && !("$limit" in stage)
-);
+    stage => !("$skip" in stage) && !("$limit" in stage)
+  );
 
-countPipeline.push({ $count: "total" });
+  countPipeline.push({ $count: "total" });
 
-const [products, countResult] = await Promise.all([
-  Product.aggregate(pipeline),
-  Product.aggregate(countPipeline),
-]);
+  const [products, countResult] = await Promise.all([
+    Product.aggregate(pipeline),
+    Product.aggregate(countPipeline),
+  ]);
 
-const total = countResult[0]?.total || 0;
+  const total = countResult[0]?.total || 0;
 
-return {
-  products,
-  totalPages: Math.ceil(total / limit),
-};
+  return {
+    products,
+    totalPages: Math.ceil(total / limit),
+  };
 };

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Order Details | PitchWear</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#f8f8f4] text-gray-800">
+
+<header class="bg-[#eff2c8] px-10 py-5 flex justify-between items-center">
+  <h1 class="font-bold text-lg">PitchWear</h1>
+  <nav class="flex gap-8 text-sm">
+    <a href="/">Home</a>
+    <a href="/shop">Shop</a>
+    <a href="/about">About</a>
+    <a href="/contact">Contact</a>
+  </nav>
+  <div class="flex gap-4 text-lg">
+    🔍 🛒 👤
+  </div>
+</header>
+
+<main class="max-w-5xl mx-auto py-12">
+
+  <h2 class="text-2xl font-semibold mb-4">Order Details</h2>
+
+  <p class="text-xs text-pink-600 mb-2">
+    Order Date: <%= new Date(order.createdAt).toDateString() %>
+  </p>
+
+  <p class="font-semibold mb-10">
+    Order ID: #<%= order.orderId %>
+  </p>
+
+  <!-- LOOP ALL ITEMS -->
+  <% order.items.forEach(item => { %>
+
+  <div class="border rounded-xl p-6 mb-10 bg-white">
+
+    <!-- ITEM STATUS -->
+    <p class="text-sm mb-2 font-medium"><%= item.status %></p>
+
+    <!-- PROGRESS BAR -->
+    <div class="w-full h-2 bg-pink-200 rounded-full mb-6">
+      <div class="h-2 bg-pink-500 rounded-full"
+           style="width: <%= item.status === 'Pending' ? '25%' :
+                             item.status === 'Shipped' ? '50%' :
+                             item.status === 'Out for Delivery' ? '75%' :
+                             item.status === 'Delivered' ? '100%' :
+                             item.status === 'Cancelled' ? '100%' :
+                             item.status === 'Returned' ? '100%' : '0%' %>">
+      </div>
+    </div>
+
+    <div class="flex justify-between items-center">
+
+      <div>
+        <h3 class="font-semibold mb-2 text-lg">
+          <%= item.product?.name %>
+        </h3>
+
+        <p class="text-sm text-gray-600">
+          Team: <%= item.product?.team?.name %> |
+          Size: <%= item.size %> |
+          Qty: <%= item.quantity %>
+        </p>
+
+        <p class="text-sm mt-3 font-medium text-pink-600">
+          ₹<%= (item.price * item.quantity).toFixed(2) %>
+        </p>
+      </div>
+
+      <div>
+        <img src="<%= item.product?.images?.[0] || '/images/no-image.png' %>"
+             class="w-40 object-contain"/>
+      </div>
+
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="flex gap-4 mt-6">
+
+      <% if (order.status === "Delivered" || order.status === "Partially Completed" || order.status === "Returned") { %>
+
+        <a href="/orders/<%= order.orderId %>/invoice"
+           class="bg-gray-300 px-5 py-2 rounded-lg text-sm hover:bg-gray-400">
+           Download Invoice
+        </a>
+
+        <button onclick="openReturnModal('<%= order.orderId %>','<%= item._id %>')"
+                class="bg-yellow-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-yellow-700">
+            Return
+        </button>
+
+      <% } else if (item.status !== "Cancelled" && item.status !== "Returned") { %>
+
+        <button onclick="openCancelModal('<%= order.orderId %>','<%= item._id %>')"
+                class="bg-red-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-red-700">
+            Cancel
+        </button>
+
+      <% } %>
+
+    </div>
+
+  </div>
+
+  <% }) %>
+
+  <!-- DELIVERY ADDRESS -->
+  <h3 class="font-semibold mb-2">Delivery Address</h3>
+  <p class="text-sm mb-10">
+    <%= order.addressSnapshot.fullName %><br>
+    <%= order.addressSnapshot.addressLine %><br>
+    <%= order.addressSnapshot.city %>,
+    <%= order.addressSnapshot.state %>
+    <%= order.addressSnapshot.pincode %>
+  </p>
+
+  <!-- PRICE SUMMARY -->
+  <h3 class="font-semibold mb-4">Price Summary</h3>
+
+  <div class="text-sm space-y-2 max-w-md mb-8">
+    <div class="flex justify-between">
+      <span class="text-pink-600">Subtotal</span>
+      <span>₹<%= order.subtotal.toFixed(2) %></span>
+    </div>
+
+    <div class="flex justify-between">
+      <span class="text-pink-600">Shipping</span>
+      <span>₹<%= order.deliveryFee.toFixed(2) %></span>
+    </div>
+
+    <div class="flex justify-between">
+      <span class="text-pink-600">Tax</span>
+      <span>₹<%= order.tax.toFixed(2) %></span>
+    </div>
+
+    <div class="flex justify-between font-semibold border-t pt-2">
+      <span class="text-pink-600">Total</span>
+      <span>₹<%= order.finalTotal.toFixed(2) %></span>
+    </div>
+  </div>
+
+</main>
+
+
+<!-- CANCEL MODAL -->
+<div id="cancelModal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+  <div class="bg-white p-6 rounded-lg w-96">
+    <h3 class="font-semibold text-lg mb-4">Cancel Item</h3>
+    <p class="text-sm mb-4">Are you sure you want to cancel this item?</p>
+
+    <form id="cancelForm" method="POST">
+      <div class="flex justify-end gap-3">
+        <button type="button" onclick="closeCancelModal()"
+                class="bg-gray-300 px-4 py-2 rounded">
+          No
+        </button>
+        <button type="submit"
+                class="bg-red-600 text-white px-4 py-2 rounded">
+          Yes, Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- RETURN MODAL -->
+<div id="returnModal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+  <div class="bg-white p-6 rounded-lg w-96">
+    <h3 class="font-semibold text-lg mb-4">Return Item</h3>
+
+    <form id="returnForm" method="POST">
+  <textarea
+    name="reason"
+    required
+    placeholder="Enter return reason..."
+    class="w-full border p-2 rounded mb-4"
+  ></textarea>
+
+      <div class="flex justify-end gap-3">
+        <button type="button" onclick="closeReturnModal()"
+                class="bg-gray-300 px-4 py-2 rounded">
+          Cancel
+        </button>
+        <button type="submit"
+                class="bg-yellow-600 text-white px-4 py-2 rounded">
+          Submit Return
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openCancelModal(orderId, itemId) {
+  const form = document.getElementById("cancelForm");
+  form.action = `/orders/${orderId}/item/${itemId}/cancel`;
+  document.getElementById("cancelModal").classList.remove("hidden");
+}
+
+function closeCancelModal() {
+  document.getElementById("cancelModal").classList.add("hidden");
+}
+
+function openReturnModal(orderId, itemId) {
+  const form = document.getElementById("returnForm");
+  form.action = `/orders/${orderId}/item/${itemId}/return`;
+  document.getElementById("returnModal").classList.remove("hidden");
+}
+
+function closeReturnModal() {
+  document.getElementById("returnModal").classList.add("hidden");
+}
+</script>
+
+
+
+</body>
+</html>

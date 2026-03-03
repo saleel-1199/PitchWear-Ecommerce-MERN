@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#f8f8f4] text-gray-800">
+
+<!-- ✅ HEADER (UNCHANGED) -->
+<header class="bg-[#eff2c8] px-10 py-5 flex items-center justify-between">
+  <div class="flex items-center gap-10">
+    <h1 class="font-bold text-lg">Pitchwear</h1>
+    <p class="text-sm font-semibold">Admin Dashboard</p>
+  </div>
+  <div class="w-11 h-11 rounded-xl bg-white flex items-center justify-center border">
+    <span class="text-lg">👤</span>
+  </div>
+</header>
+
+<main class="flex px-10 py-10 gap-10">
+
+<!-- ✅ SIDEBAR (UNCHANGED) -->
+<aside class="w-64">
+  <p class="text-sm text-gray-500 mb-5">Pitchwear Admin</p>
+
+  <nav class="space-y-2 text-sm">
+    <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">🏠 Dashboard</a>
+    <a href="/admin/products" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">👕 Product Management</a>
+    <a href="/admin/teams" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">⚽ Manage Teams</a>
+    <a href="/admin/orders" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white font-medium">📦 Order Management</a>
+    <a href="/admin/users" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">👥 User Management</a>
+    <a href="/admin/analytics" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">📈 Analytics</a>
+    <a href="/admin/coupons" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">🧾 Coupons</a>
+    <a href="/admin/banner" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">🏷️ Banner</a>
+    <a href="/admin/offers" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">🎁 Offers</a>
+    <a href="/admin/settings" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">⚙️ Settings</a>
+    <a href="/admin/logout" class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-600 font-medium mt-6">⛔ Logout</a>
+  </nav>
+</aside>
+
+<!-- ✅ CONTENT AREA -->
+<section class="flex-1">
+
+  <!-- ✅ Breadcrumb -->
+  <nav class="mb-6 text-sm text-gray-500">
+    Dashboard / <span class="text-gray-700 font-semibold">Orders</span>
+  </nav>
+
+  <!-- ✅ Title -->
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-3xl font-bold">Order Management</h2>
+  </div>
+
+  <!-- ✅ Search + Filter -->
+  <form method="GET" class="flex gap-3 mb-6">
+
+    <input
+      type="text"
+      name="search"
+      placeholder="Search Order ID"
+      value="<%= search || '' %>"
+      class="border px-4 py-2 rounded-lg text-sm w-64"
+    />
+
+    <select name="status" class="border px-4 py-2 rounded-lg text-sm">
+      <option value="">All Status</option>
+      <option value="Pending" <%= status === "Pending" ? "selected" : "" %>>Pending</option>
+      <option value="Shipped" <%= status === "Shipped" ? "selected" : "" %>>Shipped</option>
+      <option value="Out for Delivery" <%= status === "Out for Delivery" ? "selected" : "" %>>Out for Delivery</option>
+      <option value="Delivered" <%= status === "Delivered" ? "selected" : "" %>>Delivered</option>
+      <option value="Cancelled" <%= status === "Cancelled" ? "selected" : "" %>>Cancelled</option>
+    </select>
+
+    <button class="bg-[#cdd47b] text-white px-6 py-2 rounded-lg text-sm font-semibold">
+      Apply
+    </button>
+
+    <a href="/admin/orders"
+   class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg text-sm font-semibold">
+   Clear Filters
+</a>
+
+  </form>
+
+  <!-- ✅ Orders Table -->
+  <div class="bg-white border rounded-xl overflow-hidden">
+
+    <table class="w-full text-sm">
+
+      <thead class="bg-gray-50 text-gray-500">
+        <tr>
+          <th class="text-left px-6 py-4">Order ID</th>
+          <th class="text-left px-6 py-4">Date</th>
+          <th class="text-left px-6 py-4">Customer</th>
+          <th class="text-left px-6 py-4">Total</th>
+          <th class="text-left px-6 py-4">Payment</th>
+          <th class="text-left px-6 py-4">Status</th>
+          <th class="text-center px-6 py-4">Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <% if (!orders || orders.length === 0) { %>
+          <tr>
+            <td colspan="7" class="text-center py-16 text-gray-400">
+              No orders found
+            </td>
+          </tr>
+        <% } %>
+
+        <% orders.forEach(order => { %>
+          <tr class="border-t">
+
+            <td class="px-6 py-4"><%= order.orderId %></td>
+
+            <td class="px-6 py-4">
+              <%= new Date(order.createdAt).toDateString() %>
+            </td>
+
+            <td class="px-6 py-4">
+              <%= order.user?.fullName || "User" %>
+            </td>
+
+            <td class="px-6 py-4">₹<%= order.finalTotal %></td>
+
+            <td class="px-6 py-4"><%= order.paymentMethod %></td>
+
+            <td class="px-6 py-4">
+              <% if (order.status === "Delivered") { %>
+                <span class="text-green-600 font-semibold">Delivered</span>
+              <% } else if (order.status === "Cancelled") { %>
+                <span class="text-red-500 font-semibold">Cancelled</span>
+              <% } else { %>
+                <span class="text-yellow-600 font-semibold"><%= order.status %></span>
+              <% } %>
+            </td>
+
+            <td class="px-6 py-4 text-center">
+              <a href="/admin/orders/<%= order._id %>">
+                View
+              </a>
+            </td>
+
+          </tr>
+        <% }) %>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ✅ Pagination -->
+  <% if (totalPages > 1) { %>
+    <div class="flex justify-center mt-8 gap-2 text-sm">
+
+      <% if (currentPage > 1) { %>
+        <a href="?page=<%= currentPage - 1 %>&search=<%= search || '' %>&status=<%= status || '' %>"
+           class="px-4 py-2 border rounded-lg bg-white">
+          Prev
+        </a>
+      <% } %>
+
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <a href="?page=<%= i %>&search=<%= search || '' %>&status=<%= status || '' %>"
+           class="px-4 py-2 border rounded-lg 
+           <%= i === currentPage ? 'bg-green-600 text-white' : 'bg-white' %>">
+          <%= i %>
+        </a>
+      <% } %>
+
+      <% if (currentPage < totalPages) { %>
+        <a href="?page=<%= currentPage + 1 %>&search=<%= search || '' %>&status=<%= status || '' %>"
+           class="px-4 py-2 border rounded-lg bg-white">
+          Next
+        </a>
+      <% } %>
+
+    </div>
+  <% } %>
+
+</section>
+</main>
+
+</body>
+</html>

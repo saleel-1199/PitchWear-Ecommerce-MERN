@@ -85,6 +85,7 @@
         value="<%= safeSearch %>"
         placeholder="Search teams..."
         class="w-64 border rounded-lg px-4 py-2"
+        autocomplete="off"
         autofocus
       />
 
@@ -218,6 +219,35 @@
   </div>
 </div>
 
+
+<!-- error modal -->
+
+
+<% if (error) { %>
+<div id="errorModal"
+     class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+  <div class="bg-white rounded-xl shadow-xl w-[380px] p-6">
+
+    <h3 class="text-lg font-semibold text-red-600 mb-3">
+      ⚠ Action Failed
+    </h3>
+
+    <p class="text-sm text-gray-600 mb-6">
+      <%= error %>
+    </p>
+
+    <div class="flex justify-end">
+      <button onclick="closeErrorModal()"
+              class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg text-sm font-semibold">
+        OK
+      </button>
+    </div>
+
+  </div>
+</div>
+<% } %>
+
 <script>
   function openModal() {
     teamModal.classList.remove("hidden");
@@ -270,6 +300,24 @@
   });
 </script>
 
+<!-- ✅ ERROR MODAL SCRIPT -->
+<script> 
+  function closeErrorModal() {
+    const modal = document.getElementById("errorModal");
+    if (modal) modal.style.display = "none";
+  }
+</script>
+
+<script>
+  document.addEventListener("click", (e) => {
+    const modal = document.getElementById("errorModal");
+    if (!modal) return;
+
+    if (e.target === modal) {
+      closeErrorModal();
+    }
+  });
+</script>
 
 
 

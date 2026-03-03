@@ -13,7 +13,7 @@ import productRoutes from "./User/BackEnd/Routes/ProductRoutes/product.routes.js
 import adminAuthRoutes from "./User/BackEnd/Routes/Admin/admin.auth.routes.js";
 
 import adminProductRoutes from "./User/BackEnd/Routes/Admin/admin.product.routes.js";
-
+import cartRoutes from "./User/BackEnd/Routes/ProductRoutes/product.routes.js";
 
 import {attachUser} from "./User/BackEnd/Middlewares/attachUser.middleware.js"
 
@@ -58,8 +58,8 @@ app.use(attachUser)
 
 app.set("view engine", "ejs");
 app.set("view cache", false);
-app.set("views", "User/BackEnd/Views");
-
+//app.set("views", "User/BackEnd/Views");
+app.set("views", path.join(__dirname, "User/BackEnd/Views")); 
 
 app.use("/", authRoutes);
 app.use("/",adminAuthRoutes);
@@ -67,6 +67,7 @@ app.use("/",productRoutes);
 
 app.use("/", adminProductRoutes);
 
+app.use(cartRoutes);
 
 const PORT = process.env.PORT || 3003;
 

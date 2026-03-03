@@ -9,7 +9,7 @@ import {
 
 export const teamsPage = async (req, res) => {
   try {
-    const { search = "", page = 1, limit = 4 ,error: errorMessage=null} = req.query;
+    const { search = "", page = 1, limit = 4 ,error: errorMessage=null,  showModal = false } = req.query;
 
     const data = await getAllTeams(
       search,
@@ -17,12 +17,16 @@ export const teamsPage = async (req, res) => {
       Number(limit)
     );
 
+      if (page > data.totalPages && data.totalPages > 0) {
+      return res.redirect(`/admin/teams?page=${data.totalPages}&search=${search}`);
+    }
+
     res.render("Admin/Teams", {
       teams: data.teams,
       currentPage: data.currentPage,
       totalPages: data.totalPages,
       search,
-      showModal: false ,
+     showModal: showModal === "true",  
       error:errorMessage
     });
   } catch (error) {
@@ -54,7 +58,7 @@ export const addTeam = async (req, res) => {
       totalPages: data.totalPages,
       search,
       showModal: true,              
-      error: error.message,    
+      error: error.message    
     });
   }
 };
@@ -90,10 +94,19 @@ export const updateTeamName = async (req, res) => {
 };
 
 export const deleteTeam = async (req, res) => {
-  const { page = 1, search = "" } = req.query;
+ try {
+  
+   const { page = 1, search = "" } = req.query;
 
   await softDeleteTeam(req.params.id);
 
   res.redirect(`/admin/teams?page=${page}&search=${search}`);
+ } catch (error) {
+const { page = 1, search = "" } = req.query;
+
+   return res.redirect(
+    `/admin/teams?page=${page}&search=${search}&error=${encodeURIComponent(error.message)}`
+    );
+}
 };
 

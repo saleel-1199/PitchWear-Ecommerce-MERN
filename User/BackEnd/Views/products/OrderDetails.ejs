@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Orders | PitchWear</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#f8f8f4] text-gray-800">
+
+<!-- HEADER -->
+<header class="bg-[#eff2c8] px-10 py-5 flex justify-between items-center">
+  <h1 class="font-bold text-lg">PitchWear</h1>
+
+  <nav class="flex gap-8 text-sm">
+    <a href="/">Home</a>
+    <a href="/shop">Shop</a>
+    <a href="/about">About</a>
+    <a href="/contact">Contact</a>
+  </nav>
+
+  <div class="flex gap-4 text-lg">
+    🔍 🛒 👤
+  </div>
+</header>
+
+<main class="max-w-5xl mx-auto py-12">
+
+  <h2 class="text-2xl font-semibold mb-8">My Orders</h2>
+
+  <% if (!orders || orders.length === 0) { %>
+    <p>No orders found.</p>
+  <% } %>
+
+  <% orders.forEach(order => { %>
+
+    <div class="bg-white border rounded-xl p-6 mb-10">
+
+      <!-- STATUS -->
+      <p class="text-sm mb-2 font-medium">
+        <%= order.status %>
+      </p>
+
+      <!-- PROGRESS BAR -->
+      <div class="w-full h-2 bg-pink-200 rounded-full mb-4">
+        <div class="h-2 bg-pink-400 rounded-full"
+             style="width: <%= order.status === 'Pending' ? '25%' :
+                               order.status === 'Shipped' ? '50%' :
+                               order.status === 'Out for Delivery' ? '75%' :
+                               order.status === 'Delivered' ? '100%' :
+                               order.status === 'Cancelled' ? '100%' : '0%' %>">
+        </div>
+      </div>
+
+      <p class="text-xs text-pink-600 mb-4">
+        Order Date:
+        <%= new Date(order.createdAt).toDateString() %>
+      </p>
+
+      <p class="font-semibold mb-6">
+        Order ID: #<%= order.orderId %>
+      </p>
+
+      <!-- PRODUCTS TABLE -->
+      <div class="border rounded-xl overflow-hidden mb-6">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="text-left px-6 py-4">Product</th>
+              <th class="text-left px-6 py-4">Price</th>
+              <th class="text-left px-6 py-4">Qty</th>
+              <th class="text-left px-6 py-4">Total</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y">
+            <% order.items.forEach(item => { %>
+             <td class="px-6 py-4 flex items-center gap-4">
+
+  <!-- PRODUCT IMAGE -->
+  <img src="<%= item.product?.images?.[0] || '/images/no-image.png' %>"
+       class="w-14 h-14 object-cover rounded-lg border" />
+
+  <!-- PRODUCT INFO -->
+  <div>
+    <p class="font-medium">
+      <%= item.product?.name %>,
+      <%= item.product?.type %>
+    </p>
+
+    <p class="text-xs text-gray-500">
+      Size: <%= item.size %>
+    </p>
+  </div>
+
+</td>
+                <td class="px-6 py-4 text-pink-600">
+                  ₹<%= item.price.toFixed(2) %>
+                </td>
+
+                <td class="px-6 py-4">
+                  <%= item.quantity %>
+                </td>
+
+                <td class="px-6 py-4 text-pink-600">
+                  ₹<%= (item.price * item.quantity).toFixed(2) %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SUMMARY -->
+      <div class="text-sm space-y-2 max-w-md mb-6">
+
+        <div class="flex justify-between">
+          <span class="text-pink-600">Subtotal</span>
+          <span>₹<%= order.subtotal.toFixed(2) %></span>
+        </div>
+
+        <div class="flex justify-between">
+          <span class="text-pink-600">Shipping</span>
+          <span>₹<%= order.deliveryFee.toFixed(2) %></span>
+        </div>
+
+        <div class="flex justify-between">
+          <span class="text-pink-600">Tax</span>
+          <span>₹<%= order.tax.toFixed(2) %></span>
+        </div>
+
+        <div class="flex justify-between font-semibold border-t pt-2">
+          <span class="text-pink-600">Total</span>
+          <span>₹<%= order.finalTotal.toFixed(2) %></span>
+        </div>
+
+      </div>
+
+      <!-- ACTION BUTTON -->
+      <a href="/orders/<%= order.orderId %>"
+         class="inline-block bg-green-600 text-white px-5 py-2 rounded-lg text-sm">
+         View Full Details
+      </a>
+
+    </div>
+
+  <% }) %>
+
+</main>
+</body>
+</html>

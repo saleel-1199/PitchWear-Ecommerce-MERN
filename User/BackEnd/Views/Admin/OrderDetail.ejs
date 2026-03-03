@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Detail</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#f8f8f4] text-gray-800">
+
+<header class="bg-[#eff2c8] px-10 py-5 flex items-center justify-between">
+  <div class="flex items-center gap-10">
+    <h1 class="font-bold text-lg">Pitchwear</h1>
+    <p class="text-sm font-semibold">Admin Dashboard</p>
+  </div>
+  <div class="w-11 h-11 rounded-xl bg-white flex items-center justify-center border">
+    <span class="text-lg">👤</span>
+  </div>
+</header>
+
+<main class="flex px-10 py-10 gap-10">
+
+<aside class="w-64">
+  <p class="text-sm text-gray-500 mb-5">Pitchwear Admin</p>
+  <nav class="space-y-2 text-sm">
+    <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">🏠 Dashboard</a>
+    <a href="/admin/products" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">👕 Product Management</a>
+    <a href="/admin/orders" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white font-medium">📦 Order Management</a>
+  </nav>
+</aside>
+
+<section class="flex-1">
+
+  <p class="text-sm text-gray-500 mb-6">
+    Orders / <span class="text-black font-medium"><%= order.orderId %></span>
+  </p>
+
+  <!-- Order Summary -->
+  <div class="bg-white rounded-xl border p-5 mb-6">
+    <h2 class="text-lg font-semibold mb-3">Order Summary</h2>
+    <div class="grid grid-cols-2 gap-2 text-sm">
+      <p>Order ID: <%= order.orderId %></p>
+      <p>Date: <%= new Date(order.createdAt).toDateString() %></p>
+      <p>Status: <%= order.status %></p>
+      <p>Payment: <%= order.paymentMethod %></p>
+      <p>Total Amount: ₹<%= order.finalTotal %></p>
+    </div>
+  </div>
+
+  <!-- Customer Info -->
+  <div class="bg-white rounded-xl border p-5 mb-6">
+    <h2 class="text-lg font-semibold mb-3">Customer Information</h2>
+    <p class="text-sm">
+      Name: <%= order.user?.fullName %><br>
+      Email: <%= order.user?.email %><br>
+    </p>
+  </div>
+
+  <!-- Product Details -->
+  <div class="bg-white rounded-xl border mb-6 overflow-hidden">
+    <h2 class="text-lg font-semibold p-5 border-b">Product Details</h2>
+
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 text-gray-500">
+        <tr>
+          <th class="px-6 py-3 text-left">Image</th>
+          <th class="px-6 py-3 text-left">Name</th>
+          <th class="px-6 py-3 text-left">Size</th>
+          <th class="px-6 py-3 text-left">Qty</th>
+          <th class="px-6 py-3 text-left">Price</th>
+          <th class="px-6 py-3 text-left">Subtotal</th>
+          <th class="px-6 py-3 text-left">Status</th>
+          <th class="px-6 py-3 text-left">Return Reason</th>
+          <th class="px-6 py-3 text-left">Return Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% order.items.forEach(item => { %>
+          <tr class="border-t">
+
+            <td class="px-6 py-3">
+              <img src="<%= item.product?.images?.[0] || '/images/no-image.png' %>"
+                   class="w-12 h-12 rounded object-cover"/>
+            </td>
+
+            <td class="px-6 py-3"><%= item.product?.name %></td>
+            <td class="px-6 py-3"><%= item.size %></td>
+            <td class="px-6 py-3"><%= item.quantity %></td>
+            <td class="px-6 py-3">₹<%= item.price %></td>
+            <td class="px-6 py-3">₹<%= item.price * item.quantity %></td>
+
+            <!-- Status Dropdown -->
+            <td class="px-6 py-3">
+              <form action="/admin/orders/<%= order._id %>/item/<%= item._id %>/status?_method=PATCH"
+                    method="POST"
+                    class="flex gap-2 items-center">
+
+                <select name="status" class="border px-2 py-1 text-sm rounded">
+
+                  <option value="Pending" <%= item.status === "Pending" ? "selected" : "" %>>Pending</option>
+                  <option value="Shipped" <%= item.status === "Shipped" ? "selected" : "" %>>Shipped</option>
+                  <option value="Out for Delivery" <%= item.status === "Out for Delivery" ? "selected" : "" %>>Out for Delivery</option>
+                  <option value="Delivered" <%= item.status === "Delivered" ? "selected" : "" %>>Delivered</option>
+                  <option value="Cancelled" <%= item.status === "Cancelled" ? "selected" : "" %>>Cancelled</option>
+                  <option value="Return Requested" <%= item.status === "Return Requested" ? "selected" : "" %>>Return Requested</option>
+                  <option value="Returned" <%= item.status === "Returned" ? "selected" : "" %>>Returned</option>
+
+                </select>
+
+                <button class="bg-green-500 text-white px-3 py-1 text-xs rounded">
+                  Update
+                </button>
+
+              </form>
+            </td>
+
+            <!-- Return Reason -->
+            <td class="px-6 py-3 text-sm break-words whitespace-pre-wrap max-w-xs">
+              <%= item.returnReason || "-" %>
+           </td>
+
+            <!-- Approve Return -->
+            <td class="px-6 py-3">
+              <% if (item.status === "Return Requested") { %>
+
+                <form action="/admin/orders/<%= order._id %>/item/<%= item._id %>/approve-return?_method=PATCH"
+                      method="POST">
+
+                  <button class="bg-blue-600 text-white px-3 py-1 text-xs rounded">
+                    Approve
+                  </button>
+
+                </form>
+
+              <% } else { %>
+                -
+              <% } %>
+            </td>
+
+          </tr>
+        <% }) %>
+      </tbody>
+
+    </table>
+  </div>
+
+</section>
+</main>
+
+</body>
+</html>

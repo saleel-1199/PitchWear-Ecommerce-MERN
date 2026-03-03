@@ -3,21 +3,17 @@ import { Product } from "../../Models/product.model.js";
 import {Team} from "../../Models/team.model.js"
 
 export const fetchProductDetailsService = async (slug) => {
+
   const product = await Product.findOne({
     slug,
     isDeleted: false,
     status: "Active",
-  }).lean();
-
-   if (!product) return null;
-
-
-  const teamExist = await Team.findOne({
-    name:product.team,
-    isDeleted:false
   })
+    .populate("team", "name logo")   
+    .lean();
 
-  if(!teamExist)  return null;
+  if (!product) return null;
+
 
 
   const validVariants = (product.variants || []).filter(
@@ -32,22 +28,27 @@ export const fetchProductDetailsService = async (slug) => {
     (sum, v) => sum + Number(v.stock || 0),
     0
   );
+
   return product;
 };
 
+
 export const fetchRelatedProductsService = async (product) => {
-  if (!product || !product.team) return [];
-  
+
+  if (!product || !product.team?._id) return [];
+
   const relatedProducts = await Product.find({
-    team: product.team,
+    team: product.team._id,  
     status: "Active",
     isDeleted: false,
     _id: { $ne: new mongoose.Types.ObjectId(product._id) },
   })
     .limit(4)
+    .populate("team", "name logo")   
     .lean();
 
   return relatedProducts.map((p) => {
+
     const validVariants = (p.variants || []).filter(
       v => v.stock > 0 && v.price > 0
     );
@@ -60,4 +61,3 @@ export const fetchRelatedProductsService = async (product) => {
     };
   });
 };
-

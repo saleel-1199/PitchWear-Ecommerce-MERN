@@ -183,13 +183,28 @@
         class="w-full mt-2 border rounded-lg px-4 py-2"/>
     </div>
 
+
+
     <div>
-      <label class="text-sm font-medium">
-  Team <span class="text-red-500">*</span>
-</label>
-      <input name="team" value="<%= product.team %>" required
-        class="w-full mt-2 border rounded-lg px-4 py-2"/>
-    </div>
+  <label class="text-sm font-medium">
+    Team <span class="text-red-500">*</span>
+  </label>
+
+  <select name="team"
+    class="w-full mt-2 border rounded-lg px-4 py-2">
+
+    <% teams.forEach(team => { %>
+      <option value="<%= team._id %>"
+        <%= String(product.team._id) === String(team._id) ? "selected" : "" %>>
+        <%= team.name %>
+      </option>
+    <% }) %>
+
+  </select>
+</div>
+
+
+
   </div>
 
   <div class="mt-6">
@@ -240,11 +255,11 @@
     href="/admin/products/<%= product._id %>/inventory"
     class="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold"
   >
-    Manage Inventory
+   Manage Inventory
   </a>
 </div>
 
-<!-- IMAGES -->
+<!--IMAGES-->
 <div class="bg-white border rounded-xl p-8">
   <h3 class="font-semibold mb-6">
   Product Images <span class="text-red-500">*</span>

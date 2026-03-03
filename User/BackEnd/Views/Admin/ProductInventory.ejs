@@ -65,53 +65,100 @@
     <form
       action="/admin/products/<%= product._id %>/inventory"
       method="POST"
-      class="bg-white p-6 rounded-xl max-w-xl space-y-6"
+      class="bg-white p-6 rounded-xl space-y-6"
     >
 
-      <% const sizes = ["S","M","L","XL","XXL"]; %>
+      <% const leftSizes = ["S","M","L"]; %>
+      <% const rightSizes = ["XL","XXL"]; %>
 
-      <% sizes.forEach((size, index) => { %>
-        <% const variant = product.variants.find(v => v.size === size) || {}; %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        <div class="border rounded-lg p-4">
-          <h4 class="font-semibold mb-3">Size <%= size %></h4>
+        <!-- ✅ LEFT COLUMN -->
+        <div class="space-y-6">
+          <% leftSizes.forEach((size, index) => { %>
+            <% const variant = product.variants.find(v => v.size === size) || {}; %>
 
-          <!-- SIZE -->
-          <input
-            type="hidden"
-            name="variants[<%= index %>][size]"
-            value="<%= size %>"
-          >
+            <div class="border rounded-lg p-4">
+              <h4 class="font-semibold mb-3">Size <%= size %></h4>
 
-          <!-- PRICE -->
-          <div class="mb-3">
-            <label class="text-sm font-medium">Price</label>
-            <input
-              type="number"
-              name="variants[<%= index %>][price]"
-              value="<%= variant.price ?? '' %>"
-              class="w-full border px-3 py-2 rounded mt-1"
-              min="0"
-              placeholder="Enter price"
-            />
-          </div>
+              <input
+                type="hidden"
+                name="variants[<%= index %>][size]"
+                value="<%= size %>"
+              >
 
-          <!-- STOCK -->
-          <div>
-            <label class="text-sm font-medium">Stock</label>
-            <input
-              type="number"
-              name="variants[<%= index %>][stock]"
-              value="<%= variant.stock ?? '' %>"
-              class="w-full border px-3 py-2 rounded mt-1"
-              min="0"
-              placeholder="Enter stock"
-            />
-          </div>
+              <div class="mb-3">
+                <label class="text-sm font-medium">Price</label>
+                <input
+                  type="number"
+                  name="variants[<%= index %>][price]"
+                  value="<%= variant.price ?? '' %>"
+                  class="w-full border px-3 py-2 rounded mt-1"
+                  min="0"
+                  placeholder="Enter price"
+                />
+              </div>
+
+              <div>
+                <label class="text-sm font-medium">Stock</label>
+                <input
+                  type="number"
+                  name="variants[<%= index %>][stock]"
+                  value="<%= variant.stock ?? '' %>"
+                  class="w-full border px-3 py-2 rounded mt-1"
+                  min="0"
+                  placeholder="Enter stock"
+                />
+              </div>
+            </div>
+          <% }) %>
         </div>
-      <% }) %>
 
-      <!-- ACTION BUTTONS -->
+        <!-- ✅ RIGHT COLUMN -->
+        <div class="space-y-6">
+          <% rightSizes.forEach((size, index) => { %>
+            <% const actualIndex = index + 3; %>
+            <% const variant = product.variants.find(v => v.size === size) || {}; %>
+
+            <div class="border rounded-lg p-4">
+              <h4 class="font-semibold mb-3">Size <%= size %></h4>
+
+              <input
+                type="hidden"
+                name="variants[<%= actualIndex %>][size]"
+                value="<%= size %>"
+              >
+
+              <div class="mb-3">
+                <label class="text-sm font-medium">Price</label>
+                <input
+                  type="number"
+                  name="variants[<%= actualIndex %>][price]"
+                  value="<%= variant.price ?? '' %>"
+                  class="w-full border px-3 py-2 rounded mt-1"
+                  min="0"
+                  placeholder="Enter price"
+                />
+              </div>
+
+              <div>
+                <label class="text-sm font-medium">Stock</label>
+                <input
+                  type="number"
+                  name="variants[<%= actualIndex %>][stock]"
+                  value="<%= variant.stock ?? '' %>"
+                  class="w-full border px-3 py-2 rounded mt-1"
+                  min="0"
+                  placeholder="Enter stock"
+                />
+              </div>
+            </div>
+          <% }) %>
+        </div>
+
+      </div>
+
+      <!-- ✅ ACTION BUTTONS -->
       <div class="flex justify-end gap-3 pt-4">
 
         <a

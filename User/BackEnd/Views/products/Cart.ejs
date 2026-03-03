@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shopping Cart | PitchWear</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#f8f8f4] text-gray-800">
+
+<!-- ================= HEADER ================= -->
+<header class="bg-white px-16 py-4 flex justify-between items-center">
+  <h1 class="text-xl font-semibold">PitchWear</h1>
+
+  <nav class="flex gap-8 text-sm">
+    <a href="/home" class="hover:text-primary">Home</a>
+    <a href="/shop" class="hover:text-primary">Shop</a>
+    <a href="/about" class="hover:text-primary">About</a>
+    <a href="/contact" class="hover:text-primary">Contact</a>
+  </nav>
+
+  <div class="flex items-center gap-4 text-lg">
+    <a href="/wishlist" class="hover:scale-110 transition">♡</a>
+    <a href="/cart" class="hover:scale-110 transition">🛒</a>
+    <a href="/profile" class="hover:scale-110 transition">👤</a>
+  </div>
+</header>
+
+<!-- ✅ PAGE CONTENT -->
+<main class="px-10 py-10">
+
+  <h2 class="text-3xl font-bold mb-10">Shopping Cart</h2>
+
+  <% if (!cart.items || cart.items.length === 0) { %>
+    <div class="bg-white border rounded-xl p-10 text-center text-gray-500">
+      Your cart is empty 🛒
+      <div class="mt-4">
+        <a href="/shop" class="px-6 py-2 bg-[#b76e79] text-white rounded-lg text-sm">
+          Continue Shopping
+        </a>
+      </div>
+    </div>
+  <% } else { %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+    <!-- ✅ CART TABLE -->
+    <div class="lg:col-span-2">
+
+      <div class="bg-white rounded-xl border overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-gray-600">
+            <tr>
+              <th class="text-left px-6 py-4">Product</th>
+              <th class="text-left px-6 py-4">Price</th>
+              <th class="text-left px-6 py-4">Quantity</th>
+              <th class="text-left px-6 py-4">Subtotal</th>
+              <th class="text-left px-6 py-4">Action</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y">
+
+            <% cart.items.forEach(item => { %>
+              <tr class="hover:bg-gray-50">
+
+                <!-- PRODUCT -->
+                <td class="px-6 py-4 flex items-center gap-4">
+                  <img src="<%= item.product.images[0] %>"
+                       class="w-12 h-12 object-cover rounded"/>
+
+                  <div>
+                    <p class="font-medium">
+                      <%= item.product.team?.name %>, 
+                      <%= item.product.type %>, 
+                      <%= item.product.category %>
+                    </p>
+                    <p class="text-gray-500 text-xs">
+                      Size: <%= item.size %>
+                    </p>
+                  </div>
+                </td>
+
+                <!-- PRICE -->
+                <td class="px-6 py-4 text-blue-600 font-medium">
+                  $<%= item.price.toFixed(2) %>
+                </td>
+
+                <!-- QUANTITY -->
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+
+                    <!-- DECREMENT -->
+                    <form action="/cart/<%= item.product._id %>?_method=PATCH" method="POST">
+                      <input type="hidden" name="size" value="<%= item.size %>">
+                      <input type="hidden" name="action" value="dec">
+                      <button class="text-gray-400 hover:text-black">−</button>
+                    </form>
+
+                    <span><%= item.quantity %></span>
+
+                    <!-- INCREMENT -->
+                    <form action="/cart/<%= item.product._id %>?_method=PATCH" method="POST">
+                      <input type="hidden" name="size" value="<%= item.size %>">
+                      <input type="hidden" name="action" value="inc">
+                      <button class="text-gray-400 hover:text-black">+</button>
+                    </form>
+
+                  </div>
+                </td>
+
+                <!-- SUBTOTAL -->
+                <td class="px-6 py-4 font-semibold">
+                  $<%= (item.price * item.quantity).toFixed(2) %>
+                </td>
+
+                <!-- DELETE -->
+                <td class="px-6 py-4">
+                  <form action="/cart/<%= item.product._id %>?_method=DELETE" method="POST">
+                    <input type="hidden" name="size" value="<%= item.size %>">
+                    <button class="text-gray-500 hover:text-red-600">
+                      🗑
+                    </button>
+                  </form>
+                </td>
+
+              </tr>
+            <% }) %>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- BUTTONS -->
+      <div class="flex justify-between mt-6">
+        <a href="/shop"
+           class="px-5 py-2 bg-gray-100 rounded-lg text-sm font-medium">
+          Continue Shopping
+        </a>
+
+        <a href="/checkout"
+           class="px-6 py-2 bg-[#b76e79] text-white rounded-lg text-sm font-semibold">
+          Checkout
+        </a>
+      </div>
+
+    </div>
+
+    <!-- ✅ CART SUMMARY -->
+    <div>
+
+      <div class="bg-white rounded-xl border p-6">
+        <h3 class="text-lg font-semibold mb-5">Cart Summary</h3>
+
+        <div class="space-y-3 text-sm">
+
+          <div class="flex justify-between">
+            <span class="text-gray-500">Subtotal</span>
+            <span>$<%= cart.subtotal?.toFixed(2) || "0.00" %></span>
+          </div>
+
+          <div class="flex justify-between">
+            <span class="text-gray-500">Delivery Fee</span>
+            <span>$<%= cart.deliveryFee?.toFixed(2) || "0.00" %></span>
+          </div>
+
+          <div class="flex justify-between">
+            <span class="text-gray-500">Discount</span>
+            <span class="text-red-500">
+              -$<%= cart.discount?.toFixed(2) || "0.00" %>
+            </span>
+          </div>
+
+          <div class="flex justify-between">
+            <span class="text-gray-500">Tax</span>
+            <span>$<%= cart.tax?.toFixed(2) || "0.00" %></span>
+          </div>
+
+          <hr>
+
+          <div class="flex justify-between font-semibold">
+            <span>Total</span>
+            <span>$<%= cart.finalTotal?.toFixed(2) || "0.00" %></span>
+          </div>
+
+        </div>
+      </div>
+
+    
+
+    </div>
+
+  </div>
+
+  <% } %>
+
+</main>
+
+</body>
+</html>

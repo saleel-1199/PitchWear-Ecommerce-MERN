@@ -7,7 +7,7 @@ const variantSchema = new mongoose.Schema(
       required: true,
       uppercase: true,
       trim: true,
-    },
+    }, 
     price: {
       type: Number,
       required: true,
@@ -38,9 +38,9 @@ const productSchema = new mongoose.Schema(
   },
 
     team: {
-      type: String,
-      required: true,
-      trim: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref:"Team",
+      required:true
     },
  
     description: {

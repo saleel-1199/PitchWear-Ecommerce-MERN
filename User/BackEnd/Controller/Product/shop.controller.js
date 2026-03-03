@@ -1,7 +1,6 @@
 import { fetchShopProductsService } from "../../Services/Product/shop.service.js";
-import { Product } from "../../Models/product.model.js";
-import {Team}   from "../../Models/team.model.js";
- 
+import { Team } from "../../Models/team.model.js";
+
 export const shopPageController = async (req, res) => {
   try {
     const page = Number(req.query.page) || 1;
@@ -13,10 +12,9 @@ export const shopPageController = async (req, res) => {
     const selectedTeams = [].concat(req.query.teams || []);
     const selectedTypes = [].concat(req.query.types || []);
     const selectedKits = [].concat(req.query.kits || []);
-    
+
     const minPrice = req.query.minPrice || "";
     const maxPrice = req.query.maxPrice || "";
-
 
     const { products, totalPages } = await fetchShopProductsService({
       page,
@@ -26,13 +24,11 @@ export const shopPageController = async (req, res) => {
       selectedTeams,
       selectedTypes,
       selectedKits,
-       minPrice,
-       maxPrice,
+      minPrice,
+      maxPrice,
     });
-   
-    const teams = await Team.find({
-      isDeleted:false
-    }).distinct("name")
+
+    const teams = await Team.find({ isDeleted: false }).distinct("name");
 
     res.render("products/shop", {
       title: "Shop",
@@ -47,10 +43,11 @@ export const shopPageController = async (req, res) => {
       selectedTeams,
       selectedTypes,
       selectedKits,
-       minPrice,
-        maxPrice,
+      minPrice,
+      maxPrice,
       cartCount: req.session.cartCount || 0,
     });
+
   } catch (err) {
     console.log(err);
     res.status(500).send("Server Error");

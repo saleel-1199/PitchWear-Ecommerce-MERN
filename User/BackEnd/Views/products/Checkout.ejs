@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout | PitchWear</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#fbfaf7] text-gray-800">
+
+<!-- ================= HEADER ================= -->
+<header class="bg-white px-16 py-4 flex justify-between items-center">
+  <h1 class="text-xl font-semibold">PitchWear</h1>
+
+  <nav class="flex gap-8 text-sm">
+    <a href="/home" class="hover:text-primary">Home</a>
+    <a href="/shop" class="hover:text-primary">Shop</a>
+    <a href="/about" class="hover:text-primary">About</a>
+    <a href="/contact" class="hover:text-primary">Contact</a>
+  </nav>
+
+  <div class="flex items-center gap-4 text-lg">
+    <a href="/wishlist" class="hover:scale-110 transition">♡</a>
+    <a href="/cart" class="hover:scale-110 transition">🛒</a>
+    <a href="/profile" class="hover:scale-110 transition">👤</a>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+
+  <!-- ✅ BREADCRUMB -->
+  <p class="text-sm text-gray-500 mb-6">
+    Shopping Cart / <span class="text-pink-600">Checkout</span>
+  </p>
+
+  <h1 class="text-2xl font-semibold mb-6">Checkout</h1>
+
+  <!-- ✅ CART TABLE -->
+  <div class="bg-white border rounded-xl overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 text-gray-600">
+        <tr>
+          <th class="text-left px-6 py-4">Product</th>
+          <th class="text-left px-6 py-4">Price</th>
+          <th class="text-left px-6 py-4">Quantity</th>
+          <th class="text-left px-6 py-4">Total</th>
+        </tr>
+      </thead>
+
+      <tbody class="divide-y">
+        <% cart.items.forEach(item => { %>
+          <tr>
+            <td class="px-6 py-4 flex items-center gap-4">
+              <img src="<%= item.product.images[0] %>"
+                   class="w-12 h-12 object-cover rounded"/>
+
+              <div>
+                <p class="font-medium">
+                  <%= item.product.team?.name %>
+                </p>
+                <p class="text-xs text-gray-500">
+                  Size: <%= item.size %>
+                </p>
+              </div>
+            </td>
+
+            <td class="px-6 py-4 text-pink-600 font-medium">
+              ₹<%= item.price.toFixed(2) %>
+            </td>
+
+            <td class="px-6 py-4">
+              <%= item.quantity %>
+            </td>
+
+            <td class="px-6 py-4 font-semibold">
+              ₹<%= item.subtotal.toFixed(2) %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ✅ ADDRESS SELECTION -->
+  <div class="mt-10">
+    <h2 class="text-lg font-semibold mb-4">
+      Select Delivery Address
+    </h2>
+
+    <form action="/checkout" method="POST" class="space-y-3">
+
+      <% if (!addresses.length) { %>
+        <p class="text-sm text-gray-500">
+          No saved addresses
+        </p>
+      <% } %>
+
+      <% addresses.forEach(addr => { %>
+        <label class="flex items-start gap-3 border rounded-lg p-4 cursor-pointer hover:bg-gray-50">
+          <input
+            type="radio"
+            name="addressId"
+            value="<%= addr._id %>"
+            required
+            class="mt-1"
+            <%= addr.is_default ? "checked" : "" %>
+          />
+
+          <div class="text-sm">
+            <p class="font-medium"><%= addr.full_name %></p>
+            <p class="text-gray-500">
+              <%= addr.address_line1 %>, <%= addr.city %>,
+              <%= addr.state %> - <%= addr.pin_code %>
+            </p>
+            <p class="text-gray-400 text-xs">
+              📞 <%= addr.phone_no %>
+            </p>
+          </div>
+        </label>
+      <% }) %>
+
+      <a href="/add-address"
+         class="inline-block text-sm text-pink-600 hover:underline">
+        + Add New Address
+      </a>
+
+      <!-- ✅ SUMMARY -->
+      <div class="mt-10 bg-white border rounded-xl p-6">
+        <h3 class="font-semibold mb-4">Cart Price Summary</h3>
+
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span>Total</span>
+            <span>₹<%= cart.subtotal.toFixed(2) %></span>
+          </div>
+
+          <div class="flex justify-between">
+            <span>Delivery Fee</span>
+            <span>₹<%= cart.deliveryFee.toFixed(2) %></span>
+          </div>
+
+          <div class="flex justify-between">
+            <span>Discount</span>
+            <span class="text-red-500">
+              -₹<%= cart.discount.toFixed(2) %>
+            </span>
+          </div>
+
+          <div class="flex justify-between">
+            <span>GST & Taxes</span>
+            <span>₹<%= cart.tax.toFixed(2) %></span>
+          </div>
+
+          <div class="border-t pt-3 flex justify-between font-semibold">
+            <span>Final Amount</span>
+            <span>₹<%= cart.finalTotal.toFixed(2) %></span>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="mt-6 w-full bg-[#b36a8d] hover:bg-[#9b5576]
+                 text-white py-3 rounded-lg font-medium">
+          Continue to Payment
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</main>
+
+</body>
+</html>

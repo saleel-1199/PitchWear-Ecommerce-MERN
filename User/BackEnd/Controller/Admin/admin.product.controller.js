@@ -1,4 +1,4 @@
-import {
+import { 
   getAllProducts,
   createProduct,
   getProductById,
@@ -6,7 +6,6 @@ import {
   updateInventory,
   softDeleteProduct,
 } from "../../Services/Admin/admin.product.service.js";
-
 
 import { Team } from "../../Models/team.model.js";
 
@@ -31,10 +30,8 @@ export const productsPage = async (req, res) => {
   }
 };
 
-
-
 export const addProductPage = async (req, res) => {
-  const teams = await Team.find({isDeleted:false}).lean();
+  const teams = await Team.find({ isDeleted: false }).lean();
 
   res.render("Admin/ProductAdd", {
     title: "Add Product",
@@ -52,7 +49,6 @@ export const addProduct = async (req, res) => {
 
     let errorMessage = "Something went wrong.Please try again.";
 
-    
     if (err.message === "INVALID_NAME") { 
       errorMessage = "Product name cannot be empty or spaces only.";
     } else if (err.message === "INVALID_TEAM") {
@@ -61,7 +57,7 @@ export const addProduct = async (req, res) => {
       errorMessage = "Please upload at least 3 product images.";
     }
 
-    const teams = await Team.find();
+    const teams = await Team.find({ isDeleted: false }).lean();
 
     return res.status(400).render("Admin/ProductAdd", {
       title: "Add Product",
@@ -71,14 +67,16 @@ export const addProduct = async (req, res) => {
   }
 };
 
-
 export const editProductPage = async (req, res) => {
   const product = await getProductById(req.params.id);
   if (!product) return res.redirect("/admin/products");
 
+  const teams = await Team.find({ isDeleted: false }).lean();  
+
   res.render("Admin/ProductEdit", {
     title: "Edit Product",
     product,
+    teams,   
     error: "",
   });
 };
@@ -90,7 +88,6 @@ export const editProduct = async (req, res) => {
   await updateProductBasic(product, req.body, req.files);
   res.redirect("/admin/products");
 };
-
 
 export const inventoryPage = async (req, res) => {
   const product = await getProductById(req.params.id);

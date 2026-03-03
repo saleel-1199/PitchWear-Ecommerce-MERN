@@ -4,32 +4,27 @@ import { saveProductImages } from "../../Utils/saveProductImages.js";
 import slugify from "slugify";
 
 export const getAllProducts = async (search = "", page = 1, limit = 4) => {
-   const activeTeams = await Team.find({
-    isDeleted:false
-   })
 
-   const activeTeamNames = activeTeams.map(t=> t.name)
+  const activeTeams = await Team.find({ isDeleted: false });
+  const activeTeamIds = activeTeams.map(t => t._id);   
+
   const query = { 
     isDeleted: false,
-    team:{$in:activeTeamNames}
+    team: { $in: activeTeamIds }  
   };
 
   if (search && search.trim() !== "") {
-    query.$or = [
-      { name: { $regex: search, $options: "i" } },
-      { team: { $regex: search, $options: "i" } },
-      
-    ];
+    query.name = { $regex: search, $options: "i" };  
   }
 
   const totalProducts = await Product.countDocuments(query);
 
   const products = await Product.find(query)
+    .populate("team")   
     .sort({ createdAt: -1 }) 
     .skip((page - 1) * limit)
     .limit(limit)
     .lean();
-
 
   const productsWithStock = products.map((p) => {
     const totalStock = (p.variants || []).reduce(
@@ -57,28 +52,23 @@ export const createProduct = async (data, files) => {
     throw new Error("MIN_IMAGES");
   }
   
- 
   if (!data.name || !data.name.trim()) {
     throw new Error("INVALID_NAME");
   }
 
   const productName = data.name.trim();
-  const teamName = data.team?.trim();
+  const teamId = data.team;   
 
+  if (!teamId) {
+    throw new Error("INVALID_TEAM");
+  }
 
-  if (!teamName) {
+  const teamExists = await Team.findById(teamId);   
+  if (!teamExists || teamExists.isDeleted) {
     throw new Error("INVALID_TEAM");
   }
 
   const images = await saveProductImages(files);
-
- 
-  await Team.findOneAndUpdate(
-    { name: teamName },
-    { name: teamName },
-    { upsert: true }
-  );
-
 
   const incomingVariants = Object.values(data.variants || []);
 
@@ -93,11 +83,10 @@ export const createProduct = async (data, files) => {
     0
   );
 
-  
   return Product.create({
     name: productName,
     slug: slugify(productName, { lower: true, strict: true }),
-    team: teamName,
+    team: teamId,   
     description: data.description?.trim() || "",
     type: data.type,
     kitType: data.kitType,
@@ -106,9 +95,12 @@ export const createProduct = async (data, files) => {
     totalStock
   });
 };
+ 
 export const getProductById = async (id) => {
-  return Product.findById(id);
+  return Product.findById(id).populate("team");   
 };
+
+
 export const updateProductBasic = async (product, data, files) => {
   let images = product.images || [];
 
@@ -117,12 +109,14 @@ export const updateProductBasic = async (product, data, files) => {
     images = [...images, ...newImgs];
   }
 
+  const teamExists = await Team.findById(data.team);   
+  if (!teamExists) throw new Error("INVALID_TEAM");
+
   product.name = data.name;
-  product.team = data.team;
+  product.team = data.team;   
   product.description = data.description;
   product.type = data.type;
   product.kitType = data.kitType;
-
 
   if (data.status) {
     product.status = data.status;

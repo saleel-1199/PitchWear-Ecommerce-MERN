@@ -19,6 +19,14 @@ import {
   
 } from "../../Controller/Admin/admin.team.controller.js";
 
+import {
+  adminOrdersPage,
+  adminOrderDetailPage,
+  updateOrderStatusController,
+  updateItemStatusController,
+  approveReturnController
+} from "../../Controller/Admin/admin.order.controller.js";
+
 
 import { adminAuth } from "../../Middlewares/Admin/adminauth.middleware.js";
 
@@ -37,7 +45,7 @@ router.post("/admin/products/add",adminAuth,uploadProducts.array("images", 10),a
 router.get("/admin/products/:id/edit",adminAuth,editProductPage);
 router.patch("/admin/products/:id",adminAuth,uploadProducts.array("images", 10),editProduct);
 
-router.get("/admin/products/:id/inventory",adminAuth, inventoryPage);
+router.get("/admin/products/:id/inventory", adminAuth,inventoryPage);
 router.post("/admin/products/:id/inventory",adminAuth, saveInventory);
 
 
@@ -52,5 +60,10 @@ router.post("/admin/teams/:id/edit",adminAuth,updateTeamName)
 router.delete("/admin/teams/:id",adminAuth,deleteTeam)
 
 
+router.get("/admin/orders",adminAuth,adminOrdersPage);
+router.get("/admin/orders/:id",adminAuth,adminOrderDetailPage);
+router.patch("/admin/orders/:id/status",adminAuth,updateOrderStatusController);
+router.patch("/admin/orders/:orderId/item/:itemId/status",adminAuth,updateItemStatusController);
 
+router.patch("/admin/orders/:orderId/item/:itemId/approve-return",adminAuth,approveReturnController);
 export default router;
