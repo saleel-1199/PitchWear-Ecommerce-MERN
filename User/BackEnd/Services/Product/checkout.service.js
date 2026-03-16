@@ -3,115 +3,258 @@ import  Address  from "../../Models/address.model.js"
 import { Order } from "../../Models/order.model.js";
 import { Product } from "../../Models/product.model.js";
 import { generateOrderId } from "../../Utils/generateOrderId.js";
+import Razorpay from "razorpay";
+import { Coupon } from "../../Models/coupon.model.js";
+import { debitWallet } from "./wallet.service.js";
+import { Wallet } from "../../Models/wallet.model.js"
+import { getBestOffer } from "./order.service.js"
 
 
-export const getCheckoutDataService = async (userId) => {
-  console.log(userId)
-  const cart = await Cart.findOne({ user: userId })
-    .populate({
-      path: "items.product",
-      populate: { path: "team", select: "name logo" }
-    })
-    .lean();
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY,
+  key_secret: process.env.RAZORPAY_SECRET
+});
 
-  if (!cart || !cart.items.length)
-    throw new Error("Cart empty");
+export const getCheckoutDataService = async (userId, sessionCoupon) => {
 
-  const addresses = await Address.find({ user_id : userId }).lean();
+ const cart = await Cart.findOne({ user: userId })
+  .populate("items.product")
+  .lean();
 
-  const items = cart.items.map(item => ({
-    ...item,
-    subtotal: item.price * item.quantity,
-  }));
+ if (!cart || !cart.items.length)
+  throw new Error("Cart empty");
 
-  const subtotal = items.reduce((sum, i) => sum + i.subtotal, 0);
+ const addresses = await Address.find({ user_id: userId }).lean();
 
-  const tax = 7.5;
-  const deliveryFee = 5;
-  const discount = 10;
 
-  const finalTotal = subtotal + tax + deliveryFee - discount;
+ const items = await Promise.all(
+  cart.items.map(async (item) => {
 
-  return {
-    cart: {
-      ...cart,
-      items,
-      subtotal,
-      tax,
-      deliveryFee,
-      discount,
-      finalTotal,
-    },
-    addresses,
-  };
+    const product = await Product.findById(item.product);
+
+    const discountPercent = await getBestOffer(product);
+
+    const originalPrice = item.price;
+
+    const finalPrice =
+      originalPrice - (originalPrice * discountPercent) / 100;
+
+    return {
+      ...item,
+      originalPrice,
+      price: finalPrice,
+      discountPercent,
+      subtotal: finalPrice * item.quantity
+    };
+
+  })
+);
+
+let subtotal = items.reduce(
+ (sum, i) => sum + i.subtotal,
+ 0
+);
+
+
+ const tax = 7.5;
+ const deliveryFee = 5;
+
+ let discount = 0;
+
+ if(sessionCoupon){
+   discount = sessionCoupon.discount;
+ }
+
+ const finalTotal =
+  subtotal + tax + deliveryFee - discount;
+
+ return {
+  cart:{
+   ...cart,
+   items,
+   subtotal,
+   tax,
+   deliveryFee,
+   discount,
+   finalTotal
+  },
+  addresses
+ };
+
 };
 
 
 
-export const placeOrderService = async ({ userId, addressId }) => {
+export const placeOrderService = async ({
+ userId,
+ addressId,
+ paymentMethod,
+ coupon
+}) => {
 
-  const cart = await Cart.findOne({ user: userId });
-  if (!cart || !cart.items.length)
-    throw new Error("Cart empty");
+ const cart = await Cart.findOne({ user: userId });
 
-  const address = await Address.findById(addressId).lean();
-  if (!address) throw new Error("Invalid address");
+ if (!cart || !cart.items.length)
+  throw new Error("Cart empty");
 
-  for (const item of cart.items) {
-    const product = await Product.findById(item.product);
+ const address = await Address.findById(addressId).lean();
 
-    const variant = product.variants.find(v => v.size === item.size);
+ if (!address) throw new Error("Invalid address");
 
-    if (!variant || variant.stock < item.quantity)
-      throw new Error(`Stock issue for ${product.name}`);
+ /* STOCK CHECK */
 
-    variant.stock -= item.quantity;
-    await product.save();
-  }
+ for (const item of cart.items) {
 
-  const subtotal = cart.items.reduce(
-    (sum, i) => sum + i.price * i.quantity,
-    0
-  );
+  const product = await Product.findById(item.product);
 
-  const tax = 7.5;
-  const deliveryFee = 5;
-  const discount = 10;
+  const variant =
+  product.variants.find(v=>v.size===item.size);
 
-  const finalTotal = subtotal + tax + deliveryFee - discount;
+  if(!variant || variant.stock < item.quantity)
+   throw new Error(`Stock issue`);
 
-  let orderId;
-  let exists = true;
+ }
 
-  while (exists) {
-    orderId = generateOrderId();
-    exists = await Order.findOne({ orderId });
-  }
+ /* PRICE CALCULATION */
 
-  const order = await Order.create({
-    orderId,   
-    user: userId,
-    items: cart.items,
-    subtotal,
-    tax,
-    deliveryFee,
-    discount,
-    finalTotal,
-    paymentMethod: "COD",
+ const subtotal =
+ cart.items.reduce(
+ (sum,i)=>sum+i.price*i.quantity,0);
 
-    addressSnapshot: {
-      fullName: address.full_name,
-      city: address.city,
-      state: address.state,
-      pincode: address.pin_code,
-      addressLine: address.addressLine,
-    }
-  });
+ const tax = 7.5;
+ const deliveryFee = 5;
 
-  cart.items = [];
-  await cart.save();
+ let discount = 0;
 
-  return order;
+ if(coupon){
+   discount = coupon.discount;
+ }
+
+ const finalTotal =
+ subtotal + tax + deliveryFee - discount;
+
+
+ if(paymentMethod === "Wallet"){
+
+ const wallet = await Wallet.findOne({user:userId})
+
+ if(!wallet || wallet.balance < finalTotal)
+  throw new Error("Insufficient wallet balance")
+
+}
+
+ /* GENERATE ORDER ID */
+
+ let orderId;
+ let exists=true;
+
+ while(exists){
+
+ orderId = generateOrderId();
+ exists = await Order.findOne({orderId});
+
+ }
+
+ /* CREATE ORDER */
+
+ const order = await Order.create({
+
+ orderId,
+ user:userId,
+ items:await Promise.all(
+ cart.items.map(async(item)=>{
+
+ const product = await Product.findById(item.product)
+
+ const discountPercent = await getBestOffer(product)
+
+ const discountedPrice =
+ item.price - (item.price * discountPercent)/100
+
+ return {
+  ...item.toObject(),
+  price:discountedPrice
+ }
+
+ })
+),
+ subtotal,
+ tax,
+ deliveryFee,
+ discount,
+ finalTotal,
+
+ paymentMethod,
+
+ couponCode: coupon?.code,
+
+ addressSnapshot:{
+ fullName:address.full_name,
+ city:address.city,
+ phone:address.phone_no,
+ state:address.state,
+ pincode:address.pin_code,
+ addressLine:address.address_line1
+ }
+
+ });
+
+ if(paymentMethod === "Wallet"){
+
+ await debitWallet(userId,finalTotal,orderId)
+
+}
+
+
+ /* RAZORPAY ORDER */
+
+ if(paymentMethod==="Razorpay"){
+
+ const razorpayOrder =
+ await razorpay.orders.create({
+
+  amount: finalTotal*100,
+  currency:"INR",
+  receipt: orderId
+
+ });
+
+ order.razorpayOrderId =
+ razorpayOrder.id;
+
+ await order.save();
+
+ return {
+  order,
+  razorpayOrder
+ };
+
+ }
+
+ 
+ 
+
+ /* COD */
+
+ for(const item of cart.items){
+
+ const product = await Product.findById(item.product);
+
+ const variant =
+ product.variants.find(v=>v.size===item.size);
+
+ variant.stock -= item.quantity;
+
+ await product.save();
+
+ }
+
+
+ cart.items=[];
+ await cart.save();
+
+ return {order};
+
 };
 
 
@@ -129,4 +272,30 @@ export const getOrderSuccessDataService = async (orderId, userId) => {
   }
 
   return order;
+};
+
+
+export const applyCouponCheckoutService = async(code,subtotal)=>{
+
+ const coupon = await Coupon.findOne({
+  code: new RegExp("^" + code + "$", "i"),
+  isActive: true
+});
+
+ if(!coupon) throw new Error("Invalid coupon");
+
+ if(coupon.expiryDate < new Date())
+  throw new Error("Coupon expired");
+
+ if(subtotal < coupon.minPurchase)
+  throw new Error("Minimum purchase not met");
+
+ const discount =
+ (subtotal * coupon.discountPercent)/100;
+
+ return {
+  code: coupon.code,
+  discount
+ };
+
 };

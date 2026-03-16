@@ -35,11 +35,18 @@ export const addAddressPage = (req, res) => {
 
 export const createAddressController = async (req, res) => {
   try {
+
     await addressService.createAddress(req.user._id, req.body);
+
+    if (req.xhr || req.headers.accept.includes("json")) {
+      return res.json({ success: true });
+    }
+
     return res.redirect("/address");
+
   } catch (err) {
     console.log("Create Address Error:", err);
-    return res.status(500).send("Server Error");
+    return res.status(500).json({ success:false });
   }
 };
 

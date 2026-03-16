@@ -30,6 +30,14 @@ import{
   downloadInvoiceController
 } from "../../Controller/Product/order.controller.js"
 
+import {
+  applyCouponController,
+  removeCouponController,
+  verifyPaymentController
+} from "../../Controller/Product/checkout.controller.js";
+
+import { walletPage } from "../../Controller/Product/wallet.controller.js";
+
 const router = express.Router();
 
 router.get("/shop",shopPageController);
@@ -51,11 +59,20 @@ router.get("/order-success/:id", orderSuccessController);
 router.get("/order-success/:id", orderSuccessController);
 
 
+
+router.post("/checkout/apply-coupon", applyCouponController);
+router.post("/checkout/remove-coupon", removeCouponController);
+
+router.post("/verify-payment", verifyPaymentController);
+
+
+
 router.get("/orders", getUserOrdersController);
-router.get("/orders/:orderId", getOrderDetailController);
 router.get("/orders/:orderId", getOrderDetailController);
 router.post("/orders/:orderId/item/:itemId/cancel",cancelOrderController);
 router.post("/orders/:orderId/item/:itemId/return",returnOrderController);
 router.get("/orders/:orderId/invoice", downloadInvoiceController);
+
+router.get("/wallet", walletPage);
 
 export default router;

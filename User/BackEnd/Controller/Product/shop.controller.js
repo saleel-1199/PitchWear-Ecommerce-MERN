@@ -46,6 +46,7 @@ export const shopPageController = async (req, res) => {
       minPrice,
       maxPrice,
       cartCount: req.session.cartCount || 0,
+      error: req.query.error || null
     });
 
   } catch (err) {

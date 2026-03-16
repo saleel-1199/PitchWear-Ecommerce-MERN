@@ -3,6 +3,14 @@ import { User } from "../Models/user.model.js";
 import { Otp } from "../Models/otpModels.js";
 import { createOrUpdateOtp,sendOtpMail} from "./Otp.service.js";
 
+import crypto from "crypto"
+import { Referral } from "../Models/referral.model.js";
+import { creditWallet } from "./Product/wallet.service.js";
+
+
+const generateReferralCode = (username) => {
+ return username + Math.floor(1000 + Math.random()*9000);
+};
 
 
 export const signupUser = async (data) => {
@@ -53,12 +61,44 @@ export const verifyOtp = async (email, otp) => {
   
   const hashedPassword = await bcrypt.hash(record.signupData.password, 10);
 
+  const generatedReferralCode = generateReferralCode(record.signupData.username);
 
-  await User.create({
-    ...record.signupData,
-    password:hashedPassword,
-    isVerified: true
-  });
+  const referrer = record.signupData.referralCode
+ ? await User.findOne({ referralCode: record.signupData.referralCode })
+ : null;
+
+const newUser = await User.create({
+ fullName: record.signupData.fullName,
+ username: record.signupData.username,
+ email: record.signupData.email,
+ password: hashedPassword,
+ referralCode: generatedReferralCode,
+ referredBy: referrer ? referrer._id : null,
+ isVerified: true
+});
+
+console.log("Entered referral:", record.signupData.referralCode);
+console.log("Referrer found:", referrer);
+console.log("New user created:", newUser._id);
+
+if(referrer){
+
+ await Referral.create({
+  referrer: referrer._id,
+  referredUser: newUser._id,
+  reward: 100,
+  status: "Completed"
+ });
+
+ await creditWallet(
+  
+  referrer._id,
+  100,
+  null,
+  "Referral Reward"
+ );
+console.log("Referral reward credited");
+}
 
   await Otp.deleteOne({ email });
 

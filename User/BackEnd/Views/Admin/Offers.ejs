@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offers</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#f8f8f4] text-gray-800">
+
+<!-- HEADER -->
+<header class="bg-[#eff2c8] px-10 py-5 flex items-center justify-between">
+  <div class="flex items-center gap-10">
+    <h1 class="font-bold text-lg">Pitchwear</h1>
+    <p class="text-sm font-semibold">Admin Dashboard</p>
+  </div>
+
+  <div class="w-11 h-11 rounded-xl bg-white flex items-center justify-center border">
+    👤
+  </div>
+</header>
+
+<main class="flex px-10 py-10 gap-10">
+
+<!-- SIDEBAR -->
+<aside class="w-64">
+
+<p class="text-sm text-gray-500 mb-5">Pitchwear Admin</p>
+
+<nav class="space-y-2 text-sm">
+
+<a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+🏠 Dashboard
+</a>
+
+<a href="/admin/products" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+👕 Product Management
+</a>
+
+<a href="/admin/teams" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+⚽ Manage Teams
+</a>
+
+<a href="/admin/orders" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+📦 Order Management
+</a>
+
+<a href="/admin/coupons" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+🧾 Coupons
+</a>
+
+<a href="/admin/offers" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white font-medium">
+🎁 Offers
+</a>
+
+<a href="/admin/logout" class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-600 font-medium mt-6">
+⛔ Logout
+</a>
+
+</nav>
+
+</aside>
+
+
+<!-- CONTENT -->
+<section class="flex-1">
+
+<h2 class="text-3xl font-bold mb-6">
+Offer Management
+</h2>
+
+
+<!-- CREATE OFFER -->
+<div class="bg-white border rounded-xl p-6 mb-8">
+
+<h3 class="font-semibold mb-4">Create Offer</h3>
+
+<form action="/admin/offers" method="POST" class="grid grid-cols-2 gap-4">
+
+<input
+name="name"
+placeholder="Offer Name"
+required
+class="border px-3 py-2 rounded"
+/>
+
+<input
+name="discountPercent"
+type="number"
+placeholder="Discount %"
+min="1"
+max="90"
+required
+class="border px-3 py-2 rounded"
+/>
+
+<select
+name="type"
+class="border px-3 py-2 rounded">
+
+<option value="Product">
+Product Offer
+</option>
+
+<option value="Team">
+Team Offer
+</option>
+
+</select>
+
+<input
+type="date"
+name="expiryDate"
+required
+class="border px-3 py-2 rounded"
+/>
+
+<select name="product" class="border px-3 py-2 rounded">
+
+<option value="">
+Select Product
+</option>
+
+<% products.forEach(product => { %>
+
+<option value="<%= product._id %>">
+<%= product.name %>
+</option>
+
+<% }) %>
+
+</select>
+
+
+<select name="team" class="border px-3 py-2 rounded" disabled>
+
+<option value="">
+Select Team
+</option>
+
+<% teams.forEach(team => { %>
+
+<option value="<%= team._id %>">
+<%= team.name %>
+</option>
+
+<% }) %>
+
+</select>
+
+
+<button
+class="col-span-2 bg-[#cdd47b] py-2 rounded-lg font-semibold">
+Create Offer
+</button>
+
+</form>
+
+</div>
+
+
+
+<!-- OFFERS TABLE -->
+
+<div class="bg-white border rounded-xl overflow-hidden">
+
+<table class="w-full text-sm">
+
+<thead class="bg-gray-50 text-gray-500">
+
+<tr>
+
+<th class="text-left px-6 py-4">
+Offer Name
+</th>
+
+<th class="text-left px-6 py-4">
+Type
+</th>
+
+<th class="text-left px-6 py-4">
+Discount
+</th>
+
+<th class="text-left px-6 py-4">
+Product / Team
+</th>
+
+<th class="text-left px-6 py-4">
+Expiry
+</th>
+
+<th class="text-center px-6 py-4">
+Action
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+
+<% if(!offers || offers.length === 0){ %>
+
+<tr>
+
+<td colspan="6" class="text-center py-16 text-gray-400">
+No offers found
+</td>
+
+</tr>
+
+<% } %>
+
+
+
+<% offers.forEach(offer => { %>
+
+<tr class="border-t">
+
+<td class="px-6 py-4">
+<%= offer.name %>
+</td>
+
+<td class="px-6 py-4">
+<%= offer.type %>
+</td>
+
+<td class="px-6 py-4">
+<%= offer.discountPercent %>%
+</td>
+
+<td class="px-6 py-4">
+
+<% if(offer.product){ %>
+Product: <%= offer.product.name %>
+<% } else { %>
+Team: <%= offer.team.name %>
+<% } %>
+
+</td>
+
+<td class="px-6 py-4">
+
+<%= offer.expiryDate ? new Date(offer.expiryDate).toDateString() : "No Expiry" %>
+
+</td>
+
+<td class="px-6 py-4 text-center">
+
+<form
+action="/admin/offers/<%= offer._id %>?_method=DELETE"
+method="POST">
+
+<button class="text-red-600 font-medium">
+Delete
+</button>
+
+</form>
+
+</td>
+
+</tr>
+
+<% }) %>
+
+
+</tbody>
+
+</table>
+
+</div>
+
+</section>
+
+</main>
+
+<% if(error){ %>
+
+<div id="errorModal"
+class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+
+<div class="bg-white p-6 rounded-xl w-[350px] text-center">
+
+<h3 class="text-red-600 font-semibold mb-3">
+Error
+</h3>
+
+<p class="text-sm mb-5">
+<%= error %>
+</p>
+
+<button onclick="closeModal()"
+class="bg-red-500 text-white px-4 py-2 rounded">
+OK
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+function closeModal(){
+ document.getElementById("errorModal").remove();
+}
+
+</script>
+
+<% } %>
+
+
+
+<div id="validationModal"
+class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
+
+<div class="bg-white p-6 rounded-xl w-[350px] text-center">
+
+<h3 class="text-red-600 font-semibold mb-3">
+Validation Error
+</h3>
+
+<p id="validationMessage" class="text-sm mb-5"></p>
+
+<button onclick="closeValidationModal()"
+class="bg-red-500 text-white px-4 py-2 rounded">
+OK
+</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+function showValidationModal(message){
+
+const modal = document.getElementById("validationModal")
+const messageBox = document.getElementById("validationMessage")
+
+messageBox.innerText = message
+
+modal.classList.remove("hidden")
+modal.classList.add("flex")
+
+}
+
+function closeValidationModal(){
+
+const modal = document.getElementById("validationModal")
+
+modal.classList.add("hidden")
+modal.classList.remove("flex")
+
+}
+
+</script>
+
+
+
+<script>
+
+const form = document.querySelector("form")
+
+const typeSelect = document.querySelector('[name="type"]')
+const productSelect = document.querySelector('[name="product"]')
+const teamSelect = document.querySelector('[name="team"]')
+
+typeSelect.addEventListener("change",()=>{
+
+ if(typeSelect.value === "Product"){
+  productSelect.disabled = false
+  teamSelect.disabled = true
+ }
+
+ else{
+  productSelect.disabled = true
+  teamSelect.disabled = false
+ }
+
+})
+
+
+form.addEventListener("submit",(e)=>{
+
+const type = typeSelect.value
+const product = productSelect.value
+const team = teamSelect.value
+
+if(type === "Product" && !product){
+ e.preventDefault()
+ return showValidationModal("Please select a product for Product Offer")
+}
+
+if(type === "Team" && !team){
+ e.preventDefault()
+ return showValidationModal("Please select a team for Team Offer")
+}
+
+})
+
+</script>
+
+
+
+</body>
+
+</html>

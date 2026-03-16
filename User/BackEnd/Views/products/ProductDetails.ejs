@@ -28,7 +28,7 @@
       <a href="/account">👤</a>
     </div>
   </div>
-</header>
+</header> 
 
 <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
 <!-- BREADCRUMB -->
@@ -76,9 +76,31 @@
     </p>
 
     <div class="flex flex-wrap items-center gap-3 mb-4">
-      <span id="priceText" class="text-2xl font-bold">
-        ₹<%= product.displayPrice %>
-      </span>
+      <% if(product.discountPercent > 0){ %>
+
+<div class="flex items-center gap-3">
+
+<span class="text-gray-400 line-through text-lg">
+₹<%= product.displayPrice %>
+</span>
+
+<span id="priceText" class="text-2xl font-bold text-red-600">
+₹<%= product.offerPrice %>
+</span>
+
+<span class="bg-green-100 text-green-700 px-2 py-1 text-xs rounded">
+<%= product.discountPercent %>% OFF
+</span>
+
+</div>
+
+<% } else { %>
+
+<span id="priceText" class="text-2xl font-bold">
+₹<%= product.displayPrice %>
+</span>
+
+<% } %>
       <span class="text-green-700 text-sm">
         In Stock: <%= product.totalStock %>
       </span>
@@ -260,9 +282,31 @@
             <p class="text-xs text-gray-500 mt-1">
               <%= p.kitType || "-" %>
             </p>
-            <p class="text-sm font-semibold mt-3">
-              ₹<%= Number(p.displayPrice || 0).toFixed(2) %>
-            </p>
+            <% if (p.discountPercent && p.discountPercent > 0) { %>
+
+<div class="mt-3">
+
+<span class="text-gray-400 line-through text-xs">
+₹<%= Number(p.displayPrice).toFixed(2) %>
+</span>
+
+<p class="text-sm font-bold text-red-600">
+₹<%= Number(p.offerPrice).toFixed(2) %>
+</p>
+
+<span class="text-green-600 text-xs font-semibold">
+<%= p.discountPercent %>% OFF
+</span>
+
+</div>
+
+<% } else { %>
+
+<p class="text-sm font-semibold mt-3">
+₹<%= Number(p.displayPrice).toFixed(2) %>
+</p>
+
+<% } %>
           </div>
         </div>
       </a>

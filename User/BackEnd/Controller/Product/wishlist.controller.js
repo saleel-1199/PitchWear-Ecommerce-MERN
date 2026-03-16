@@ -22,7 +22,7 @@ export const addToWishlistController = async (req, res) => {
     productId: req.body.productId,
   });
 
-  res.redirect("back");
+  res.redirect("/shop");
 };
 
 

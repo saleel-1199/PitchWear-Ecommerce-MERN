@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Checkout | PitchWear</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
+
 
 <body class="bg-[#fbfaf7] text-gray-800">
 
@@ -65,9 +67,27 @@
               </div>
             </td>
 
-            <td class="px-6 py-4 text-pink-600 font-medium">
-              ₹<%= item.price.toFixed(2) %>
-            </td>
+            <td class="px-6 py-4">
+
+<% if(item.originalPrice && item.originalPrice > item.price){ %>
+
+<span class="text-gray-400 line-through text-xs">
+₹<%= item.originalPrice.toFixed(2) %>
+</span>
+
+<p class="text-pink-600 font-semibold">
+₹<%= item.price.toFixed(2) %>
+</p>
+
+<% } else { %>
+
+<span class="text-pink-600 font-medium">
+₹<%= item.price.toFixed(2) %>
+</span>
+
+<% } %>
+
+</td>
 
             <td class="px-6 py-4">
               <%= item.quantity %>
@@ -89,6 +109,9 @@
     </h2>
 
     <form action="/checkout" method="POST" class="space-y-3">
+      
+<input type="hidden" name="selectedPaymentMethod" id="paymentMethodInput">
+
 
       <% if (!addresses.length) { %>
         <p class="text-sm text-gray-500">
@@ -120,14 +143,51 @@
         </label>
       <% }) %>
 
-      <a href="/add-address"
-         class="inline-block text-sm text-pink-600 hover:underline">
-        + Add New Address
-      </a>
+
+
+      <button
+  type="button"
+  onclick="openAddressModal()"
+  class="text-sm text-pink-600 hover:underline"
+>
+  + Add New Address
+</button>
+
 
       <!-- ✅ SUMMARY -->
       <div class="mt-10 bg-white border rounded-xl p-6">
         <h3 class="font-semibold mb-4">Cart Price Summary</h3>
+           
+
+        <!-- COUPON SECTION -->
+<div class="mb-4">
+  <label class="text-sm font-medium">Apply Coupon</label>
+
+  <div class="flex gap-2 mt-2">
+    <input
+      id="couponCode"
+      type="text"
+      placeholder="Enter coupon code"
+      class="border px-3 py-2 rounded w-full text-sm"
+    >
+
+    <button
+      type="button"
+      onclick="applyCoupon()"
+      class="bg-gray-800 text-white px-4 rounded text-sm">
+      Apply
+    </button>
+
+    <button
+      type="button"
+      onclick="removeCoupon()"
+      class="bg-gray-200 px-3 rounded text-sm">
+      Remove
+    </button>
+  </div>
+</div>
+
+
 
         <div class="space-y-2 text-sm">
           <div class="flex justify-between">
@@ -158,12 +218,36 @@
           </div>
         </div>
 
-        <button
-          type="submit"
-          class="mt-6 w-full bg-[#b36a8d] hover:bg-[#9b5576]
-                 text-white py-3 rounded-lg font-medium">
-          Continue to Payment
-        </button>
+
+
+        <!-- PAYMENT METHOD -->
+<div class="mt-6">
+  <h3 class="font-medium mb-3">Payment Method</h3>
+
+  <label class="flex items-center gap-2 text-sm">
+    <input type="radio" name="paymentMethod" value="COD" checked>
+    Cash on Delivery
+  </label>
+
+  <label class="flex items-center gap-2 text-sm mt-2">
+    <input type="radio" name="paymentMethod" value="Razorpay">
+    Razorpay (UPI / Card / Netbanking)
+  </label>
+
+  <label class="flex items-center gap-2 text-sm mt-2">
+    <input type="radio" name="paymentMethod" value="Wallet">
+    Wallet Payment
+  </label>
+  
+</div>
+
+
+<button
+  type="submit"
+  class="mt-6 w-full bg-[#b36a8d] hover:bg-[#9b5576]
+         text-white py-3 rounded-lg font-medium">
+  Continue to Payment
+</button>
       </div>
 
     </form>
@@ -171,5 +255,407 @@
 
 </main>
 
+
+<!-- ADD ADDRESS MODAL -->
+<div id="addressModal"
+     class="fixed inset-0 bg-black bg-opacity-40 hidden
+            items-center justify-center z-50">
+
+  <div class="bg-white rounded-xl w-[500px] p-6 relative">
+
+    <button
+      onclick="closeAddressModal()"
+      class="absolute right-4 top-3 text-gray-500 text-lg">
+      ✕
+    </button>
+
+    <h2 class="text-lg font-semibold mb-4">Add New Address</h2>
+
+    <form id="checkoutAddressForm" class="space-y-4">
+
+      <input name="full_name" placeholder="Full Name"
+             class="w-full border px-3 py-2 rounded" required>
+
+      <input id="phone_no" name="phone_no"
+             placeholder="Phone Number"
+             class="w-full border px-3 py-2 rounded"
+             required>
+
+      <input id="alt_phone_no" name="alt_phone_no"
+             placeholder="Alternative Phone"
+             class="w-full border px-3 py-2 rounded">
+
+      <input name="address_line1"
+             placeholder="Address Line"
+             class="w-full border px-3 py-2 rounded"
+             required>
+
+      <div class="grid grid-cols-2 gap-3">
+
+        <input name="city"
+               placeholder="City"
+               class="border px-3 py-2 rounded"
+               required>
+
+        <input name="state"
+               placeholder="State"
+               class="border px-3 py-2 rounded"
+               required>
+
+      </div>
+
+      <input id="pin_code"
+             name="pin_code"
+             placeholder="Pincode"
+             class="w-full border px-3 py-2 rounded"
+             required>
+
+      <select name="type"
+              class="w-full border px-3 py-2 rounded"
+              required>
+        <option value="">Select Type</option>
+        <option value="Home">Home</option>
+        <option value="Work">Work</option>
+      </select>
+
+      <label class="flex items-center gap-2 text-sm">
+        <input type="checkbox" name="is_default">
+        Set as default
+      </label>
+
+      <button
+        type="submit"
+        class="w-full bg-pink-600 text-white py-2 rounded">
+        Save Address
+      </button>
+
+    </form>
+
+  </div>
+</div>
+
+<script>
+function openAddressModal() {
+  const modal = document.getElementById("addressModal");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function closeAddressModal() {
+  const modal = document.getElementById("addressModal");
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+</script>
+
+<script>
+document
+  .getElementById("checkoutAddressForm")
+  .addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const form = e.target;
+
+    const data = {
+      full_name: form.full_name.value,
+      phone_no: form.phone_no.value,
+      alt_phone_no: form.alt_phone_no.value,
+      address_line1: form.address_line1.value,
+      city: form.city.value,
+      state: form.state.value,
+      pin_code: form.pin_code.value,
+      type: form.type.value,
+      is_default: form.is_default.checked
+    };
+
+    try {
+
+      const res = await fetch("/address", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest"
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (res.ok) {
+
+        closeAddressModal();
+
+        location.reload();
+
+      } else {
+        alert("Failed to save address");
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
+    }
+
+});
+</script>
+
+<script>
+function onlyDigits(input, maxLen) {
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/\D/g, "").slice(0, maxLen);
+  });
+}
+
+onlyDigits(document.getElementById("phone_no"), 10);
+onlyDigits(document.getElementById("alt_phone_no"), 10);
+onlyDigits(document.getElementById("pin_code"), 6);
+</script>
+
+
+<!-- <script>
+const checkoutForm = document.querySelector("form[action='/checkout']")
+
+checkoutForm.addEventListener("submit", function(e){
+
+const selectedPayment =
+document.querySelector('input[name="paymentMethod"]:checked').value
+
+document.getElementById("paymentMethodInput").value = selectedPayment
+
+// stop normal submit when Razorpay selected
+if(selectedPayment === "Razorpay"){
+e.preventDefault()
+}
+
+})
+</script> -->
+
+
+<script>
+
+async function applyCoupon(){
+
+const code = document.getElementById("couponCode").value
+
+const subtotal = <%= cart.subtotal %>
+
+const res = await fetch("/checkout/apply-coupon",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+code,
+subtotal
+})
+
+})
+
+const data = await res.json()
+
+if(data.success){
+location.reload()
+}else{
+alert(data.message)
+}
+
+}
+
+async function removeCoupon(){
+
+await fetch("/checkout/remove-coupon",{
+method:"POST"
+})
+
+location.reload()
+
+}
+
+</script>
+
+
+
+<script>
+
+document.querySelector("form[action='/checkout']")
+.addEventListener("submit", async function(e){
+
+const paymentMethod =
+document.querySelector('input[name="paymentMethod"]:checked').value
+
+if(paymentMethod !== "Razorpay") return
+
+e.preventDefault()
+
+const address =
+document.querySelector('input[name="addressId"]:checked')
+
+if(!address){
+alert("Please select address")
+return
+}
+
+const res = await fetch("/checkout",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+addressId: address.value,
+selectedPaymentMethod: paymentMethod
+})
+
+})
+
+const data = await res.json()
+
+const options = {
+
+key:data.key,
+amount:data.razorpayOrder.amount,
+currency:"INR",
+order_id:data.razorpayOrder.id,
+name: "PitchWear",
+description: "PitchWear Order Payment",
+
+handler:async function(response){
+
+await fetch("/verify-payment",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+orderId:response.razorpay_order_id,
+paymentId:response.razorpay_payment_id
+})
+
+})
+
+window.location.href="/order-success/"+data.order._id
+
+}
+
+}
+
+const rzp = new Razorpay(options)
+rzp.open()
+
+})
+
+</script>
+
+
+
+<!-- <script>
+
+async function handleCheckout(){
+
+const address =
+document.querySelector('input[name="addressId"]:checked')
+
+if(!address){
+alert("Please select address")
+return
+}
+
+const paymentMethod =
+document.querySelector('input[name="paymentMethod"]:checked').value
+
+
+/* COD PAYMENT */
+
+if(paymentMethod === "COD"){
+
+document.getElementById("paymentMethodInput").value = "COD"
+
+document.querySelector("form[action='/checkout']").submit()
+
+return
+
+}
+
+
+/* RAZORPAY PAYMENT */
+
+const res = await fetch("/checkout",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+addressId:address.value,
+paymentMethod:"Razorpay"
+})
+
+})
+
+const data = await res.json()
+
+console.log(data)
+
+const options = {
+
+key:data.key,
+amount:data.razorpayOrder.amount,
+currency:"INR",
+order_id:data.razorpayOrder.id,
+
+handler:async function(response){
+
+await fetch("/verify-payment",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+orderId:response.razorpay_order_id,
+paymentId:response.razorpay_payment_id
+})
+
+})
+
+window.location.href="/order-success/"+data.order._id
+
+}
+
+}
+
+const rzp = new Razorpay(options)
+
+rzp.open()
+
+}
+
+</script> -->
+
+<script>
+
+const form = document.querySelector("form[action='/checkout']");
+
+form.addEventListener("submit", function () {
+
+  const selectedPayment =
+  document.querySelector('input[name="paymentMethod"]:checked').value;
+
+  document.getElementById("paymentMethodInput").value = selectedPayment;
+
+});
+
+</script>
 </body>
 </html>

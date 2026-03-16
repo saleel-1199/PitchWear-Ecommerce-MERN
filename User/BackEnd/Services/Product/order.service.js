@@ -1,5 +1,7 @@
 import { Order } from "../../Models/order.model.js";
 import { Product } from "../../Models/product.model.js";
+import { creditWallet } from "./wallet.service.js"
+import { Offer } from "../../Models/offer.model.js";
 
 export const getUserOrdersService = async (userId, search = "") => {
 
@@ -61,6 +63,19 @@ export const cancelOrderService = async (orderId, userId, itemId) => {
   else {
     order.status = "Partially Completed";
   }
+  
+  if(order.paymentMethod !== "COD"){
+
+   const refundAmount = (item.price * item.quantity) +(order.tax / order.items.length) +(order.deliveryFee / order.items.length)
+ 
+   await creditWallet(
+  order.user,
+  refundAmount,
+  order.orderId,
+  "Order Cancel Refund"
+ )
+
+}
 
   await order.save();
 
@@ -99,3 +114,32 @@ export const generateInvoiceService = async (orderId, userId) => {
 
   return order;
 };
+
+export const getBestOffer = async(product)=>{
+
+ const now = new Date()
+
+ const productOffer = await Offer.findOne({
+  product:product._id,
+  type:"Product",
+  isActive:true,
+  expiryDate:{ $gte: now }
+ })
+
+ const teamOffer = await Offer.findOne({
+  team:product.team,
+  type:"Team",
+  isActive:true,
+  expiryDate:{ $gte: now }
+ })
+
+ let discount = 0
+
+ if(productOffer)
+  discount = productOffer.discountPercent
+
+ if(teamOffer)
+  discount = Math.max(discount,teamOffer.discountPercent)
+
+ return discount
+}

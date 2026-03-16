@@ -4,6 +4,40 @@
   <meta charset="UTF-8" />
   <title>Order Confirmed | PitchWear</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+
+.checkmark {
+  width: 80px;
+  height: 80px;
+  stroke-width: 3;
+  stroke: #16a34a;
+}
+
+.checkmark-circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 3;
+  stroke: #16a34a;
+  fill: none;
+  animation: stroke 0.6s ease forwards;
+}
+
+.checkmark-check {
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  stroke-width: 3;
+  stroke: #16a34a;
+  animation: stroke 0.4s 0.6s ease forwards;
+}
+
+@keyframes stroke {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+</style>
 </head>
 
 <body class="bg-[#f8f8f4] text-gray-800">
@@ -28,25 +62,23 @@
 
       <h1 class="text-gray-400 text-sm mb-4">Order Confirmed</h1>
 
-      <!-- Banner -->
-      <div class="rounded-xl overflow-hidden mb-8 shadow-sm">
-        <img 
-          src="/Images/Screenshot 2026-02-25 212555.png" 
-          alt="Order Confirmed"
-          class="w-full h-56 object-cover"
-        />
-      </div>
+    <!-- Success Animation -->
+<div class="bg-white rounded-xl shadow-sm mb-8 py-10 text-center">
 
-      <!-- Thank You -->
-      <div class="mb-8">
-        <h2 class="text-2xl font-semibold mb-2">
-          Thank you for your order!
-        </h2>
-        <p class="text-gray-600 text-sm">
-          Your order has been placed and will be processed shortly.
-          You will receive tracking details once your order ships.
-        </p>
-      </div>
+  <svg class="checkmark mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+    <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+    <path class="checkmark-check" fill="none" d="M14 27l7 7 16-16"/>
+  </svg>
+
+  <h2 class="text-2xl font-semibold mb-2">
+    Order Confirmed!
+  </h2>
+
+  <p class="text-gray-600 text-sm">
+    Thank you for shopping with PitchWear. Your order has been successfully placed.
+  </p>
+
+</div>
 
       <!-- Order Summary -->
       <div class="mb-10">

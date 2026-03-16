@@ -1,42 +1,66 @@
 import { Order } from "../../Models/order.model.js";
 import { Product } from "../../Models/product.model.js";
+import { creditWallet } from "../Product/wallet.service.js"
 
 export const getAdminOrdersService = async ({
   search = "",
   status = "",
   page = 1,
-  limit = 10,
+  limit = 8
 }) => {
 
   const query = {};
-
- if (search) {
-  query.orderId = { 
-    $regex: search, 
-    $options: "i" 
-  };
-}
 
   if (status) {
     query.status = status;
   }
 
+  if (search) {
+
+    const orConditions = [
+
+      { orderId: { $regex: search, $options: "i" } },
+
+    
+      { "addressSnapshot.fullName": { $regex: search, $options: "i" } }
+
+    ];
+
+    const date = new Date(search);
+
+    if (!isNaN(date.getTime())) {
+
+      const start = new Date(date);
+      start.setHours(0,0,0,0);
+
+      const end = new Date(date);
+      end.setHours(23,59,59,999);
+
+      orConditions.push({
+        createdAt: { $gte: start, $lte: end }
+      });
+
+    }
+
+    query.$or = orConditions;
+  }
+
+  const skip = (page - 1) * limit;
+
   const orders = await Order.find(query)
-    .populate("user", "fullName email")
+    .populate("user")
     .sort({ createdAt: -1 })
-    .skip((page - 1) * limit)
+    .skip(skip)
     .limit(limit);
 
-  const total = await Order.countDocuments(query);
+  const totalOrders = await Order.countDocuments(query);
 
   return {
     orders,
-    totalPages: Math.ceil(total / limit),
     currentPage: page,
+    totalPages: Math.ceil(totalOrders / limit)
   };
 };
-
-
 
 
 export const getOrderDetailService = async (orderId) => {
@@ -117,7 +141,26 @@ export const updateItemStatusService = async (orderId, itemId, status) => {
   const item = order.items.id(itemId);
   if (!item) throw new Error("Item not found");
 
+
+if (item.status === "Cancelled") {
+  throw new Error("Item already cancelled");
+}
+
   item.status = status;
+
+  if (status === "Cancelled" && order.paymentMethod === "Razorpay") {
+
+  const refundAmount = item.price * item.quantity;
+
+  await creditWallet(
+    order.user,
+    refundAmount,
+    order.orderId,
+    "Order Cancel Refund"
+  );
+
+}
+
 
   const statuses = order.items.map(i => i.status);
 
@@ -166,7 +209,7 @@ export const approveReturnService = async (orderId, itemId) => {
     order.status = "Cancelled";
   }
   else if (statuses.every(s => s === "Returned")) {
-    order.status = "Partially Completed";
+    order.status = "Returned";
   }
   else if (statuses.every(s => s === "Delivered")) {
     order.status = "Delivered";
@@ -176,4 +219,14 @@ export const approveReturnService = async (orderId, itemId) => {
   }
 
   await order.save();
+
+  const refundAmount = item.price * item.quantity;
+
+ await creditWallet(
+  order.user,
+  refundAmount,
+  order.orderId,
+  "Return Refund"
+ )
+
 };

@@ -26,6 +26,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null
     },
+    referredBy:{
+  type: mongoose.Schema.Types.ObjectId,
+  ref:"User",
+  default:null
+},
     isBlocked: { 
       type: Boolean, 
       default: false 

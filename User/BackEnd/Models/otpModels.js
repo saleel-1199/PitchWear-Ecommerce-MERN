@@ -18,6 +18,7 @@ const otpSchema = new mongoose.Schema({
     fullName: String,
     username: String,
     email: String,
+    referralCode: String,
     password: String
   }
 });

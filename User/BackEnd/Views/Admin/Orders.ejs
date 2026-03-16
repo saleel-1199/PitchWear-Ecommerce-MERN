@@ -53,37 +53,79 @@
   <div class="flex justify-between items-center mb-6">
     <h2 class="text-3xl font-bold">Order Management</h2>
   </div>
+<!-- ✅ Search + Filter -->
+<form method="GET" class="flex flex-wrap items-center gap-4 mb-8 bg-white border rounded-xl px-5 py-4 shadow-sm">
 
-  <!-- ✅ Search + Filter -->
-  <form method="GET" class="flex gap-3 mb-6">
+  <!-- 🔎 Search -->
+  <div class="relative">
+    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+      🔍
+    </span>
 
     <input
       type="text"
       name="search"
       placeholder="Search Order ID"
       value="<%= search || '' %>"
-      class="border px-4 py-2 rounded-lg text-sm w-64"
+      class="border border-gray-300 pl-9 pr-4 py-2 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-[#cdd47b] transition"
     />
+  </div>
 
-    <select name="status" class="border px-4 py-2 rounded-lg text-sm">
-      <option value="">All Status</option>
-      <option value="Pending" <%= status === "Pending" ? "selected" : "" %>>Pending</option>
-      <option value="Shipped" <%= status === "Shipped" ? "selected" : "" %>>Shipped</option>
-      <option value="Out for Delivery" <%= status === "Out for Delivery" ? "selected" : "" %>>Out for Delivery</option>
-      <option value="Delivered" <%= status === "Delivered" ? "selected" : "" %>>Delivered</option>
-      <option value="Cancelled" <%= status === "Cancelled" ? "selected" : "" %>>Cancelled</option>
+  <!-- 📦 Status Dropdown -->
+  <div class="relative">
+
+    <select
+      name="status"
+      class="appearance-none border border-gray-300 bg-white px-4 py-2 pr-10 rounded-lg text-sm shadow-sm hover:shadow-md hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-[#cdd47b] transition"
+    >
+
+      <option value="">📦 All Status</option>
+
+      <option value="Pending" <%= status === "Pending" ? "selected" : "" %>>
+        🟡 Pending
+      </option>
+
+      <option value="Shipped" <%= status === "Shipped" ? "selected" : "" %>>
+        🚚 Shipped
+      </option>
+
+      <option value="Out for Delivery" <%= status === "Out for Delivery" ? "selected" : "" %>>
+        📦 Out for Delivery
+      </option>
+
+      <option value="Delivered" <%= status === "Delivered" ? "selected" : "" %>>
+        ✅ Delivered
+      </option>
+
+      <option value="Cancelled" <%= status === "Cancelled" ? "selected" : "" %>>
+        ❌ Cancelled
+      </option>
+
     </select>
 
-    <button class="bg-[#cdd47b] text-white px-6 py-2 rounded-lg text-sm font-semibold">
-      Apply
-    </button>
+    <!-- Arrow -->
+    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+      ▼
+    </span>
 
-    <a href="/admin/orders"
-   class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg text-sm font-semibold">
-   Clear Filters
-</a>
+  </div>
 
-  </form>
+  <!-- Apply Button -->
+  <button
+    class="bg-[#cdd47b] hover:bg-[#bfc66d] text-gray-900 px-6 py-2 rounded-lg text-sm font-semibold shadow-sm transition"
+  >
+    Apply Filters
+  </button>
+
+  <!-- Clear Button -->
+  <a
+    href="/admin/orders"
+    class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded-lg text-sm font-semibold transition"
+  >
+    Clear
+  </a>
+
+</form>
 
   <!-- ✅ Orders Table -->
   <div class="bg-white border rounded-xl overflow-hidden">

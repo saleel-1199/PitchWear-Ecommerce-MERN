@@ -1,13 +1,19 @@
 import * as authService from "../Services/auth.service.js";
 
 export const renderSignup = (req, res) => {
+
+  const referralCode = req.query.ref || "";
+
   res.render("Signup",{
     message:null,
-    formData : {}
+    formData : {
+      referralCode
+    }
   });
 };
 
 export const signup = async (req, res) => {
+  
   try {
     const {email} =  req.body;
 
@@ -19,6 +25,7 @@ export const signup = async (req, res) => {
       message:null
     })
   } catch (error) {
+
     res.render("Signup",{
       message : error.message,
       formData : req.body

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Product } from "../../Models/product.model.js";
 import {Team} from "../../Models/team.model.js"
+import { getBestOffer } from "./order.service.js"
 
 export const fetchProductDetailsService = async (slug) => {
 
@@ -21,8 +22,16 @@ export const fetchProductDetailsService = async (slug) => {
   );
 
   product.displayPrice = validVariants.length
-    ? Math.min(...validVariants.map(v => v.price))
-    : 0;
+  ? Math.min(...validVariants.map(v => v.price))
+  : 0;
+
+const discountPercent = await getBestOffer(product);
+
+product.discountPercent = discountPercent;
+
+product.offerPrice =
+product.displayPrice -
+(product.displayPrice * discountPercent)/100;
 
   product.totalStock = (product.variants || []).reduce(
     (sum, v) => sum + Number(v.stock || 0),
@@ -47,17 +56,28 @@ export const fetchRelatedProductsService = async (product) => {
     .populate("team", "name logo")   
     .lean();
 
-  return relatedProducts.map((p) => {
+  return Promise.all(
+    relatedProducts.map(async(p) => {
 
-    const validVariants = (p.variants || []).filter(
-      v => v.stock > 0 && v.price > 0
-    );
+      const validVariants = (p.variants || []).filter(
+        v => v.stock > 0 && v.price > 0
+      );
 
-    return {
-      ...p,
-      displayPrice: validVariants.length
+      const displayPrice = validVariants.length
         ? Math.min(...validVariants.map(v => v.price))
-        : 0,
-    };
-  });
+        : 0;
+
+      const discountPercent = await getBestOffer(p);
+
+      const offerPrice =
+        displayPrice - (displayPrice * discountPercent)/100;
+
+      return {
+        ...p,
+        displayPrice,
+        discountPercent,
+        offerPrice
+      };
+    })
+  );
 };

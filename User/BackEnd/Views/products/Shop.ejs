@@ -106,31 +106,52 @@
 
       <!-- Sort -->
       <form action="/shop" method="GET" class="flex items-center gap-3 justify-end">
-        <input type="hidden" name="search" value="<%= search || '' %>">
 
-        <% (selectedTeams || []).forEach((t) => { %>
-          <input type="hidden" name="teams" value="<%= t %>">
-        <% }) %>
-        <% (selectedTypes || []).forEach((t) => { %>
-          <input type="hidden" name="types" value="<%= t %>">
-        <% }) %>
-        <% (selectedKits || []).forEach((k) => { %>
-          <input type="hidden" name="kits" value="<%= k %>">
-        <% }) %>
+  <input type="hidden" name="search" value="<%= search || '' %>">
 
-        <label class="text-sm text-gray-600">Sort by</label>
-        <select
-          name="sort"
-          onchange="this.form.submit()"
-          class="bg-white border border-borderTone rounded-lg px-4 py-2 text-sm"
-        >
-          <option value="priceLow" <%= sort === "priceLow" ? "selected" : "" %>>Price low to high</option>
-          <option value="priceHigh" <%= sort === "priceHigh" ? "selected" : "" %>>Price high to low</option>
-          <option value="az" <%= sort === "az" ? "selected" : "" %>>A - Z</option>
-          <option value="za" <%= sort === "za" ? "selected" : "" %>>Z - A</option>
-          <option value="latest" <%= sort === "latest" ? "selected" : "" %>>Latest</option>
-        </select>
-      </form>
+  <!-- keep all your hidden filters here -->
+
+  <div class="flex items-center gap-3">
+
+    <span class="text-sm text-gray-600">Sort by</span>
+
+    <div class="relative">
+      <select
+        name="sort"
+        onchange="this.form.submit()"
+        class="appearance-none bg-white border border-borderTone rounded-xl px-4 py-2 pr-10 text-sm shadow-sm hover:shadow-md hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5f7550] transition"
+      >
+
+        <option value="priceLow" <%= sort === "priceLow" ? "selected" : "" %>>
+          Price: Low → High
+        </option>
+
+        <option value="priceHigh" <%= sort === "priceHigh" ? "selected" : "" %>>
+          Price: High → Low
+        </option>
+
+        <option value="az" <%= sort === "az" ? "selected" : "" %>>
+          Name: A → Z
+        </option>
+
+        <option value="za" <%= sort === "za" ? "selected" : "" %>>
+          Name: Z → A
+        </option>
+
+        <option value="latest" <%= sort === "latest" ? "selected" : "" %>>
+          Latest
+        </option>
+
+      </select>
+
+      <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+        ▼
+      </span>
+    </div>
+
+  </div>
+
+</form>
     </section>
 
     <!-- LAYOUT -->
@@ -147,25 +168,42 @@
           <!-- Teams dropdown -->
           <div class="relative">
             <button type="button"
-              onclick="toggleDropdown('teamsBox')"
-              class="w-full bg-white border border-borderTone rounded-xl px-4 py-3 flex justify-between items-center text-sm"
-            >
-              <span>Teams</span>
-              <span class="text-gray-400">⌄</span>
-            </button>
+  onclick="toggleDropdown('teamsBox', this)"
+  class="dropdownBtn w-full bg-white border border-borderTone rounded-xl px-4 py-3 flex justify-between items-center text-sm shadow-sm hover:shadow-md hover:border-[#cfcbb5] transition">
 
-            <div id="teamsBox" class="hidden mt-2 bg-white border border-borderTone rounded-xl p-4 space-y-3">
+  <span class="font-medium flex items-center gap-2">
+    ⚽ Teams
+  </span>
+
+  <svg class="arrow w-4 h-4 text-gray-400 transition-transform duration-200"
+       xmlns="http://www.w3.org/2000/svg"
+       fill="none"
+       viewBox="0 0 24 24"
+       stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+      d="M19 9l-7 7-7-7"/>
+  </svg>
+
+</button>
+           <div id="teamsBox"
+class="dropdown hidden mt-2 bg-white border border-borderTone rounded-xl p-4 space-y-3 shadow-xl animate-dropdown">
               <% (teams || []).forEach((t) => { %>
-                <label class="flex items-center gap-3 text-sm">
-                  <input
-                    type="checkbox"
-                    name="teams"
-                    value="<%= t %>"
-                    <%= (selectedTeams || []).includes(t) ? "checked" : "" %>
-                    class="w-4 h-4"
-                  />
-                  <span><%= t %></span>
-                </label>
+               <label class="filterOption flex items-center justify-between gap-3 text-sm px-3 py-2 rounded-lg cursor-pointer">
+
+  <div class="flex items-center gap-3">
+    <input
+      type="checkbox"
+      name="teams"
+      value="<%= t %>"
+      <%= (selectedTeams || []).includes(t) ? "checked" : "" %>
+      class="accent-[#5f7550] w-4 h-4"
+    />
+
+    <span><%= t %></span>
+  </div>
+
+</label>
+</label>
               <% }) %>
             </div>
           </div>
@@ -182,16 +220,21 @@
 
             <div id="typeBox" class="hidden mt-2 bg-white border border-borderTone rounded-xl p-4 space-y-3">
               <% (types || ["Home","Away"]).forEach((t) => { %>
-                <label class="flex items-center gap-3 text-sm">
-                  <input
-                    type="checkbox"
-                    name="types"
-                    value="<%= t %>"
-                    <%= (selectedTypes || []).includes(t) ? "checked" : "" %>
-                    class="w-4 h-4"
-                  />
-                  <span><%= t %></span>
-                </label>
+                <label class="filterOption flex items-center justify-between gap-3 text-sm px-3 py-2 rounded-lg cursor-pointer">
+
+  <div class="flex items-center gap-3">
+    <input
+      type="checkbox"
+      name="teams"
+      value="<%= t %>"
+      <%= (selectedTeams || []).includes(t) ? "checked" : "" %>
+      class="accent-[#5f7550] w-4 h-4"
+    />
+
+    <span><%= t %></span>
+  </div>
+
+</label>
               <% }) %>
             </div>
           </div>
@@ -269,9 +312,31 @@
                         Out of Stock
                      </p>
                  <% } else { %>
-                    <p class="text-sm font-semibold mt-3">
-                       ₹<%= Number(p.displayPrice).toFixed(2) %>
-                    </p>
+                    <% if (p.discountPercent && p.discountPercent > 0) { %>
+
+<div class="mt-3">
+
+<span class="text-gray-400 line-through text-xs">
+₹<%= Number(p.displayPrice).toFixed(2) %>
+</span>
+
+<p class="text-sm font-bold text-red-600">
+₹<%= Number(p.offerPrice).toFixed(2) %>
+</p>
+
+<span class="text-green-600 text-xs font-semibold">
+<%= p.discountPercent %>% OFF
+</span>
+
+</div>
+
+<% } else { %>
+
+<p class="text-sm font-semibold mt-3">
+₹<%= Number(p.displayPrice).toFixed(2) %>
+</p>
+
+<% } %>
                 <% } %>
 
 
@@ -328,6 +393,56 @@
       </div>
   
     </section>
+    
+
+
+
+    <% if (error) { %>
+  <div id="errorModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+
+    <div class="bg-white w-[90%] max-w-md rounded-2xl shadow-xl p-6 relative animate-fadeIn">
+
+      <!-- Close Button -->
+      <button
+        onclick="closeErrorModal()"
+        class="absolute top-3 right-4 text-gray-400 hover:text-gray-700 text-xl"
+      >
+        ✕
+      </button>
+
+      <!-- Icon -->
+      <div class="flex justify-center mb-4">
+        <div class="w-14 h-14 flex items-center justify-center rounded-full bg-red-100 text-red-600 text-2xl">
+          !
+        </div>
+      </div>
+
+      <!-- Title -->
+      <h3 class="text-lg font-semibold text-center mb-2">
+        Something went wrong
+      </h3>
+
+      <!-- Error Message -->
+      <p class="text-sm text-gray-600 text-center">
+        <%= error %>
+      </p>
+
+      <!-- Button -->
+      <div class="mt-6 text-center">
+        <button
+          onclick="closeErrorModal()"
+          class="bg-primaryBtn hover:bg-primaryBtnHover text-white px-6 py-2 rounded-lg text-sm"
+        >
+          Okay
+        </button>
+      </div>
+
+    </div>
+  </div>
+<% } %>
+
+
+
 
   </main>
 
@@ -387,6 +502,20 @@
     });
   });
 });
+  
+
+function closeErrorModal() {
+  const modal = document.getElementById("errorModal");
+  if (modal) {
+    modal.remove();
+
+    // Remove error from URL (clean URL after close)
+    const url = new URL(window.location);
+    url.searchParams.delete("error");
+    window.history.replaceState({}, document.title, url.pathname + url.search);
+  }
+}
+
 
   </script>
 

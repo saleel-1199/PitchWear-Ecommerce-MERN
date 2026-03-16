@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coupons</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#f8f8f4] text-gray-800">
+
+<!-- HEADER -->
+<header class="bg-[#eff2c8] px-10 py-5 flex items-center justify-between">
+  <div class="flex items-center gap-10">
+    <h1 class="font-bold text-lg">Pitchwear</h1>
+    <p class="text-sm font-semibold">Admin Dashboard</p>
+  </div>
+
+  <div class="w-11 h-11 rounded-xl bg-white flex items-center justify-center border">
+    👤
+  </div>
+</header>
+
+<main class="flex px-10 py-10 gap-10">
+
+<!-- SIDEBAR -->
+<aside class="w-64">
+
+<p class="text-sm text-gray-500 mb-5">Pitchwear Admin</p>
+
+<nav class="space-y-2 text-sm">
+
+<a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+🏠 Dashboard
+</a>
+
+<a href="/admin/products" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+👕 Product Management
+</a>
+
+<a href="/admin/teams" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+⚽ Manage Teams
+</a>
+
+<a href="/admin/orders" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+📦 Order Management
+</a>
+
+<a href="/admin/coupons" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white font-medium">
+🧾 Coupons
+</a>
+
+<a href="/admin/offers" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
+🎁 Offers
+</a>
+
+<a href="/admin/logout" class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-600 font-medium mt-6">
+⛔ Logout
+</a>
+
+</nav>
+
+</aside>
+
+<!-- CONTENT -->
+<section class="flex-1">
+
+<h2 class="text-3xl font-bold mb-6">
+Coupon Management
+</h2>
+
+
+<!-- CREATE COUPON -->
+<div class="bg-white border rounded-xl p-6 mb-8">
+
+<h3 class="font-semibold mb-4">Create Coupon</h3>
+
+<form action="/admin/coupons" method="POST" class="grid grid-cols-2 gap-4">
+
+<input
+name="code"
+placeholder="Coupon Code"
+required
+class="border px-3 py-2 rounded"
+/>
+
+<input
+name="discountPercent"
+type="number"
+placeholder="Discount %"
+required
+class="border px-3 py-2 rounded"
+/>
+
+<input
+name="minPurchase"
+type="number"
+placeholder="Minimum Purchase"
+class="border px-3 py-2 rounded"
+/>
+
+<input
+type="date"
+name="expiryDate"
+class="border px-3 py-2 rounded"
+/>
+
+<button
+class="col-span-2 bg-[#cdd47b] py-2 rounded-lg font-semibold">
+Create Coupon
+</button>
+
+</form>
+
+</div>
+
+
+<!-- COUPON TABLE -->
+
+<div class="bg-white border rounded-xl overflow-hidden">
+
+<table class="w-full text-sm">
+
+<thead class="bg-gray-50 text-gray-500">
+
+<tr>
+
+<th class="text-left px-6 py-4">
+Code
+</th>
+
+<th class="text-left px-6 py-4">
+Discount
+</th>
+
+<th class="text-left px-6 py-4">
+Min Purchase
+</th>
+
+<th class="text-left px-6 py-4">
+Expiry
+</th>
+
+<th class="text-center px-6 py-4">
+Action
+</th>
+
+</tr>
+
+</thead>
+
+
+<tbody>
+
+<% if(!coupons || coupons.length === 0){ %>
+
+<tr>
+<td colspan="5" class="text-center py-16 text-gray-400">
+No coupons found
+</td>
+</tr>
+
+<% } %>
+
+
+<% coupons.forEach(coupon => { %>
+
+<tr class="border-t">
+
+<td class="px-6 py-4">
+<%= coupon.code %>
+</td>
+
+<td class="px-6 py-4">
+<%= coupon.discountPercent %>%
+</td>
+
+<td class="px-6 py-4">
+₹<%= coupon.minPurchase %>
+</td>
+
+<td class="px-6 py-4">
+<%= new Date(coupon.expiryDate).toDateString() %>
+</td>
+
+<td class="px-6 py-4 text-center">
+
+<form action="/admin/coupons/<%= coupon._id %>?_method=DELETE" method="POST">
+
+<button class="text-red-600 font-medium">
+Delete
+</button>
+
+</form>
+
+</td>
+
+</tr>
+
+<% }) %>
+
+</tbody>
+
+</table>
+
+</div>
+
+</section>
+
+</main>
+
+</body>
+</html>
