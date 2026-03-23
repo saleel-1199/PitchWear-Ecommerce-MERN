@@ -65,8 +65,18 @@ let subtotal = items.reduce(
    discount = sessionCoupon.discount;
  }
 
+
+
  const finalTotal =
   subtotal + tax + deliveryFee - discount;
+  
+  const coupons = await Coupon.find({
+  isActive: true,
+  expiryDate: { $gt: new Date() },
+  minPurchase: { $lte: subtotal }
+}).lean();
+
+
 
  return {
   cart:{
@@ -78,7 +88,8 @@ let subtotal = items.reduce(
    discount,
    finalTotal
   },
-  addresses
+  addresses,
+  coupons
  };
 
 };
@@ -101,7 +112,7 @@ export const placeOrderService = async ({
 
  if (!address) throw new Error("Invalid address");
 
- /* STOCK CHECK */
+ //STOCK
 
  for (const item of cart.items) {
 
@@ -115,11 +126,29 @@ export const placeOrderService = async ({
 
  }
 
- /* PRICE CALCULATION */
+ // PRICE 
 
- const subtotal =
- cart.items.reduce(
- (sum,i)=>sum+i.price*i.quantity,0);
+ const items = await Promise.all(
+ cart.items.map(async (item) => {
+
+   const product = await Product.findById(item.product);
+
+   const discountPercent = await getBestOffer(product);
+
+   const originalPrice = item.price;
+
+   const finalPrice =
+     originalPrice - (originalPrice * discountPercent) / 100;
+
+   return {
+     ...item.toObject(),
+     price: finalPrice,
+     subtotal: finalPrice * item.quantity
+   };
+ })
+);
+
+const subtotal = items.reduce((sum, i) => sum + i.subtotal, 0);
 
  const tax = 7.5;
  const deliveryFee = 5;
@@ -161,23 +190,7 @@ export const placeOrderService = async ({
 
  orderId,
  user:userId,
- items:await Promise.all(
- cart.items.map(async(item)=>{
-
- const product = await Product.findById(item.product)
-
- const discountPercent = await getBestOffer(product)
-
- const discountedPrice =
- item.price - (item.price * discountPercent)/100
-
- return {
-  ...item.toObject(),
-  price:discountedPrice
- }
-
- })
-),
+ items:items,
  subtotal,
  tax,
  deliveryFee,

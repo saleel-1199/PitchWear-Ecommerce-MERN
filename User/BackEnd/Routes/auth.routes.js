@@ -18,7 +18,7 @@ router.route("/signup")
           .post(loggedIn,authController.signup);
 
 router.post("/VerifyOtp",authController.verifyOtp);
-
+router.get("/VerifyOtp", authController.renderVerifyOtp);
 
 router.route("/ForgotPassword")
          .get(authController.renderForgot)

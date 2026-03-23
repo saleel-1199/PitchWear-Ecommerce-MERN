@@ -31,7 +31,7 @@ export const createTeam = async (name) => {
   if (!name || !name.trim()) {
     throw new Error("Team name is required");
   }
-
+ 
   const teamName = name.trim().toUpperCase();
 
    const existing = await Team.findOne({name:teamName})
@@ -53,17 +53,30 @@ export const getTeamById = async (id) => {
 
 
 export const updateTeamNameService = async (teamId, newName) => {
-  if (!newName) {
+
+  if (!newName || !newName.trim()) {
     throw new Error("Team name is required");
   }
+
+  const formattedName = newName.trim().toUpperCase();
 
   const team = await Team.findById(teamId);
 
   if (!team) {
-    throw new Error("TEAM_NOT_FOUND");
+    throw new Error("Team not found");
   }
 
-  team.name = newName.trim().toUpperCase();
+  const existing = await Team.findOne({
+    name: formattedName,
+    _id: { $ne: teamId },
+    isDeleted: false
+  });
+
+  if (existing) {
+    throw new Error("Team already exists");
+  }
+
+  team.name = formattedName;
   await team.save();
 
   return team;

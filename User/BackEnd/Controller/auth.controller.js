@@ -20,10 +20,7 @@ export const signup = async (req, res) => {
     await authService.signupUser(req.body);
     
     req.session.email = email;
-    res.render("VerifyOtp",{  
-      email:req.body.email,
-      message:null
-    })
+    return res.redirect("/VerifyOtp");
   } catch (error) {
 
     res.render("Signup",{
@@ -47,9 +44,9 @@ export const verifyOtp = async (req, res) => {
     res.redirect("/login");
 
   } catch (err) {
-    res.render("verifyOtp",{
-      message:null
-    })
+     req.session.otpError = err.message;
+
+    return res.redirect("/VerifyOtp");
   }
 };
 
@@ -65,16 +62,30 @@ export const resendSignupOtp = async(req,res) =>{
     }
     
     await authService.resendSignupOtp(email);
+    req.session.otpResent = true;
     return res.render("VerifyOtp",{
       message:null
     })
   } catch (error) {
-    return res.render("VerifyOtp", {
-      message:null
-    });
+     req.session.otpError = "Failed to resend OTP";
+
+    return res.redirect("/VerifyOtp");
   }
 }
 
+export const renderVerifyOtp = (req, res) => {
+
+  const error = req.session.otpError || null;
+  const otpResent = req.session.otpResent || false;
+
+  req.session.otpError = null;
+  req.session.otpResent = null;
+
+  res.render("VerifyOtp", {
+    error,
+    otpResent
+  });
+};
 
 export const renderLogin = (req, res) => {
 

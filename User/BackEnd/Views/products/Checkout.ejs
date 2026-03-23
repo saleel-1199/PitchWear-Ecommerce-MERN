@@ -188,6 +188,41 @@
 </div>
 
 
+<!-- AVAILABLE COUPONS -->
+<div class="mt-4">
+  <p class="text-sm font-medium mb-2">Available Coupons</p>
+
+  <% if(coupons && coupons.length){ %>
+    <div class="space-y-2">
+
+      <% coupons.forEach(c => { %>
+        <div class="flex justify-between items-center border p-3 rounded">
+
+          <div class="text-sm">
+            <p class="font-semibold text-green-600">
+              <%= c.code %>
+            </p>
+            <p class="text-xs text-gray-500">
+              <%= c.discountPercent %>% OFF • Min ₹<%= c.minPurchase %>
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onclick="applyCouponFromList('<%= c.code %>')"
+            class="bg-black text-white px-3 py-1 rounded text-xs">
+            Apply
+          </button>
+
+        </div>
+      <% }) %>
+
+    </div>
+  <% } else { %>
+    <p class="text-xs text-gray-400">No coupons available</p>
+  <% } %>
+</div>
+
 
         <div class="space-y-2 text-sm">
           <div class="flex justify-between">
@@ -346,6 +381,11 @@ function closeAddressModal() {
   modal.classList.add("hidden");
   modal.classList.remove("flex");
 }
+
+function applyCouponFromList(code){
+  document.getElementById("couponCode").value = code
+  applyCoupon()
+}
 </script>
 
 <script>
@@ -387,12 +427,12 @@ document
         location.reload();
 
       } else {
-        alert("Failed to save address");
+       showModal ("Failed to save address");
       }
 
     } catch (err) {
       console.error(err);
-      alert("Something went wrong");
+      showModal("Something went wrong");
     }
 
 });
@@ -411,23 +451,6 @@ onlyDigits(document.getElementById("pin_code"), 6);
 </script>
 
 
-<!-- <script>
-const checkoutForm = document.querySelector("form[action='/checkout']")
-
-checkoutForm.addEventListener("submit", function(e){
-
-const selectedPayment =
-document.querySelector('input[name="paymentMethod"]:checked').value
-
-document.getElementById("paymentMethodInput").value = selectedPayment
-
-// stop normal submit when Razorpay selected
-if(selectedPayment === "Razorpay"){
-e.preventDefault()
-}
-
-})
-</script> -->
 
 
 <script>
@@ -458,7 +481,7 @@ const data = await res.json()
 if(data.success){
 location.reload()
 }else{
-alert(data.message)
+showModalt(data.message)
 }
 
 }
@@ -493,7 +516,7 @@ const address =
 document.querySelector('input[name="addressId"]:checked')
 
 if(!address){
-alert("Please select address")
+showModal("Please select address")
 return
 }
 
@@ -555,93 +578,7 @@ rzp.open()
 
 
 
-<!-- <script>
 
-async function handleCheckout(){
-
-const address =
-document.querySelector('input[name="addressId"]:checked')
-
-if(!address){
-alert("Please select address")
-return
-}
-
-const paymentMethod =
-document.querySelector('input[name="paymentMethod"]:checked').value
-
-
-/* COD PAYMENT */
-
-if(paymentMethod === "COD"){
-
-document.getElementById("paymentMethodInput").value = "COD"
-
-document.querySelector("form[action='/checkout']").submit()
-
-return
-
-}
-
-
-/* RAZORPAY PAYMENT */
-
-const res = await fetch("/checkout",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-addressId:address.value,
-paymentMethod:"Razorpay"
-})
-
-})
-
-const data = await res.json()
-
-console.log(data)
-
-const options = {
-
-key:data.key,
-amount:data.razorpayOrder.amount,
-currency:"INR",
-order_id:data.razorpayOrder.id,
-
-handler:async function(response){
-
-await fetch("/verify-payment",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-orderId:response.razorpay_order_id,
-paymentId:response.razorpay_payment_id
-})
-
-})
-
-window.location.href="/order-success/"+data.order._id
-
-}
-
-}
-
-const rzp = new Razorpay(options)
-
-rzp.open()
-
-}
-
-</script> -->
 
 <script>
 
@@ -657,5 +594,41 @@ form.addEventListener("submit", function () {
 });
 
 </script>
+
+<!-- 🔥 GLOBAL MODAL -->
+<div id="customModal"
+     class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
+
+  <div class="bg-white rounded-xl p-6 w-[350px] text-center shadow-lg">
+
+    <p id="modalMessage" class="text-red-600 font-medium mb-4"></p>
+
+    <button onclick="closeModal()"
+      class="bg-black text-white px-4 py-2 rounded">
+      OK
+    </button>
+
+  </div>
+</div>
+
+<script>
+function showModal(message) {
+  const modal = document.getElementById("customModal");
+  const text = document.getElementById("modalMessage");
+
+  text.innerText = message;
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function closeModal() {
+  const modal = document.getElementById("customModal");
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+</script>
+
 </body>
 </html>

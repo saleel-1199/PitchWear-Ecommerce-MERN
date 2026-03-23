@@ -56,10 +56,13 @@ export const sendEmailOtp = async (req, res) => {
 };
 
 export const renderVerifyEmailOtp = async(req,res) =>{
-    res.render("VerifyEmailOtp",{
-        error:null,
+    const error = req.session.otpError || null;
 
-    })
+  req.session.otpError = null;
+
+  res.render("VerifyEmailOtp", {
+    error
+  });
 }
 
 export const verifyEmailOtp = async (req, res) => {
@@ -71,7 +74,8 @@ export const verifyEmailOtp = async (req, res) => {
     );
     res.redirect("/profile");
   } catch (error) {
-    res.render("VerifyEmailOtp", { error: error.message });
+   req.session.otpError = error.message;
+    return res.redirect("/profile/verify-email-otp");
   }
 };
 

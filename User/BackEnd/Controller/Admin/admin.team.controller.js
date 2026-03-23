@@ -70,7 +70,8 @@ export const editTeamPage = async (req, res) => {
   res.render("Admin/TeamsEdit", {
     team,
     page: req.query.page || 1,
-    search: req.query.search || ""
+    search: req.query.search || "",
+    error:null
   });
 };
 
@@ -80,16 +81,33 @@ export const updateTeamName = async (req, res) => {
     const teamId = req.params.id;
     const newName = req.body.name?.trim();
 
+    const { page = 1, search = "" } = req.query;
+
     if (!newName) {
-      return res.status(400).send("Team name is required");
+      throw new Error("Team name is required");
     }
 
     await updateTeamNameService(teamId, newName);
-    res.redirect("/admin/teams");
+
+    res.redirect(`/admin/teams?page=${page}&search=${search}`);
 
   } catch (error) {
-    console.error("Edit Team Error:", error);
-    res.status(500).send("Internal Server Error");
+
+    console.log("Update Team Error:", error.message);
+
+    const { page = 1, search = "" } = req.query;
+
+    const team = await getTeamById(req.params.id);
+
+    res.render("Admin/TeamsEdit", {
+      team: {
+        ...team.toObject(),
+        name: req.body.name 
+      },
+      error: error.message,
+      page,
+      search
+    });
   }
 };
 

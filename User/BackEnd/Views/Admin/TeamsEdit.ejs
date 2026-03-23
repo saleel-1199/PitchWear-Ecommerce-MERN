@@ -98,6 +98,13 @@
             Team Name
           </label>
 
+            <!-- ✅ ERROR HERE -->
+  <% if (error) { %>
+    <p class="text-red-500 text-sm mb-2">
+      <%= error %>
+    </p>
+  <% } %>
+
           <input
             type="text"
             name="name"

@@ -17,7 +17,7 @@ const variantSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 0,
-    },
+    }
   },
   { _id: false }
 );
