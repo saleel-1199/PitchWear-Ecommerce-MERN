@@ -5,6 +5,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
+
 <body class="bg-[#f8f8f4] text-gray-800">
 
 <header class="bg-[#eff2c8] px-10 py-5 flex justify-between items-center">
@@ -27,10 +28,35 @@
   <p class="text-xs text-pink-600 mb-2">
     Order Date: <%= new Date(order.createdAt).toDateString() %>
   </p>
+        
+
 
   <p class="font-semibold mb-10">
     Order ID: #<%= order.orderId %>
   </p>
+
+  <p class="text-sm mb-2">
+  Payment: 
+  <span class="<%= order.paymentStatus === 'Failed' ? 'text-red-600' : 'text-green-600' %>">
+    <%= order.paymentStatus %>
+  </span>
+</p>
+  
+
+  <p class="font-semibold mb-10">
+  Order ID: #<%= order.orderId %>
+</p>
+
+<% if(order.paymentMethod === "Razorpay" && order.paymentStatus === "Failed") { %>
+  <button 
+  id="retryBtn"
+  onclick="retryPayment('<%= order._id %>')"
+  class="bg-red-500 text-white px-5 py-2 rounded-lg text-sm">
+  Retry Payment
+</button>
+<% } %>
+
+
 
   <!-- LOOP ALL ITEMS -->
   <% order.items.forEach(item => { %>
@@ -78,30 +104,35 @@
     </div>
 
     <!-- ACTION BUTTONS -->
-    <div class="flex gap-4 mt-6">
+<div class="flex gap-4 mt-6">
 
-      <% if (order.status === "Delivered" || order.status === "Partially Completed" || order.status === "Returned") { %>
 
-        <a href="/orders/<%= order.orderId %>/invoice"
-           class="bg-gray-300 px-5 py-2 rounded-lg text-sm hover:bg-gray-400">
-           Download Invoice
-        </a>
+  <a href="/orders/<%= order._id %>/invoice"
+     class="bg-gray-300 px-5 py-2 rounded-lg text-sm hover:bg-gray-400">
+     Download Invoice
+  </a>
 
-        <button onclick="openReturnModal('<%= order.orderId %>','<%= item._id %>')"
-                class="bg-yellow-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-yellow-700">
-            Return
-        </button>
+ 
+  <% if (order.status === "Delivered" || order.status === "Partially Completed" || order.status === "Returned") { %>
 
-      <% } else if (item.status !== "Cancelled" && item.status !== "Returned") { %>
+    <button onclick="openReturnModal('<%= order._id %>','<%= item._id %>')"
+            class="bg-yellow-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-yellow-700">
+        Return
+    </button>
 
-        <button onclick="openCancelModal('<%= order.orderId %>','<%= item._id %>')"
-                class="bg-red-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-red-700">
-            Cancel
-        </button>
+  <% } %>
 
-      <% } %>
+ 
+  <% if (order.status !== "Delivered" && item.status !== "Cancelled" && item.status !== "Returned") { %>
 
-    </div>
+    <button onclick="openCancelModal('<%= order._id %>','<%= item._id %>')"
+            class="bg-red-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-red-700">
+        Cancel
+    </button>
+
+  <% } %>
+
+</div>
 
   </div>
 
@@ -216,6 +247,169 @@ function closeReturnModal() {
 </script>
 
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
+
+
+<script>
+async function retryPayment(orderId){
+
+  const btn = document.getElementById("retryBtn");
+  btn.disabled = true;
+  btn.innerText = "Processing...";
+
+  let data;
+
+  try {
+    const res = await fetch(`/retry-payment/${orderId}`, {
+      method: "POST"
+    });
+
+    data = await res.json();
+  } catch (err) {
+    showAlertModal("Network error");
+
+    // 🔥 re-enable button if error
+    btn.disabled = false;
+    btn.innerText = "Retry Payment";
+
+    return;
+  }
+ 
+
+  if(!data.success){
+    showAlertModal(data.message || "Something went wrong");
+    return;
+  }
+
+  const options = {
+    key: data.key,
+    amount: data.razorpayOrder.amount,
+    currency: "INR",
+    order_id: data.razorpayOrder.id,
+
+    handler: async function(response){
+
+  if(!response.razorpay_payment_id){
+    
+    // 🔥 TREAT AS FAILURE
+    await fetch("/payment-failed", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        orderId: response.razorpay_order_id
+      })
+    });
+
+    window.location.href =
+      "/orders/" + data.order._id + "?payment=failed";
+
+    return;
+  }
+
+  // ✅ SUCCESS FLOW
+  await fetch("/verify-payment",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      orderId:response.razorpay_order_id,
+      paymentId:response.razorpay_payment_id
+    })
+  });
+
+  window.location.href="/order-success/"+data.order._id;
+}
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
+
+  rzp.on("payment.failed", function () {
+    showAlertModal("Payment failed again");
+    window.location.href = "/orders";
+  });
+}
+</script>
+
+
+
+<script>
+document.getElementById("cancelForm")
+.addEventListener("submit", function () {
+
+  // small delay to allow backend redirect
+  setTimeout(() => {
+    window.location.reload();
+  }, 200);
+
+});
+</script>
+
+
+
+<script>
+let redirectAfterClose = null;
+
+function showAlertModal(message, redirect = null) {
+  document.getElementById("modalMessage").innerText = message;
+
+  const modal = document.getElementById("customModal");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  redirectAfterClose = redirect;
+}
+
+function closeAlertModal() {
+  const modal = document.getElementById("customModal");
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+
+  if (redirectAfterClose) {
+    window.location.href = redirectAfterClose;
+  }
+}
+</script>
+
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+
+   const paymentFailed = <%= JSON.stringify(paymentFailed || false) %>;
+ 
+   if (paymentFailed) {
+    showAlertModal(
+      "❌ Last payment failed. You can retry payment."
+    );
+
+    // 🔥 optional: scroll to retry button
+    document.getElementById("retryBtn")?.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
+
+});
+</script>
+
+<!-- GLOBAL ALERT MODAL (NEW) -->
+<div id="customModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
+
+  <div class="bg-white rounded-xl shadow-lg w-[350px] p-6 text-center">
+
+    <p id="modalMessage" class="text-gray-700 mb-6"></p>
+
+    <button 
+      onclick="closeAlertModal()" 
+      class="bg-[#5f7550] text-white px-6 py-2 rounded"
+    >
+      OK
+    </button>
+
+  </div>
+
+</div>
 </body>
 </html>

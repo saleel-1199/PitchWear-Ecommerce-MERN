@@ -2,10 +2,13 @@ import {
   getCheckoutDataService,
   placeOrderService,
   getOrderSuccessDataService,
-  applyCouponCheckoutService
+  applyCouponCheckoutService,
+  verifyPaymentService,
+  handlePaymentFailureService,
+  retryPaymentService
 } from "../../Services/Product/checkout.service.js";
 
-
+import Razorpay from "razorpay";
 
 
 export const getCheckoutPageController = async (req, res) => {
@@ -14,6 +17,11 @@ export const getCheckoutPageController = async (req, res) => {
   try {
 
     if (!req.session.userId) return res.redirect("/login");
+    
+    res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
+    res.set("Pragma", "no-cache");
+    res.set("Expires", "0");
+
 
     const data = await getCheckoutDataService(
       req.session.userId,
@@ -24,12 +32,23 @@ export const getCheckoutPageController = async (req, res) => {
       ...data,
       cartCount: data.cart.items.length,
       addresses: data.addresses,
-      coupon: req.session.coupon || null  
+      appliedCoupon: req.session.coupon || null
     });
 
-  } catch (error) {
+  } catch (error) { 
 
     console.log("Checkout Error:", error.message);
+
+
+   req.session.errorMessage = error.message;
+
+   if (req.xhr || req.headers.accept.includes("json")) {
+    return res.json({
+      success: false,
+      redirect: "/cart"   
+    });
+  }
+
     res.redirect("/cart");
 
   }
@@ -105,7 +124,9 @@ export const placeOrderController = async (req, res) => {
     });
 
  
+  req.session.coupon = null;
 
+  
     if(req.body.selectedPaymentMethod === "Razorpay"){
 
       return res.json({
@@ -121,51 +142,61 @@ export const placeOrderController = async (req, res) => {
 
   
 
-    req.session.coupon = null;
+// 🔥 HANDLE WALLET (ADD THIS)
+   if (req.body.selectedPaymentMethod === "Wallet") {
+  return res.json({
+    success: true,
+    orderId: result.order._id
+  });
+  }
 
-    res.redirect(`/order-success/${result.order._id}`);
-
+// ✅ COD fallback
+return res.json({
+  success: true,
+  orderId: result.order._id
+});
   } catch (error) {
 
-    console.log("Place Order Error:", error.message);
-    res.redirect("/checkout");
-
+    res.json({
+  success: false,
+  message: error.message,
+  redirect: "/cart" 
+});
   }
 };
 
 
 
 
-export const verifyPaymentController = async(req,res)=>{
-
-  try{
+export const verifyPaymentController = async (req, res) => {
+  try {
 
     const { orderId, paymentId } = req.body;
 
-    await Order.findOneAndUpdate(
+    await verifyPaymentService(orderId, paymentId);
 
-      { razorpayOrderId:orderId },
+    res.json({ success: true });
 
-      {
-        paymentStatus:"Paid",
-        razorpayPaymentId:paymentId
-      }
-
-    );
-
-    req.session.coupon = null;
-
-    res.json({success:true});
-
-  }catch(error){
-
-    res.json({success:false});
-
+  } catch (error) {
+    console.log("VERIFY ERROR:", error.message);
+    res.json({ success: false });
   }
-
 };
 
+export const paymentFailedController = async (req, res) => {
+  try {
 
+    const { orderId } = req.body;
+
+    await handlePaymentFailureService(orderId);
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.log(err.message);
+    res.json({ success: false });
+  }
+};
 
 export const orderSuccessController = async (req, res) => {
 
@@ -174,6 +205,9 @@ export const orderSuccessController = async (req, res) => {
     if (!req.session.userId) {
       return res.redirect("/login");
     }
+     
+    res.set("Cache-Control", "no-store");
+
 
     const { id } = req.params;
 
@@ -195,5 +229,36 @@ export const orderSuccessController = async (req, res) => {
       `/shop?error=${encodeURIComponent(error.message)}`
     );
 
+  }
+};
+
+export const retryPaymentController = async (req, res) => {
+  try {
+
+    if (!req.session.userId) {
+      return res.json({ success: false });
+    }
+
+    const { orderId } = req.params;
+
+    const result = await retryPaymentService(
+      orderId,
+      req.session.userId
+    );
+
+    res.json({
+      success: true,
+      razorpayOrder: result.razorpayOrder,
+      key: process.env.RAZORPAY_KEY,
+      orderId: result.order._id
+    });
+
+  } catch (err) {
+    console.log(err.message);
+
+    res.json({
+      success: false,
+      message: err.message
+    });
   }
 };

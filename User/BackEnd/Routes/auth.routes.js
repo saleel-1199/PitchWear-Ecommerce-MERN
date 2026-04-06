@@ -33,7 +33,7 @@ router.route("/login")
         .get(loggedIn,authController.renderLogin)
         .post(loggedIn,authController.login)
 router.route("/Home")
-        .get(isAuth,authController.renderHome)
+        .get(authController.renderHome)
 
 
 router.get("/auth/google",passport.authenticate("google", { scope: ["profile", "email"] }));
@@ -72,5 +72,6 @@ router.post("/address/edit/:id",attachUser, isAuth, addressController.updateAddr
 
 router.get("/address/delete/:id", attachUser,isAuth, addressController.deleteAddressController);
 
-router.post("/resend-otp",authController.resendSignupOtp)
+router.post("/resend-otp",authController.resendSignupOtp);
+
 export default router;

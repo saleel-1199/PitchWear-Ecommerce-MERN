@@ -28,6 +28,7 @@
 
 <body class="bg-bg text-gray-800">
 
+
   <!-- HEADER -->
   <header class="w-full bg-bg border-b border-borderTone">
        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
@@ -54,6 +55,24 @@
       </div>
     </div>
   </header>
+
+  <% if (message) { %>
+  <div class="w-full flex justify-center mt-4">
+    
+    <div id="flashMessage"
+         class="bg-green-600 text-white px-6 py-3 rounded-lg shadow text-sm font-medium">
+      <%= message %>
+    </div>
+
+  </div>
+
+  <script>
+    setTimeout(() => {
+      const el = document.getElementById("flashMessage");
+      if (el) el.style.display = "none";
+    }, 2000);
+  </script>
+<% } %>
 
 <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 

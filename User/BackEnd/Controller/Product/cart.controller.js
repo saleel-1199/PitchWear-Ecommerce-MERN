@@ -14,9 +14,13 @@ export const getCartPageController = async (req, res) => {
    
     const cart = await getUserCartService(req.session.userId);
 
+    const errorMessage = req.session.errorMessage || null; 
+  req.session.errorMessage = null;
+
     res.render("products/Cart", {
       cart,
       cartCount: cart.items.length,
+      errorMessage
     });
 
   } catch (error) {

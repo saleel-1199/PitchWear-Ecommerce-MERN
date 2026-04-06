@@ -131,10 +131,29 @@
           <p class="text-gray-500">Name</p>
           <p><%= user.fullName %></p>
         </div>
+        
         <div>
           <p class="text-gray-500">Email</p>
           <p><%= user.email %></p>
         </div>
+
+         <div>
+    <p class="text-gray-500">Referral Code</p>
+    <div class="flex items-center gap-2">
+      <p class="font-medium">
+        <%= user.referralCode || "N/A" %>
+      </p>
+
+      <% if (user.referralCode) { %>
+        <button 
+          onclick="navigator.clipboard.writeText('<%= user.referralCode %>')"
+          class="text-xs px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+        >
+          Copy
+        </button>
+      <% } %>
+    </div>
+  </div>
       </div>
     </div>
 

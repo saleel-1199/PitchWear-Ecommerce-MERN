@@ -54,7 +54,6 @@ const orderSchema = new mongoose.Schema({
   default: "Pending"
 },
 couponCode: String,
-
 razorpayOrderId: String,
 razorpayPaymentId: String,
 

@@ -27,52 +27,7 @@
 
 <!-- SIDEBAR -->
 
-<aside class="w-64">
-
-<p class="text-sm text-gray-500 mb-5">Pitchwear Admin</p>
-
-<nav class="space-y-2 text-sm">
-
-<a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
-🏠 Dashboard
-</a>
-
-<a href="/admin/products" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
-👕 Product Management
-</a>
-
-<a href="/admin/teams" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
-⚽ Manage Teams
-</a>
-
-<a href="/admin/orders" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
-📦 Order Management
-</a>
-
-<a href="/admin/users" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
-👥 User Management
-</a>
-
-<a href="/admin/coupons" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
-🧾 Coupons
-</a>
-
-<a href="/admin/offers" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
-🎁 Offers
-</a>
-
-<a href="/admin/sales-report" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white font-medium">
-📊 Sales Report
-</a>
-
-<a href="/admin/logout" class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-600 font-medium mt-6">
-⛔ Logout
-</a>
-
-</nav>
-
-</aside>
-
+   <%- include("partials/sidebar") %>
 
 
 <!-- CONTENT AREA -->
@@ -95,19 +50,15 @@ Dashboard / <span class="text-gray-700 font-semibold">Sales Report</span>
 <h2 class="text-3xl font-bold">Sales Report</h2>
 
 <div class="flex gap-3">
-
-<a href="/sales-report/pdf"
-class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg shadow">
-
-Download PDF
-
+  
+<a href="/sales-report/pdf?filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>"
+   class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg font-semibold shadow">
+  Download PDF
 </a>
 
-<a href="/sales-report/excel"
-class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg shadow">
-
-Download Excel
-
+<a href="/sales-report/excel?filter=<%= filter %>&startDate=<%= startDate %>&endDate=<%= endDate %>"
+   class="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg font-semibold shadow">
+  Download Excel
 </a>
 
 </div>

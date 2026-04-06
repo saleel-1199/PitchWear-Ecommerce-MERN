@@ -17,10 +17,17 @@ export const getWishlistPageController = async (req, res) => {
 export const addToWishlistController = async (req, res) => {
   if (!req.session.userId) return res.redirect("/login");
 
-  await addToWishlistService({
-    userId: req.session.userId,
-    productId: req.body.productId,
-  });
+  try {
+    await addToWishlistService({
+      userId: req.session.userId,
+      productId: req.body.productId,
+    });
+
+    req.session.message = "Added to wishlist ❤️";
+
+  } catch (err) {
+    req.session.message = err.message || "Something went wrong";
+  }
 
   res.redirect("/shop");
 };

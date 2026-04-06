@@ -49,9 +49,6 @@ export const getUserCartService = async (userId) => {
 
 })
 )
-
-
-
   leanCart.subtotal = leanCart.items.reduce(
     (sum, i) => sum + i.subtotal,
     0

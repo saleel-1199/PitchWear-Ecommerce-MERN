@@ -66,7 +66,43 @@ export const salesReportPage = async (req,res)=>{
 
 export const downloadExcelReportController = async (req,res)=>{
 
- const orders = await Order.find({status:"Delivered"})
+const { filter, startDate, endDate } = req.query;
+
+let query = { status: "Delivered" };
+const now = new Date();
+
+if (filter === "daily") {
+  const start = new Date();
+  start.setHours(0,0,0,0);
+
+  const end = new Date();
+  end.setHours(23,59,59,999);
+
+  query.createdAt = { $gte: start, $lte: end };
+}
+
+if (filter === "weekly") {
+  const start = new Date();
+  start.setDate(now.getDate() - 7);
+
+  query.createdAt = { $gte: start };
+}
+
+if (filter === "yearly") {
+  const start = new Date();
+  start.setFullYear(now.getFullYear() - 1);
+
+  query.createdAt = { $gte: start };
+}
+
+if (startDate && endDate) {
+  query.createdAt = {
+    $gte: new Date(startDate),
+    $lte: new Date(endDate)
+  };
+}
+
+const orders = await Order.find(query);
 
  const workbook = new ExcelJS.Workbook()
 
@@ -109,7 +145,43 @@ export const downloadExcelReportController = async (req,res)=>{
 
 export const downloadPDFReportController = async (req,res)=>{
 
- const orders = await Order.find({status:"Delivered"})
+ const { filter, startDate, endDate } = req.query;
+
+let query = { status: "Delivered" };
+const now = new Date();
+
+if (filter === "daily") {
+  const start = new Date();
+  start.setHours(0,0,0,0);
+
+  const end = new Date();
+  end.setHours(23,59,59,999);
+
+  query.createdAt = { $gte: start, $lte: end };
+}
+
+if (filter === "weekly") {
+  const start = new Date();
+  start.setDate(now.getDate() - 7);
+
+  query.createdAt = { $gte: start };
+}
+
+if (filter === "yearly") {
+  const start = new Date();
+  start.setFullYear(now.getFullYear() - 1);
+
+  query.createdAt = { $gte: start };
+}
+
+if (startDate && endDate) {
+  query.createdAt = {
+    $gte: new Date(startDate),
+    $lte: new Date(endDate)
+  };
+}
+
+const orders = await Order.find(query);
 
  const doc = new PDFDocument({ margin:40 })
 

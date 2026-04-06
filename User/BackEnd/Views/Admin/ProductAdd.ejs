@@ -74,14 +74,7 @@
 <main class="flex px-10 py-10 gap-10">
 
 <!-- SIDEBAR -->
-<aside class="w-64">
-  <nav class="space-y-2 text-sm">
-    <a href="/admin/dashboard" class="block px-4 py-2 rounded-lg hover:bg-white">🏠 Dashboard</a>
-    <a href="/admin/products" class="block px-4 py-2 rounded-lg bg-white font-medium">👕 Product Management</a>
-    <a href="/admin/logout" class="block px-4 py-2 rounded-lg text-red-600 mt-6">⛔ Logout</a>
-  </nav>
-</aside>
-
+  <%- include("partials/sidebar") %>
 <!-- CONTENT -->
 <section class="flex-1">
 
@@ -208,7 +201,18 @@
 </div>
  
 
+<!-- <div class="mt-6">
+  <label class="text-sm font-medium">
+    Colors <span class="text-red-500">*</span>
+  </label>
 
+  <input
+    type="text"
+    name="color"
+    placeholder="e.g. Red, Blue, Black"
+    class="w-full mt-2 border rounded-lg px-4 py-2"
+  />
+</div> -->
 
 
 

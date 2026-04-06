@@ -37,12 +37,15 @@ export const createOfferService = async(data)=>{
   expiryDate
  };
 
- if(type === "Product")
- offerData.product = product;
+ if(type === "Product"){
+  offerData.product = product;
+  offerData.team = undefined;
+}
 
- if(type === "Team")
- offerData.team = team;
-
+if(type === "Team"){
+  offerData.team = team;
+  offerData.product = undefined; 
+}
  const offer = await Offer.create(offerData);
 
  return offer;

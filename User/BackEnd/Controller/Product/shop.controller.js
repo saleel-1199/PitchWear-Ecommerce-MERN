@@ -16,6 +16,8 @@ export const shopPageController = async (req, res) => {
     const minPrice = req.query.minPrice || "";
     const maxPrice = req.query.maxPrice || "";
 
+
+
     const { products, totalPages } = await fetchShopProductsService({
       page,
       limit,
@@ -29,10 +31,18 @@ export const shopPageController = async (req, res) => {
     });
 
     const teams = await Team.find({ isDeleted: false }).distinct("name");
+    
+    const message = req.session.message;
+    const error = req.session.error;
+
+    req.session.message = null;
+    req.session.error = null;
 
     res.render("products/shop", {
       title: "Shop",
       products,
+      message,
+      error,
       page,
       totalPages,
       search,
@@ -46,7 +56,7 @@ export const shopPageController = async (req, res) => {
       minPrice,
       maxPrice,
       cartCount: req.session.cartCount || 0,
-      error: req.query.error || null
+      
     });
 
   } catch (err) {

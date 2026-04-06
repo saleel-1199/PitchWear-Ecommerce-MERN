@@ -72,11 +72,16 @@ export const createProduct = async (data, files) => {
 
   const incomingVariants = Object.values(data.variants || []);
 
+  
+
   const variants = incomingVariants.map(v => ({
     size: v.size,
     price: Number(v.price || 0),
-    stock: Number(v.stock || 0),
+    stock: Number(v.stock || 0)
   }));
+  
+
+  
 
   const totalStock = variants.reduce(
     (sum, v) => sum + v.stock,

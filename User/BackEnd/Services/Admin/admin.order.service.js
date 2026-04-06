@@ -220,7 +220,7 @@ export const approveReturnService = async (orderId, itemId) => {
 
   await order.save();
 
-  const refundAmount = item.price * item.quantity;
+  const refundAmount = item.subtotal;
 
  await creditWallet(
   order.user,

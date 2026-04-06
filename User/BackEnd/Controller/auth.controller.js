@@ -33,45 +33,49 @@ export const signup = async (req, res) => {
 
 export const verifyOtp = async (req, res) => {
   try {
+    // ✅ SAFE CHECK
+    if (!req.body.otp || !Array.isArray(req.body.otp)) {
+      req.session.otpError = "Please enter complete OTP";
+      return res.redirect("/VerifyOtp");
+    }
 
-     const otp = req.body.otp.join("");
-     
-      const  email  = req.session.email;
-      
-    await authService.verifyOtp(email,otp);
-     
-    req.session.successMessage =  "Signup successful Please login now"
+    const otp = req.body.otp.join("");
+
+    const email = req.session.email;
+
+    await authService.verifyOtp(email, otp);
+
+    req.session.successMessage =
+      "Signup successful Please login now";
+
     res.redirect("/login");
 
   } catch (err) {
-     req.session.otpError = err.message;
-
+    req.session.otpError = err.message;
     return res.redirect("/VerifyOtp");
   }
 };
 
-export const resendSignupOtp = async(req,res) =>{
 
+export const resendSignupOtp = async (req, res) => {
   try {
-    const email = req.session.email;
-    if(!email){
-      return  res.render("Login",{
-        message:"Session expired.Please login again",
-        successMessage:null
-      })
-    }
-    
-    await authService.resendSignupOtp(email);
-    req.session.otpResent = true;
-    return res.render("VerifyOtp",{
-      message:null
-    })
-  } catch (error) {
-     req.session.otpError = "Failed to resend OTP";
+    const email =req.body.email || req.session.email;
 
-    return res.redirect("/VerifyOtp");
+    if (!email) {
+      req.session.otpError = "Session expired. Please login again";
+      return res.redirect("/login");
+    }
+
+    await authService.resendSignupOtp(email);
+
+    req.session.otpResent = true;
+
+    return res.redirect("/VerifyOtp"); // ✅ FIX
+  } catch (error) {
+    req.session.otpError = "Failed to resend OTP";
+    return res.redirect("/VerifyOtp"); // ✅ FIX
   }
-}
+};
 
 export const renderVerifyOtp = (req, res) => {
 
@@ -83,7 +87,8 @@ export const renderVerifyOtp = (req, res) => {
 
   res.render("VerifyOtp", {
     error,
-    otpResent
+    otpResent,
+    email:req.session.email
   });
 };
 

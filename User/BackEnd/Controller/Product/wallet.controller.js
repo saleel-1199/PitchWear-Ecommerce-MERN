@@ -1,4 +1,8 @@
 import { getWalletService } from "../../Services/Product/wallet.service.js";
+import {
+  createWalletTopupOrderService,
+  verifyWalletPaymentService
+} from "../../Services/Product/wallet.service.js";
 
 export const walletPage = async (req, res) => {
   try {
@@ -18,5 +22,53 @@ export const walletPage = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.redirect("/profile");
+  }
+};
+
+export const createWalletTopupController = async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const { amount } = req.body;
+
+    // ✅ store amount securely
+    req.session.walletTopupAmount = Number(amount);
+
+    const order = await createWalletTopupOrderService(
+      userId,
+      amount
+    );
+
+    res.json({
+      success: true,
+      order,
+      key: process.env.RAZORPAY_KEY
+    });
+
+  } catch (error) {
+    res.json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+export const verifyWalletPaymentController = async (req, res) => {
+  try {
+
+    const userId = req.session.userId;
+
+    await verifyWalletPaymentService({
+      userId,
+      session: req.session,
+      ...req.body
+    });
+
+    res.json({ success: true });
+
+  } catch (error) {
+    res.json({
+      success: false,
+      message: error.message
+    });
   }
 };

@@ -33,10 +33,16 @@ import{
 import {
   applyCouponController,
   removeCouponController,
-  verifyPaymentController
+  verifyPaymentController,
+  paymentFailedController,
+  retryPaymentController
 } from "../../Controller/Product/checkout.controller.js";
 
-import { walletPage } from "../../Controller/Product/wallet.controller.js";
+import { 
+  walletPage,
+  createWalletTopupController,
+  verifyWalletPaymentController
+ } from "../../Controller/Product/wallet.controller.js";
 
 const router = express.Router();
 
@@ -64,6 +70,8 @@ router.post("/checkout/apply-coupon", applyCouponController);
 router.post("/checkout/remove-coupon", removeCouponController);
 
 router.post("/verify-payment", verifyPaymentController);
+router.post("/payment-failed", paymentFailedController);
+router.post("/retry-payment/:orderId", retryPaymentController);
 
 
 
@@ -74,5 +82,7 @@ router.post("/orders/:orderId/item/:itemId/return",returnOrderController);
 router.get("/orders/:orderId/invoice", downloadInvoiceController);
 
 router.get("/wallet", walletPage);
+router.post("/wallet/topup", createWalletTopupController);
+router.post("/wallet/verify", verifyWalletPaymentController);
 
 export default router;

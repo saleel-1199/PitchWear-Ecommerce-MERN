@@ -1,5 +1,5 @@
 import { Cart } from "../../Models/cart.model.js";
-import  Address  from "../../Models/address.model.js"
+import Address  from "../../Models/address.model.js"
 import { Order } from "../../Models/order.model.js";
 import { Product } from "../../Models/product.model.js";
 import { generateOrderId } from "../../Utils/generateOrderId.js";
@@ -7,7 +7,9 @@ import Razorpay from "razorpay";
 import { Coupon } from "../../Models/coupon.model.js";
 import { debitWallet } from "./wallet.service.js";
 import { Wallet } from "../../Models/wallet.model.js"
-import { getBestOffer } from "./order.service.js"
+import { getBestOffer } from "./order.service.js";
+import mongoose from "mongoose";
+
 
 
 const razorpay = new Razorpay({
@@ -18,6 +20,7 @@ const razorpay = new Razorpay({
 export const getCheckoutDataService = async (userId, sessionCoupon) => {
 
  const cart = await Cart.findOne({ user: userId })
+ 
   .populate("items.product")
   .lean();
 
@@ -89,7 +92,9 @@ let subtotal = items.reduce(
    finalTotal
   },
   addresses,
+  appliedCoupon: sessionCoupon || null,
   coupons
+  
  };
 
 };
@@ -101,7 +106,7 @@ export const placeOrderService = async ({
  addressId,
  paymentMethod,
  coupon
-}) => {
+}) => { 
 
  const cart = await Cart.findOne({ user: userId });
 
@@ -118,6 +123,11 @@ export const placeOrderService = async ({
 
   const product = await Product.findById(item.product);
 
+   if (!product || product.isDeleted) {
+    throw new Error("Product is no longer available");
+  }
+
+
   const variant =
   product.variants.find(v=>v.size===item.size);
 
@@ -132,6 +142,10 @@ export const placeOrderService = async ({
  cart.items.map(async (item) => {
 
    const product = await Product.findById(item.product);
+
+   if (!product || product.isDeleted) {
+  throw new Error("Some products are no longer available");
+}
 
    const discountPercent = await getBestOffer(product);
 
@@ -172,7 +186,7 @@ const subtotal = items.reduce((sum, i) => sum + i.subtotal, 0);
 
 }
 
- /* GENERATE ORDER ID */
+
 
  let orderId;
  let exists=true;
@@ -184,7 +198,6 @@ const subtotal = items.reduce((sum, i) => sum + i.subtotal, 0);
 
  }
 
- /* CREATE ORDER */
 
  const order = await Order.create({
 
@@ -199,6 +212,15 @@ const subtotal = items.reduce((sum, i) => sum + i.subtotal, 0);
 
  paymentMethod,
 
+ paymentStatus:
+  paymentMethod === "Razorpay"
+    ? "Pending"
+    : paymentMethod === "COD"
+    ? "Pending"
+    : "Paid",
+  status:  "Pending",
+
+
  couponCode: coupon?.code,
 
  addressSnapshot:{
@@ -212,14 +234,21 @@ const subtotal = items.reduce((sum, i) => sum + i.subtotal, 0);
 
  });
 
+
+ if (cart && cart.items.length) {
+  cart.items = [];
+  await cart.save();
+}
+
+
+
  if(paymentMethod === "Wallet"){
 
  await debitWallet(userId,finalTotal,orderId)
 
 }
 
-
- /* RAZORPAY ORDER */
+//razorpay
 
  if(paymentMethod==="Razorpay"){
 
@@ -244,12 +273,9 @@ const subtotal = items.reduce((sum, i) => sum + i.subtotal, 0);
 
  }
 
- 
- 
+ //cod
 
- /* COD */
-
- for(const item of cart.items){
+ for(const item of items){
 
  const product = await Product.findById(item.product);
 
@@ -262,27 +288,33 @@ const subtotal = items.reduce((sum, i) => sum + i.subtotal, 0);
 
  }
 
-
- cart.items=[];
- await cart.save();
-
  return {order};
 
 };
 
 
 
+
+
 export const getOrderSuccessDataService = async (orderId, userId) => {
 
-  const order = await Order.findOne({
-    _id: orderId,
-    user: userId, 
-  })
-    .populate("items.product");
+ let order;
 
-  if (!order) {
-    throw new Error("Order not found");
-  }
+if (mongoose.Types.ObjectId.isValid(orderId)) {
+  order = await Order.findOne({
+    _id: orderId,
+    user: userId
+  });
+} else {
+  order = await Order.findOne({
+    orderId: orderId,
+    user: userId
+  });
+}
+
+if (!order) throw new Error("Order not found");
+
+order = await order.populate("items.product");
 
   return order;
 };
@@ -311,4 +343,123 @@ export const applyCouponCheckoutService = async(code,subtotal)=>{
   discount
  };
 
+};  
+
+
+export const verifyPaymentService = async (orderId, paymentId) => {
+
+  let order;
+
+if (mongoose.Types.ObjectId.isValid(orderId)) {
+  order = await Order.findOne({ _id: orderId });
+} else {
+  order = await Order.findOne({ razorpayOrderId: orderId });
+}
+
+  if (!order) {
+    throw new Error("Order not found");
+  }
+
+  order.paymentStatus = "Paid";
+  order.status = "Pending";
+  order.razorpayPaymentId = paymentId;
+
+  await order.save();
+
+
+  const cart = await Cart.findOne({ user: order.user });
+
+  if (cart && cart.items.length) {
+
+    for (const item of cart.items) {
+      const product = await Product.findById(item.product);
+
+      const variant = product.variants.find(
+        v => v.size === item.size
+      );
+
+      if (variant) {
+        variant.stock -= item.quantity;
+      }
+
+      await product.save();
+    }
+
+    cart.items = [];
+    await cart.save();
+  }
+
+  return order;
+};
+
+export const handlePaymentFailureService = async (orderId) => {
+
+  let order;
+
+  // ✅ if it's a valid Mongo ObjectId
+  if (mongoose.Types.ObjectId.isValid(orderId)) {
+
+    order = await Order.findOne({
+      _id: orderId
+    });
+
+  } else {
+
+    // ✅ otherwise treat as Razorpay ID
+    order = await Order.findOne({
+      razorpayOrderId: orderId
+    });
+
+  }
+
+  console.log("FOUND ORDER:", order);
+
+  if (!order) throw new Error("Order not found");
+
+  order.paymentStatus = "Failed";
+  order.status = "Pending";
+
+  await order.save();
+
+  console.log("UPDATED TO FAILED");
+
+  return order;
+};
+
+
+export const retryPaymentService = async (orderId, userId) => {
+ 
+
+  let order;
+
+  if (mongoose.Types.ObjectId.isValid(orderId)) {
+  order = await Order.findOne({
+    _id: orderId,
+    user: userId
+  });
+} else {
+  order = await Order.findOne({
+    orderId: orderId,
+    user: userId
+  });
+}
+
+if (!order) throw new Error("Order not found");
+  if (order.paymentStatus === "Paid")
+    throw new Error("Already paid");
+
+  if (order.paymentMethod !== "Razorpay")
+    throw new Error("Invalid payment method");
+
+  // 🔥 Razorpay logic HERE
+  const razorpayOrder = await razorpay.orders.create({
+    amount: order.finalTotal * 100,
+    currency: "INR",
+    receipt: order.orderId
+  });
+
+  order.razorpayOrderId = razorpayOrder.id;
+  await order.save();
+
+  return { order, razorpayOrder };
 };

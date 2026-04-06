@@ -48,7 +48,8 @@ export const getOrderDetailController = async (req, res) => {
       order,
       cartCount: 0,
       returnError: req.query.returnError || null,
-     errorItemId: req.query.itemId || null
+     errorItemId: req.query.itemId || null,
+     paymentFailed: req.query.payment === "failed"
     });
 
   } catch (error) {
@@ -58,13 +59,22 @@ export const getOrderDetailController = async (req, res) => {
 };
 
 export const cancelOrderController = async (req, res) => {
+  try {
 
-  cancelOrderService(
-  req.params.orderId,
-  req.session.userId,
-  req.params.itemId
-);
- res.redirect(`/orders/${req.params.orderId}`);
+    await cancelOrderService(
+      req.params.orderId,
+      req.session.userId,
+      req.params.itemId
+    );
+
+    res.redirect(`/orders/${req.params.orderId}`);
+
+  } catch (error) {
+
+    console.log("CANCEL ERROR:", error.message);
+
+    res.redirect(`/orders/${req.params.orderId}?error=${encodeURIComponent(error.message)}`);
+  }
 };
 
 export const returnOrderController = async (req, res) => {

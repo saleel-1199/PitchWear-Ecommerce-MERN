@@ -80,25 +80,25 @@ router.post("/admin/teams/:id/edit",adminAuth,updateTeamName)
 router.delete("/admin/teams/:id",adminAuth,deleteTeam)
 
 
-router.get("/admin/orders",adminOrdersPage);
-router.get("/admin/orders/:id",adminOrderDetailPage);
-router.patch("/admin/orders/:id/status",updateOrderStatusController);
-router.patch("/admin/orders/:orderId/item/:itemId/status",updateItemStatusController);
+router.get("/admin/orders",adminAuth,adminOrdersPage);
+router.get("/admin/orders/:id",adminAuth,adminOrderDetailPage);
+router.patch("/admin/orders/:id/status",adminAuth,updateOrderStatusController);
+router.patch("/admin/orders/:orderId/item/:itemId/status",adminAuth,updateItemStatusController);
 
 router.patch("/admin/orders/:orderId/item/:itemId/approve-return",approveReturnController);
 
-router.get("/admin/offers",offersPage)
-router.post("/admin/offers",createOfferController)
-router.delete("/admin/offers/:id",deleteOfferController)
+router.get("/admin/offers",adminAuth,offersPage)
+router.post("/admin/offers",adminAuth,createOfferController)
+router.delete("/admin/offers/:id",adminAuth,deleteOfferController)
 
 
-router.get("/admin/coupons",couponsPage);
-router.post("/admin/coupons",createCouponController);
-router.delete("/admin/coupons/:id",deleteCouponController);
+router.get("/admin/coupons",adminAuth,couponsPage);
+router.post("/admin/coupons",adminAuth,createCouponController);
+router.delete("/admin/coupons/:id",adminAuth,deleteCouponController);
 
-router.get("/admin/sales-report",salesReportPage);
-router.get("/sales-report/excel", downloadExcelReportController);
-router.get("/sales-report/pdf", downloadPDFReportController);
+router.get("/admin/sales-report",adminAuth,salesReportPage);
+router.get("/sales-report/excel",adminAuth,downloadExcelReportController);
+router.get("/sales-report/pdf",adminAuth,downloadPDFReportController);
 
 
 

@@ -30,7 +30,15 @@ const walletSchema = new mongoose.Schema({
    createdAt:{
     type:Date,
     default:Date.now
-   }
+   },
+   status:{
+  type:String,
+  enum:["PENDING","SUCCESS","FAILED"],
+  default:"SUCCESS"
+},
+referredUser:{
+  type:String
+}
   }
  ]
 

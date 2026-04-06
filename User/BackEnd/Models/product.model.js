@@ -8,6 +8,9 @@ const variantSchema = new mongoose.Schema(
       uppercase: true,
       trim: true,
     }, 
+    color:{
+          type:String
+    },
     price: {
       type: Number,
       required: true,

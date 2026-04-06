@@ -25,7 +25,7 @@
     <div class="flex gap-4 text-lg">
       <a href="/wishlist">♡</a>
       <a href="/cart">🛒</a>
-      <a href="/account">👤</a>
+      <a href="/profile">👤</a>
     </div>
   </div>
 </header> 
@@ -162,7 +162,7 @@
 
     <input type="hidden" name="productId" value="<%= product._id %>">
 
-    <input type="hidden" name="size" id="selectedSize">
+    <input type="hidden" name="size" id="selectedSize" required>
 
    <input type="hidden" name="quantity" id="selectedQty" value="1"> 
 
@@ -493,14 +493,14 @@
 
 <script>
   function validateCartForm() {
-    const size = document.getElementById("selectedSize").value;
+    const size = document.getElementById("selectedSize").value.trim();
 
-    if (!size) {
-      alert("Please select a size");
-      return false;
-    }
+  if (!size) {
+    showModal("Please select a size");
+    return false; // 🔥 MUST STOP FORM
+  }
 
-    return true;
+  return true;
   }
 </script>
 
@@ -520,7 +520,45 @@
   }
 </script>
 
+<script>
+let redirectUrl = null;
 
+function showModal(message, redirect = null) {
+  document.getElementById("modalMessage").innerText = message;
+
+  const modal = document.getElementById("customModal");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  redirectUrl = redirect;
+}
+
+function closeModal() {
+  const modal = document.getElementById("customModal");
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+
+  if (redirectUrl) {
+    window.location.href = redirectUrl;
+  }
+}
+</script>
+
+ <div id="customModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
+
+  <div class="bg-white rounded-xl shadow-lg w-[350px] p-6 text-center">
+
+    <p id="modalMessage" class="text-gray-700 mb-6"></p>
+
+    <button 
+      onclick="closeModal()" 
+      class="bg-[#5f7550] text-white px-6 py-2 rounded"
+    >
+      OK
+    </button>
+
+  </div>
 
 </body>
 </html>

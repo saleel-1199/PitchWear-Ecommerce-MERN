@@ -95,7 +95,8 @@ if(referrer){
   referrer._id,
   100,
   null,
-  "Referral Reward"
+  "Referral Reward",
+  newUser.username
  );
 console.log("Referral reward credited");
 }

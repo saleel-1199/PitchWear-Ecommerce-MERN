@@ -23,56 +23,7 @@
   <main class="flex px-10 py-10 gap-10">
 
     <!-- Sidebar -->
-    <aside class="w-64">
-      <p class="text-sm text-gray-500 mb-5">LookIt Admin</p>
-
-      <nav class="space-y-2 text-sm">
-        <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white font-medium">
-          🏠 Dashboard
-        </a>
-
-        <a href="/admin/products" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
-          👕 Product Management
-        </a>
-
-        <a href="/admin/orders" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
-          📦 Order Management
-        </a>
-
-        <a href="/admin/users" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
-          👥 User Management
-        </a>
-
-        <a href="/admin/analytics" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
-          📈 Analytics
-        </a>
-
-        <a href="/admin/coupons" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
-          🧾 Coupons
-        </a>
-
-        <a href="/admin/sales-report"
-         class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
-         📊 Sales Report
-         </a>
-
-        <a href="/admin/banner" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
-          🏷️ Banner
-        </a>
-
-        <a href="/admin/offers" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
-          🎁 Offers
-        </a>
-
-        <a href="/admin/settings" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white">
-          ⚙️ Settings
-        </a>
-
-        <a href="/admin/logout" class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-600 font-medium mt-6">
-          ⛔ Logout
-        </a>
-      </nav>
-    </aside>
+      <%- include("partials/sidebar") %>
 
     <!-- Content -->
     <section class="flex-1">

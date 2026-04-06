@@ -61,6 +61,10 @@ app.set("view cache", false);
 //app.set("views", "User/BackEnd/Views");
 app.set("views", path.join(__dirname, "User/BackEnd/Views")); 
 
+app.get("/", (req, res) => {
+  res.redirect("/Home"); 
+});
+
 app.use("/", authRoutes);
 app.use("/",adminAuthRoutes);
 app.use("/",productRoutes);

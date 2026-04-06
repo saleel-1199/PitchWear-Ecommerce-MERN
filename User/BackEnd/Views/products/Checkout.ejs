@@ -108,8 +108,9 @@
       Select Delivery Address
     </h2>
 
-    <form action="/checkout" method="POST" class="space-y-3">
-      
+<form id="checkoutForm" class="space-y-3">
+  
+  
 <input type="hidden" name="selectedPaymentMethod" id="paymentMethodInput">
 
 
@@ -160,10 +161,10 @@
            
 
         <!-- COUPON SECTION -->
-<div class="mb-4">
-  <label class="text-sm font-medium">Apply Coupon</label>
+<!-- <div class="mb-4">
+  <label class="text-sm font-medium">Apply Coupon</label> -->
 
-  <div class="flex gap-2 mt-2">
+  <!-- <div class="flex gap-2 mt-2">
     <input
       id="couponCode"
       type="text"
@@ -185,7 +186,7 @@
       Remove
     </button>
   </div>
-</div>
+</div> -->
 
 
 <!-- AVAILABLE COUPONS -->
@@ -207,12 +208,24 @@
             </p>
           </div>
 
-          <button
-            type="button"
-            onclick="applyCouponFromList('<%= c.code %>')"
-            class="bg-black text-white px-3 py-1 rounded text-xs">
-            Apply
-          </button>
+          <% if(appliedCoupon && appliedCoupon.code === c.code){ %>
+
+  <button
+    type="button"
+    class="bg-green-500 text-white px-3 py-1 rounded text-xs cursor-not-allowed">
+    Applied
+  </button>
+
+<% } else { %>
+
+  <button
+    type="button"
+    onclick="applyCouponFromList('<%= c.code %>')"
+    class="bg-black text-white px-3 py-1 rounded text-xs">
+    Apply
+  </button>
+
+<% } %>
 
         </div>
       <% }) %>
@@ -382,10 +395,31 @@ function closeAddressModal() {
   modal.classList.remove("flex");
 }
 
-function applyCouponFromList(code){
-  document.getElementById("couponCode").value = code
-  applyCoupon()
+async function applyCouponFromList(code){
+
+  const subtotal = <%= cart.subtotal %>
+
+  const res = await fetch("/checkout/apply-coupon",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      code,
+      subtotal
+    })
+  })
+
+  const data = await res.json()
+
+  if(data.success){
+    location.reload()
+  }else{
+    showModal(data.message)
+  }
 }
+
+
 </script>
 
 <script>
@@ -453,7 +487,7 @@ onlyDigits(document.getElementById("pin_code"), 6);
 
 
 
-<script>
+<!-- <script>
 
 async function applyCoupon(){
 
@@ -481,7 +515,7 @@ const data = await res.json()
 if(data.success){
 location.reload()
 }else{
-showModalt(data.message)
+showModal(data.message)
 }
 
 }
@@ -496,90 +530,178 @@ location.reload()
 
 }
 
-</script>
+</script> -->
 
 
 
 <script>
 
-document.querySelector("form[action='/checkout']")
+  let isProcessing = false;
+
+document.getElementById("checkoutForm")
 .addEventListener("submit", async function(e){
+   
+   if(isProcessing) return;   // 🚫 prevent double click
+  isProcessing = true;
 
-const paymentMethod =
-document.querySelector('input[name="paymentMethod"]:checked').value
 
-if(paymentMethod !== "Razorpay") return
+  const paymentMethod =
+  document.querySelector('input[name="paymentMethod"]:checked').value;
 
-e.preventDefault()
+  const address =
+  document.querySelector('input[name="addressId"]:checked');
 
-const address =
-document.querySelector('input[name="addressId"]:checked')
+  if(!address){
+    e.preventDefault();
+    showModal("Please select address");
+    return;
+  }
 
-if(!address){
-showModal("Please select address")
-return
+  // 👉 HANDLE RAZORPAY
+  if(paymentMethod === "Razorpay"){
+    e.preventDefault();
+
+    const res = await fetch("/checkout",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({
+        addressId: address.value,
+        selectedPaymentMethod: paymentMethod
+      })
+    });
+
+    const data = await res.json();
+
+    if(!data.razorpay){
+  showModal(data.message || "Something went wrong", data.redirect || null);
+  return;
 }
 
-const res = await fetch("/checkout",{
+    const options = {
+      key:data.key,
+      amount:data.razorpayOrder.amount,
+      currency:"INR",
+      order_id:data.razorpayOrder.id,
+      name: "PitchWear",
+      description: "PitchWear Order Payment",
 
-method:"POST",
 
-headers:{
-"Content-Type":"application/json"
-},
+      modal: {
+    ondismiss: function () {
 
-body:JSON.stringify({
-addressId: address.value,
-selectedPaymentMethod: paymentMethod
-})
+      // call backend (don’t block)
+      fetch("/payment-failed", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          orderId: data.razorpayOrder.id   // 🔥 Razorpay ID
+        })
+      }).catch(() => {});
 
-})
+      // redirect immediately
+      window.location.href =
+        "/orders/" + data.order._id + "?payment=failed";
+    }
+  },
 
-const data = await res.json()
+      handler:async function(response){
 
-const options = {
+        await fetch("/verify-payment",{
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body:JSON.stringify({
+            orderId:response.razorpay_order_id,
+            paymentId:response.razorpay_payment_id
+          })
+        });
 
-key:data.key,
-amount:data.razorpayOrder.amount,
-currency:"INR",
-order_id:data.razorpayOrder.id,
-name: "PitchWear",
-description: "PitchWear Order Payment",
+        window.location.href="/order-success/"+data.order._id;
+      }
+    };
 
-handler:async function(response){
+    const rzp = new Razorpay(options);
+    rzp.open();
 
-await fetch("/verify-payment",{
 
-method:"POST",
 
-headers:{
-"Content-Type":"application/json"
-},
+    rzp.on("payment.failed", function (response) {
 
-body:JSON.stringify({
-orderId:response.razorpay_order_id,
-paymentId:response.razorpay_payment_id
-})
+  isProcessing = false;
 
-})
+  // 🔥 CALL API BUT DON'T BLOCK REDIRECT
+  fetch("/payment-failed", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      orderId: options.order_id
+    })
+  }).catch(() => {}); // ignore errors
 
-window.location.href="/order-success/"+data.order._id
+  // 🔥 FORCE REDIRECT IMMEDIATELY
+  window.location.href =
+    "/orders/" + data.order._id + "?payment=failed";
+});
 
+  }
+
+  // 👉 HANDLE WALLET (THIS IS YOUR FIX 🔥)
+  else if(paymentMethod === "Wallet"){
+    e.preventDefault();
+
+    const res = await fetch("/checkout",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({
+        addressId: address.value,
+        selectedPaymentMethod: paymentMethod
+      })
+    });
+
+    const data = await res.json();
+
+   if(!data.success){
+  showModal(data.message, data.redirect || null);
+  return;
 }
 
+    // success
+    window.location.href="/order-success/"+data.orderId;
+  }
+
+  //cod
+
+  else if(paymentMethod === "COD"){
+  e.preventDefault();
+
+  const res = await fetch("/checkout",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      addressId: address.value,
+      selectedPaymentMethod: paymentMethod
+    })
+  });
+
+  const data = await res.json();
+
+  if(!data.success){
+  showModal(data.message, data.redirect || null);
+  return;
 }
-
-const rzp = new Razorpay(options)
-rzp.open()
-
-})
+  window.location.href = "/order-success/" + data.orderId;
+}
+});
 
 </script>
 
 
 
 
-
+<!-- 
 <script>
 
 const form = document.querySelector("form[action='/checkout']");
@@ -593,7 +715,7 @@ form.addEventListener("submit", function () {
 
 });
 
-</script>
+</script> -->
 
 <!-- 🔥 GLOBAL MODAL -->
 <div id="customModal"
@@ -612,21 +734,29 @@ form.addEventListener("submit", function () {
 </div>
 
 <script>
-function showModal(message) {
+let redirectUrl = null; // store redirect
+
+function showModal(message, redirect = null){
+  document.getElementById("modalMessage").innerText = message;
+
   const modal = document.getElementById("customModal");
-  const text = document.getElementById("modalMessage");
 
-  text.innerText = message;
+  modal.classList.remove("hidden"); // show modal
+  modal.classList.add("flex");      // 🔥 FIX: enable centering
 
-  modal.classList.remove("hidden");
-  modal.classList.add("flex");
+  redirectUrl = redirect; // store redirect
 }
 
-function closeModal() {
+function closeModal(){
   const modal = document.getElementById("customModal");
 
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
+  modal.classList.add("hidden");    // 🔥 FIX: hide modal
+  modal.classList.remove("flex");   // remove flex
+
+  // redirect AFTER user clicks OK
+  if(redirectUrl){
+    window.location.href = redirectUrl;
+  }
 }
 </script>
 

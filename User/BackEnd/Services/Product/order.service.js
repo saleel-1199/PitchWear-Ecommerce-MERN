@@ -2,6 +2,8 @@ import { Order } from "../../Models/order.model.js";
 import { Product } from "../../Models/product.model.js";
 import { creditWallet } from "./wallet.service.js"
 import { Offer } from "../../Models/offer.model.js";
+import { Wallet } from "../../Models/wallet.model.js";
+import mongoose from "mongoose";
 
 export const getUserOrdersService = async (userId, search = "") => {
 
@@ -20,21 +22,46 @@ export const getUserOrdersService = async (userId, search = "") => {
 
 export const getOrderDetailService = async (orderId, userId) => {
 
-  const order = await Order.findOne({
-    orderId,
-    user: userId
-  }).populate("items.product");
+  let order;
 
-  if (!order) throw new Error("Order not found");
+if (mongoose.Types.ObjectId.isValid(orderId)) {
+  order = await Order.findOne({
+    _id: orderId,
+    user: userId
+  });
+} else {
+  order = await Order.findOne({
+    orderId: orderId,
+    user: userId
+  });
+}
+
+if (!order) throw new Error("Order not found");
 
   return order;
 };
 
+
 export const cancelOrderService = async (orderId, userId, itemId) => {
+   
+  console.log("ORDER ID:", orderId);
+  console.log("USER ID:", userId);
 
-  const order = await Order.findOne({ orderId, user: userId });
+ let order;
 
-  if (!order) throw new Error("Order not found");
+if (mongoose.Types.ObjectId.isValid(orderId)) {
+  order = await Order.findOne({
+    _id: orderId,
+    user: userId
+  });
+} else {
+  order = await Order.findOne({
+    orderId: orderId,
+    user: userId
+  });
+}
+
+if (!order) throw new Error("Order not found");
 
   const item = order.items.id(itemId);
   if (!item) throw new Error("Item not found");
@@ -42,6 +69,7 @@ export const cancelOrderService = async (orderId, userId, itemId) => {
   if (item.status === "Cancelled")
     throw new Error("Already cancelled");
 
+  // ✅ Restore stock
   const product = await Product.findById(item.product);
   const variant = product.variants.find(v => v.size === item.size);
 
@@ -50,8 +78,10 @@ export const cancelOrderService = async (orderId, userId, itemId) => {
     await product.save();
   }
 
+  // ✅ Update item status
   item.status = "Cancelled";
 
+  // ✅ Update order status
   const allStatuses = order.items.map(i => i.status);
 
   if (allStatuses.every(s => s === "Cancelled")) {
@@ -63,32 +93,99 @@ export const cancelOrderService = async (orderId, userId, itemId) => {
   else {
     order.status = "Partially Completed";
   }
-  
-  if(order.paymentMethod !== "COD"){
 
-   const refundAmount = (item.price * item.quantity) +(order.tax / order.items.length) +(order.deliveryFee / order.items.length)
- 
-   await creditWallet(
-  order.user,
-  refundAmount,
-  order.orderId,
-  "Order Cancel Refund"
- )
+  // =========================
+  // ✅ FIXED REFUND LOGIC (UPDATED)
+  // =========================
 
-}
+  if (["Razorpay", "Wallet"].includes(order.paymentMethod)) {
+
+    // ❗ Only refund if payment is completed
+    if (order.paymentStatus !== "Paid") {
+      await order.save();
+      return order;
+    }
+
+    let refundAmount;
+
+    // ✅ CHANGE 1: Use finalTotal directly for single item
+    if (order.items.length === 1) {
+      refundAmount = order.finalTotal; // 🔥 EXACT amount paid
+    } else {
+      // ✅ CHANGE 2: proportional split for multi-item orders
+      const totalItemsPrice = order.items.reduce(
+        (sum, i) => sum + (i.price * i.quantity),
+        0
+      );
+
+      const itemTotal = item.price * item.quantity;
+      const ratio = itemTotal / totalItemsPrice;
+
+      refundAmount = Math.round(order.finalTotal * ratio);
+    }
+
+    // 🔒 Safety
+    refundAmount = Math.max(refundAmount, 0);
+
+    // =========================
+    // 🔒 DUPLICATE CHECK (KEEP SAME)
+    // =========================
+
+    let wallet = await Wallet.findOne({ user: order.user });
+
+    if (!wallet) {
+      wallet = await Wallet.create({
+        user: order.user,
+        balance: 0,
+        transactions: []
+      });
+    }
+
+    const alreadyRefunded = wallet.transactions.some(
+      t =>
+        t.orderId === order.orderId &&
+        t.type === "credit"
+    );
+
+    // ✅ CHANGE 3: simplified duplicate check (no meta issue)
+    if (!alreadyRefunded && refundAmount > 0) {
+      await creditWallet(
+        order.user,
+        refundAmount,
+        order.orderId,
+        "Order Cancel Refund"
+      );
+    }
+  }
 
   await order.save();
 
   return order;
 };
 
-
 export const returnOrderService = async (orderId, userId, itemId, reason) => {
 
   if (!reason) throw new Error("Return reason required");
 
-  const order = await Order.findOne({ orderId, user: userId });
-  if (!order) throw new Error("Order not found");
+
+
+  let order;
+
+if (mongoose.Types.ObjectId.isValid(orderId)) {
+  order = await Order.findOne({
+    _id: orderId,
+    user: userId
+  });
+} else {
+  order = await Order.findOne({
+    orderId: orderId,
+    user: userId
+  });
+}
+
+if (!order) throw new Error("Order not found");
+
+
 
   const item = order.items.id(itemId);
   if (!item) throw new Error("Item not found");
@@ -104,11 +201,19 @@ export const returnOrderService = async (orderId, userId, itemId, reason) => {
 
 export const generateInvoiceService = async (orderId, userId) => {
 
-  const order = await Order.findOne({
-    orderId,
-    user: userId
-  })
-  .populate("items.product");
+  let order;
+
+  if (mongoose.Types.ObjectId.isValid(orderId)) {
+    order = await Order.findOne({
+      _id: orderId,
+      user: userId
+    }).populate("items.product");
+  } else {
+    order = await Order.findOne({
+      orderId: orderId,
+      user: userId
+    }).populate("items.product");
+  }
 
   if (!order) return null;
 
