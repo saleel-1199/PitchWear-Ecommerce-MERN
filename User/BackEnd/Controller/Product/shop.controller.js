@@ -38,7 +38,7 @@ export const shopPageController = async (req, res) => {
     req.session.message = null;
     req.session.error = null;
 
-    res.render("products/shop", {
+    res.render("products/Shop", {
       title: "Shop",
       products,
       message,

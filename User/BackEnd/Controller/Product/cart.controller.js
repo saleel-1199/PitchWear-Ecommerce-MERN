@@ -25,7 +25,7 @@ export const getCartPageController = async (req, res) => {
 
   } catch (error) {
     console.log("Cart Page Error:", error.message);
-    res.redirect("/shop");
+    res.redirect("/Shop");
   }
 };
 
