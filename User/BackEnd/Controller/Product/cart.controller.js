@@ -54,7 +54,7 @@ export const addToCartController = async (req, res) => {
   } 
   catch (error) {
     console.log("Add To Cart Error:", error.message);
-    res.redirect(`/shop?error=${encodeURIComponent(error.message)}`);
+    res.redirect(`/Shop?error=${encodeURIComponent(error.message)}`);
   }
 };
 

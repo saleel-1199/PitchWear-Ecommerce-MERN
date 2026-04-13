@@ -233,7 +233,7 @@ export const orderSuccessController = async (req, res) => {
     console.log("Order Success Error:", error.message);
 
     res.redirect(
-      `/shop?error=${encodeURIComponent(error.message)}`
+      `/Shop?error=${encodeURIComponent(error.message)}`
     );
 
   }

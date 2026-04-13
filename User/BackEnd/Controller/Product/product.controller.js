@@ -14,7 +14,7 @@ export const getProductDetailsController = async (req, res) => {
       product.isDeleted ||
       product.status !== "Active"
     ) {
-      return res.redirect("/shop");
+      return res.redirect("/Shop");
     }
 
     let relatedProducts = await fetchRelatedProductsService(product);
@@ -23,7 +23,7 @@ export const getProductDetailsController = async (req, res) => {
       (p) => String(p._id) !== String(product._id)
     );
 
-    res.render("products/productDetails", {
+    res.render("products/ProductDetails", {
       title: product.name,
       product,
       relatedProducts,
@@ -31,6 +31,6 @@ export const getProductDetailsController = async (req, res) => {
     });
   } catch (error) {
     console.log("getProductDetailsController error:", error);
-    res.redirect("/shop");
+    res.redirect("/Shop");
   }
 };

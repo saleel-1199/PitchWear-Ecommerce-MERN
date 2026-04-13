@@ -29,7 +29,7 @@ export const addToWishlistController = async (req, res) => {
     req.session.message = err.message || "Something went wrong";
   }
 
-  res.redirect("/shop");
+  res.redirect("/Shop");
 };
 
 
