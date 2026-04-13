@@ -250,7 +250,7 @@ class="dropdown hidden mt-2 bg-white border border-borderTone rounded-xl p-4 spa
       class="accent-[#5f7550] w-4 h-4"
     />
 
-    <span><%= t %></span>
+    <span><%= t %></span> 
   </div>
 
 </label>
@@ -509,17 +509,17 @@ class="dropdown hidden mt-2 bg-white border border-borderTone rounded-xl p-4 spa
     searchInput.addEventListener("input", debouncedSubmit);
   }
 
-  document.querySelectorAll("#typeBox input").forEach(input => {
-    input.addEventListener("change", () => {
-      handleSingleSelect("typeBox", input);
-    });
-  });
+  // document.querySelectorAll("#typeBox input").forEach(input => {
+  //   input.addEventListener("change", () => {
+  //     handleSingleSelect("typeBox", input);
+  //   });
+  // });
 
-  document.querySelectorAll("#kitBox input").forEach(input => {
-    input.addEventListener("change", () => {
-      handleSingleSelect("kitBox", input);
-    });
-  });
+  // document.querySelectorAll("#kitBox input").forEach(input => {
+  //   input.addEventListener("change", () => {
+  //     handleSingleSelect("kitBox", input);
+  //   });
+  // });
 });
   
 
