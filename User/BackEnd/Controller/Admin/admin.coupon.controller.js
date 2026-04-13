@@ -4,7 +4,7 @@ export const couponsPage = async (req,res)=>{
 
  const coupons = await Coupon.find().sort({createdAt:-1})
 
- res.render("Admin/Coupons",{
+ res.render("admin/Coupons",{
   coupons
  })
 

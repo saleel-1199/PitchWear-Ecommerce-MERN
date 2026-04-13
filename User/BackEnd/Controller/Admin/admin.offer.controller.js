@@ -18,7 +18,7 @@ export const offersPage = async(req,res)=>{
 
  const teams = await Team.find();
 
- res.render("Admin/Offers",{
+ res.render("admin/Offers",{
   offers,
   products,
   teams,
@@ -27,7 +27,7 @@ export const offersPage = async(req,res)=>{
 
  }catch(err){
 
- res.render("Admin/Offers",{
+ res.render("admin/Offers",{
   offers:[],
   products:[],
   teams:[],
@@ -55,7 +55,7 @@ export const createOfferController = async(req,res)=>{
 
  const offers = await getOffersDataService();
 
- res.render("Admin/Offers",{
+ res.render("admin/Offers",{
   offers,
   products,
   teams,

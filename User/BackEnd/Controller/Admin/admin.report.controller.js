@@ -54,7 +54,7 @@ export const salesReportPage = async (req,res)=>{
  const reports = await Order.find(query)
  .sort({createdAt:-1})
 
- res.render("Admin/SalesReport",{
+ res.render("admin/SalesReport",{
   reports,
   filter,
   startDate,

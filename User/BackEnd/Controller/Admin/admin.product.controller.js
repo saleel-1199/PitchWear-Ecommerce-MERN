@@ -17,7 +17,7 @@ export const productsPage = async (req, res) => {
 
     const { products, totalPages } = await getAllProducts(search, page, limit);
 
-    res.render("Admin/Products", {
+    res.render("admin/Products", {
       title: "Products",
       products,
       search,
@@ -33,7 +33,7 @@ export const productsPage = async (req, res) => {
 export const addProductPage = async (req, res) => {
   const teams = await Team.find({ isDeleted: false }).lean();
 
-  res.render("Admin/ProductAdd", {
+  res.render("admin/ProductAdd", {
     title: "Add Product",
     error: "",
     teams
@@ -73,7 +73,7 @@ export const editProductPage = async (req, res) => {
 
   const teams = await Team.find({ isDeleted: false }).lean();  
 
-  res.render("Admin/ProductEdit", {
+  res.render("admin/ProductEdit", {
     title: "Edit Product",
     product,
     teams,   
@@ -93,7 +93,7 @@ export const inventoryPage = async (req, res) => {
   const product = await getProductById(req.params.id);
   if (!product) return res.redirect("/admin/products");
 
-  res.render("Admin/ProductInventory", {
+  res.render("admin/ProductInventory", {
     title: "Add Stock",
     product,
   });

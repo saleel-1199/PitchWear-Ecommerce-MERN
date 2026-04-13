@@ -23,7 +23,7 @@ export const renderUserManagement = async (req, res) => {
     
     const { users, totalPages } = result;
 
-    return res.render("Admin/UserManagement", {
+    return res.render("admin/UserManagement", {
       title: "User Management",
       active: "users",
       users,
@@ -60,7 +60,7 @@ export const renderConfirmBlockPage = async (req, res) => {
     const user = await User.findById(id).lean();
     if (!user) return res.status(404).send("User not found");
 
-    return res.render("Admin/ConfirmBlock", {
+    return res.render("admin/ConfirmBlock", {
       title: "Confirm Action",
       user,
       active: "users"
