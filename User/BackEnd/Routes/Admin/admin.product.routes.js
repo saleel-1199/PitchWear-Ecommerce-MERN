@@ -8,7 +8,7 @@ import {
   inventoryPage,
   saveInventory,
   deleteProduct,
-} from "../../Controller/admin/admin.product.controller.js";
+} from "../../Controller/Admin/admin.product.controller.js";
 
 import {
   teamsPage,
@@ -16,7 +16,7 @@ import {
   editTeamPage,
   updateTeamName,
   deleteTeam,
-} from "../../Controller/admin/admin.team.controller.js";
+} from "../../Controller/Admin/admin.team.controller.js";
 
 import {
   adminOrdersPage,
@@ -24,26 +24,26 @@ import {
   updateOrderStatusController,
   updateItemStatusController,
   approveReturnController,
-} from "../../Controller/admin/admin.order.controller.js";
+} from "../../Controller/Admin/admin.order.controller.js";
 
 import {
   downloadExcelReportController,
   downloadPDFReportController,
-} from "../../Controller/admin/admin.report.controller.js";
+} from "../../Controller/Admin/admin.report.controller.js";
 
 import {
   offersPage,
   createOfferController,
   deleteOfferController,
-} from "../../Controller/admin/admin.offer.controller.js";
+} from "../../Controller/Admin/admin.offer.controller.js";
 
 import {
   couponsPage,
   createCouponController,
   deleteCouponController,
-} from "../../Controller/admin/admin.coupon.controller.js";
+} from "../../Controller/Admin/admin.coupon.controller.js";
 
-import { salesReportPage } from "../../Controller/admin/admin.report.controller.js";
+import { salesReportPage } from "../../Controller/Admin/admin.report.controller.js";
 
 import { adminAuth } from "../../Middlewares/Admin/adminauth.middleware.js";
 
