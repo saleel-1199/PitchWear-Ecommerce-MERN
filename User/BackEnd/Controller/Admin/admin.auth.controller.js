@@ -38,23 +38,3 @@ export const adminLogout = (req, res) => {
 };
 
 
-export const renderDashboard = async (req, res) => {
-  try {
-   
-    const stats = {
-      totalUsers: 0,
-      totalOrders: 0,
-      totalProducts: 0,
-      revenue: 0,
-    };
-
-    return res.render("Admin/dashboard", {
-      title: "Admin Dashboard",
-      stats,
-      active: "dashboard"
-    });
-  } catch (err) {
-    console.log("Dashboard Render Error:", err);
-    return res.status(500).send("Server Error");
-  }
-};

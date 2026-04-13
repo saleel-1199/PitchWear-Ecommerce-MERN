@@ -1,5 +1,5 @@
 import * as authService from "../Services/auth.service.js";
-import { Team } from "../../BackEnd/Models/team.model.js";
+import { logger } from "../Utils/logger.js";
 import { Product } from "../../BackEnd/Models/product.model.js"; 
 
 export const renderSignup = (req, res) => {
@@ -22,6 +22,8 @@ export const signup = async (req, res) => {
     await authService.signupUser(req.body);
     
     req.session.email = email;
+
+
     return res.redirect("/VerifyOtp");
   } catch (error) {
 
@@ -98,6 +100,8 @@ export const renderLogin = (req, res) => {
 
   const successMessage = req.session.successMessage;
   req.session.successMessage = null;
+   
+
 
   res.render("Login",{
     message:null,
@@ -109,6 +113,9 @@ export const login = async (req, res) => {
   try {
    const user = await authService.loginUser(req.body);
     req.session.userId =  user._id;
+           
+     logger.info(`User logged in: ${req.session.userId}`);
+
 
     res.redirect("/Home");
   } catch (error) {

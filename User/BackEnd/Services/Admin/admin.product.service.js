@@ -108,20 +108,24 @@ export const getProductById = async (id) => {
 
 export const updateProductBasic = async (product, data, files) => {
 
-  let images = [...(product.images || [])];
+ let images = [...(product.images || [])];
 
-  if (files && files.length > 0) {
+if (files && files.length > 0) {
 
-    // files already contain correct index positions
-    for (let i = 0; i < files.length; i++) {
+  for (const file of files) {
 
-      if (!files[i]) continue;
+    const saved = await saveProductImages([file]);
 
-      const saved = await saveProductImages([files[i]]);
+    // 🔥 extract index from filename
+    const match = file.originalname.match(/image-(\d+)/);
 
-      images[i] = saved[0]; 
+    const index = match ? parseInt(match[1]) : null;
+
+    if (index !== null) {
+      images[index] = saved[0];   // ✅ correct position
     }
   }
+}
 
   const teamExists = await Team.findById(data.team);
   if (!teamExists) throw new Error("INVALID_TEAM");

@@ -95,13 +95,14 @@
         const dt = new DataTransfer();
 
        files.forEach((f, i) => {
-          if (f) {
-         const newFile = new File([f], `image-${i}.jpg`, {
+  if (f) {
+    const newFile = new File([f], `image-${i}.jpg`, {
       type: f.type
-           });
-         dt.items.add(newFile);
-        }
-        });
+    });
+    dt.items.add(newFile);
+  }
+});
+
         document.getElementById("finalImages").files = dt.files;
 
         cropper.destroy();
@@ -109,6 +110,27 @@
       });
     };
   }
+
+
+
+  window.addEventListener("DOMContentLoaded", () => {
+  const imgs = document.querySelectorAll(".image-slot img");
+
+  imgs.forEach((img, i) => {
+    if (img && img.src) {
+      fetch(img.src)
+        .then(res => res.blob())
+        .then(blob => {
+          files[i] = new File([blob], `image-${i}.jpg`, {
+            type: blob.type
+          });
+        });
+    }
+  });
+});
+
+
+
 </script>
 
 
