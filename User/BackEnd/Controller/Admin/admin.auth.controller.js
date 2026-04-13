@@ -1,5 +1,5 @@
 export const renderAdminLogin = (req, res) => {
-  return res.render("Admin/AdminLogin", {
+  return res.render("admin/AdminLogin", {
     title: "Admin Login",
     error: null,
   });
@@ -20,7 +20,7 @@ export const adminLogin = async (req, res) => {
       return res.redirect("/admin/Dashboard");
     }
 
-    return res.render("Admin/AdminLogin", {
+    return res.render("admin/AdminLogin", {
       title: "Admin Login",
       error: "Invalid admin email or password"
     });

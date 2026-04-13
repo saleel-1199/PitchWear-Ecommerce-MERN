@@ -2,7 +2,7 @@ import {
  getOffersDataService,
  createOfferService,
  deleteOfferService
-} from "../../Services/Admin/admin.offer.service.js";
+} from "../../Services/admin/admin.offer.service.js";
 
 import { Product } from "../../Models/product.model.js";
 import { Team } from "../../Models/team.model.js";

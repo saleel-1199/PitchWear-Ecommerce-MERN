@@ -3,7 +3,7 @@ import { User } from "../../Models/user.model.js";
 import {
   fetchUsersService,
   toggleBlockUserService,
-} from "../../Services/Admin/admin.user.services.js";
+} from "../../Services/admin/admin.user.services.js";
 
 export const renderUserManagement = async (req, res) => {
   try {
