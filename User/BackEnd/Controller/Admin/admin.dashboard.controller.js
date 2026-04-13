@@ -6,7 +6,7 @@ export const getDashboard = async (req, res) => {
     
     console.log("DATA:", data);
 
-    res.render("admin/dashboard", data);
+    res.render("admin/Dashboard", data);
 
   } catch (error) {
     console.log(error);

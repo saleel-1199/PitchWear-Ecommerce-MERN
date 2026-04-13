@@ -17,7 +17,7 @@ export const adminLogin = async (req, res) => {
       req.session.adminId = "superadmin";
       req.session.adminEmail = email;
 
-      return res.redirect("/admin/dashboard");
+      return res.redirect("/admin/Dashboard");
     }
 
     return res.render("Admin/AdminLogin", {
