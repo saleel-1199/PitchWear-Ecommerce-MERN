@@ -21,7 +21,7 @@ export const teamsPage = async (req, res) => {
       return res.redirect(`/admin/teams?page=${data.totalPages}&search=${search}`);
     }
 
-    res.render("Admin/Teams", {
+    res.render("admin/Teams", {
       teams: data.teams,
       currentPage: data.currentPage,
       totalPages: data.totalPages,
