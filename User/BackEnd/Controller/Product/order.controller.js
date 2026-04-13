@@ -228,6 +228,20 @@ order.items.forEach(item => {
     .text(`₹ ${total}`, 470, y);
 
   y += 25;
+  
+
+   if (item.status === "Cancelled") {
+    doc
+      .font("regular")
+      .fontSize(10)
+      .fillColor("red")
+      .text(`(Cancelled Item)`, 50, y);
+
+    y += 15;
+    doc.fillColor("black"); // reset color
+  }
+
+
 
   doc
     .moveTo(40, y - 10)

@@ -107,31 +107,39 @@ export const getProductById = async (id) => {
 
 
 export const updateProductBasic = async (product, data, files) => {
-  let images = product.images || [];
+
+  let images = [...(product.images || [])];
 
   if (files && files.length > 0) {
-    const newImgs = await saveProductImages(files);
-    images = [...images, ...newImgs];
+
+    // files already contain correct index positions
+    for (let i = 0; i < files.length; i++) {
+
+      if (!files[i]) continue;
+
+      const saved = await saveProductImages([files[i]]);
+
+      images[i] = saved[0]; 
+    }
   }
 
-  const teamExists = await Team.findById(data.team);   
+  const teamExists = await Team.findById(data.team);
   if (!teamExists) throw new Error("INVALID_TEAM");
 
-  product.name = data.name;
-  product.team = data.team;   
-  product.description = data.description;
-  product.type = data.type;
-  product.kitType = data.kitType;
-
-  if (data.status) {
-    product.status = data.status;
-  }
-
-  product.images = images;
-
-  return product.save();
+  return Product.findByIdAndUpdate(
+    product._id,
+    {
+      name: data.name,
+      team: data.team,
+      description: data.description,
+      type: data.type,
+      kitType: data.kitType,
+      images,
+      ...(data.status && { status: data.status })
+    },
+    { new: true }
+  );
 };
-
 
 export const updateInventory = async (product, incomingVariants) => {
 

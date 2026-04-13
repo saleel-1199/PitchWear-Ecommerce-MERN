@@ -152,13 +152,12 @@ if (item.status === "Cancelled") {
 
   const refundAmount = item.price * item.quantity;
 
-  await creditWallet(
-    order.user,
-    refundAmount,
-    order.orderId,
-    "Order Cancel Refund"
-  );
-
+ await creditWallet(
+  order.user,
+  refundAmount,
+  `${order.orderId}_${item._id}`, // 🔥 unique
+  "Order Cancel Refund"
+);
 }
 
 
@@ -192,7 +191,6 @@ export const approveReturnService = async (orderId, itemId) => {
   if (item.status !== "Return Requested")
     throw new Error("Invalid return state");
 
- 
   const product = await Product.findById(item.product);
   const variant = product.variants.find(v => v.size === item.size);
 
@@ -220,13 +218,19 @@ export const approveReturnService = async (orderId, itemId) => {
 
   await order.save();
 
-  const refundAmount = item.subtotal;
+  if (["Razorpay", "Wallet"].includes(order.paymentMethod)) {
 
- await creditWallet(
-  order.user,
-  refundAmount,
-  order.orderId,
-  "Return Refund"
- )
+    if (order.paymentStatus !== "Paid") return;
 
+    const refundAmount = order.finalTotal; 
+
+    const txnId = `${order.orderId}_${item._id}`; 
+
+    await creditWallet(
+      order.user,
+      refundAmount,
+      txnId,
+      "Return Full Refund"
+    );
+  }
 };

@@ -61,7 +61,6 @@
               <th class="text-left px-6 py-4">Profile</th>
               <th class="text-left px-6 py-4">Full Name</th>
               <th class="text-left px-6 py-4">Email</th>
-              <th class="text-left px-6 py-4">Phone</th>
               <th class="text-left px-6 py-4">Joined Date</th>
               <th class="text-left px-6 py-4">Status</th>
               <th class="text-center px-6 py-4">Actions</th>
@@ -94,8 +93,6 @@
 
                   <td class="px-6 py-5 font-medium"><%= u.fullName || "-" %></td>
                   <td class="px-6 py-5 text-gray-500"><%= u.email || "-" %></td>
-                  <td class="px-6 py-5 text-gray-500"><%= u.phone_no || "-" %></td>
-
                   <td class="px-6 py-5 text-gray-500">
                     <%= u.createdAt ? new Date(u.createdAt).toISOString().slice(0,10) : "-" %>
                   </td>

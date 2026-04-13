@@ -16,9 +16,17 @@
     <a href="/about">About</a>
     <a href="/contact">Contact</a>
   </nav>
+
   <div class="flex gap-4 text-lg">
-    🛒 👤
+
+    <!-- CART -->
+    <a href="/cart" title="Cart">🛒</a>
+
+    <!-- PROFILE -->
+    <a href="/profile" title="Profile">👤</a>
+
   </div>
+
 </header>
 
 <main class="max-w-5xl mx-auto py-12">
@@ -107,13 +115,10 @@
 <div class="flex gap-4 mt-6">
 
 
-  <a href="/orders/<%= order._id %>/invoice"
-     class="bg-gray-300 px-5 py-2 rounded-lg text-sm hover:bg-gray-400">
-     Download Invoice
-  </a>
+ 
 
  
-  <% if (order.status === "Delivered" || order.status === "Partially Completed" || order.status === "Returned") { %>
+  <% if (order.status === "Delivered" || order.status === "Partially Completed" ) { %>
 
     <button onclick="openReturnModal('<%= order._id %>','<%= item._id %>')"
             class="bg-yellow-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-yellow-700">
@@ -137,6 +142,15 @@
   </div>
 
   <% }) %>
+
+  <div class="flex justify-end mb-10">
+
+  <a href="/orders/<%= order._id %>/invoice"
+     class="bg-black text-white px-6 py-3 rounded-lg text-sm hover:bg-gray-800 transition">
+     📄 Download Invoice
+  </a>
+
+</div>
 
   <!-- DELIVERY ADDRESS -->
   <h3 class="font-semibold mb-2">Delivery Address</h3>

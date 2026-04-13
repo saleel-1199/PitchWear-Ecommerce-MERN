@@ -31,6 +31,13 @@ export const signupUser = async (data) => {
     throw new Error("Passwords do not match");
   }
 
+  console.log(fullName)
+    console.log(username)
+
+      console.log(email) 
+
+
+
   const userExists = await User.findOne({
     $or: [{ email }, { username }]
   });

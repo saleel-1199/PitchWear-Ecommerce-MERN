@@ -48,7 +48,7 @@ export const renderDashboard = async (req, res) => {
       revenue: 0,
     };
 
-    return res.render("Admin/AdminDashboard", {
+    return res.render("Admin/dashboard", {
       title: "Admin Dashboard",
       stats,
       active: "dashboard"

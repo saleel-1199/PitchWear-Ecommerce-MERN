@@ -38,7 +38,6 @@
         <a href="/home" class="hover:underline">Home</a>
         <a href="/shop" class="hover:underline font-medium">Shop</a>
         <a href="/about" class="hover:underline">About</a>
-        <a href="/contact" class="hover:underline">Contact</a>
       </nav>
       
       <div class="flex items-center gap-5 text-lg">
@@ -103,6 +102,7 @@
         <% (selectedKits || []).forEach((k) => { %>
           <input type="hidden" name="kits" value="<%= k %>">
         <% }) %>
+        
 
         <div class="bg-white border border-borderTone rounded-lg px-4 py-3 flex items-center gap-2">
           <span class="text-gray-400">🔍</span>

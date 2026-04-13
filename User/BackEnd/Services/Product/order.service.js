@@ -28,12 +28,12 @@ if (mongoose.Types.ObjectId.isValid(orderId)) {
   order = await Order.findOne({
     _id: orderId,
     user: userId
-  });
+  }).populate("items.product");
 } else {
   order = await Order.findOne({
     orderId: orderId,
     user: userId
-  });
+  }).populate("items.product");
 }
 
 if (!order) throw new Error("Order not found");
@@ -69,7 +69,6 @@ if (!order) throw new Error("Order not found");
   if (item.status === "Cancelled")
     throw new Error("Already cancelled");
 
-  // ✅ Restore stock
   const product = await Product.findById(item.product);
   const variant = product.variants.find(v => v.size === item.size);
 
@@ -78,10 +77,8 @@ if (!order) throw new Error("Order not found");
     await product.save();
   }
 
-  // ✅ Update item status
   item.status = "Cancelled";
 
-  // ✅ Update order status
   const allStatuses = order.items.map(i => i.status);
 
   if (allStatuses.every(s => s === "Cancelled")) {
@@ -94,13 +91,9 @@ if (!order) throw new Error("Order not found");
     order.status = "Partially Completed";
   }
 
-  // =========================
-  // ✅ FIXED REFUND LOGIC (UPDATED)
-  // =========================
-
+ 
   if (["Razorpay", "Wallet"].includes(order.paymentMethod)) {
 
-    // ❗ Only refund if payment is completed
     if (order.paymentStatus !== "Paid") {
       await order.save();
       return order;
@@ -108,11 +101,9 @@ if (!order) throw new Error("Order not found");
 
     let refundAmount;
 
-    // ✅ CHANGE 1: Use finalTotal directly for single item
     if (order.items.length === 1) {
-      refundAmount = order.finalTotal; // 🔥 EXACT amount paid
+      refundAmount = order.finalTotal; 
     } else {
-      // ✅ CHANGE 2: proportional split for multi-item orders
       const totalItemsPrice = order.items.reduce(
         (sum, i) => sum + (i.price * i.quantity),
         0
@@ -124,13 +115,9 @@ if (!order) throw new Error("Order not found");
       refundAmount = Math.round(order.finalTotal * ratio);
     }
 
-    // 🔒 Safety
     refundAmount = Math.max(refundAmount, 0);
 
-    // =========================
-    // 🔒 DUPLICATE CHECK (KEEP SAME)
-    // =========================
-
+   
     let wallet = await Wallet.findOne({ user: order.user });
 
     if (!wallet) {
@@ -147,7 +134,6 @@ if (!order) throw new Error("Order not found");
         t.type === "credit"
     );
 
-    // ✅ CHANGE 3: simplified duplicate check (no meta issue)
     if (!alreadyRefunded && refundAmount > 0) {
       await creditWallet(
         order.user,

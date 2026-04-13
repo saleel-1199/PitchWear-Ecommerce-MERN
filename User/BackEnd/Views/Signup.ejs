@@ -116,7 +116,10 @@
       <label class="text-sm lg:text-base text-gray-600 mb-1">
         Password
       </label>
+
+      <div class="relative mb-5">
       <input
+        id="password"
         type="password"
         name="password"
         oncopy="return false"
@@ -124,15 +127,29 @@
         onpaste="return false"
         placeholder="Create a password"
         required
-        class="mb-5 rounded-md border border-gray-300 px-4 py-3 text-sm lg:text-lg
-               focus:outline-none focus:border-[#d6c37a]"
+        class="w-full rounded-md border border-gray-300 px-4 py-3 pr-12 text-sm lg:text-lg
+           focus:outline-none focus:border-[#d6c37a]"
       />
+       
+      <button
+    type="button"
+    onclick="togglePassword('password', this)"
+    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+  >
+    👁️
+  </button>
+
+      </div>
 
       <!-- Confirm Password -->
       <label class="text-sm lg:text-base text-gray-600 mb-1">
         Confirm Password
       </label>
+
+      <div class="relative mb-7">
+
       <input
+        id="confirmPassword"
         type="password"
         name="confirmPassword"
         oncopy="return false"
@@ -140,9 +157,18 @@
         onpaste="return false"
         placeholder="Confirm your password"
         required
-        class="mb-7 rounded-md border border-gray-300 px-4 py-3 text-sm lg:text-lg
-               focus:outline-none focus:border-[#d6c37a]"
+        class="w-full rounded-md border border-gray-300 px-4 py-3 pr-12 text-sm lg:text-lg
+           focus:outline-none focus:border-[#d6c37a]"
       />
+       <button
+    type="button"
+    onclick="togglePassword('confirmPassword', this)"
+    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+  >
+    👁️
+  </button>
+</div>
+
 
       <!-- SIGNUP BUTTON -->
       <button
@@ -186,8 +212,9 @@
     const usernameRegex = /^(?=.*[a-zA-Z0-9])[a-zA-Z0-9_-]{3,15}$/;
 
     // ✅ Email Regex
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+     const emailRegex = /^[a-zA-Z0-9](?!.*\.\.)[a-zA-Z0-9._%+-]{2,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+     
     form.addEventListener("submit", (e) => {
       const fullName = fullNameInput.value.trim();
       const username = usernameInput.value.trim();
@@ -232,6 +259,19 @@
       emailError.classList.add("hidden");
       emailError.textContent = "";
     });
+
+    function togglePassword(inputId, button) {
+  const input = document.getElementById(inputId);
+
+  if (input.type === "password") {
+    input.type = "text";
+    button.textContent = "🙈"; // hide icon
+  } else {
+    input.type = "password";
+    button.textContent = "👁️"; // show icon
+  }
+}
+
   </script>
 
 </body>

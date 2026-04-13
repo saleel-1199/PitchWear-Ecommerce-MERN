@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#f8f8f4] text-gray-800">
+
+<!-- HEADER -->
+<header class="bg-[#eff2c8] px-10 py-5 flex justify-between">
+  <h1 class="font-bold text-lg">PitchWear Admin</h1>
+  <div class="bg-white w-10 h-10 flex items-center justify-center rounded">👤</div>
+</header>
+
+<main class="flex px-10 py-10 gap-10">
+
+  <!-- SIDEBAR -->
+  <%- include("partials/sidebar") %>
+
+  <!-- CONTENT -->
+  <section class="flex-1">
+
+    <!-- TOP -->
+    <div class="flex justify-between items-center">
+      <h2 class="text-3xl font-bold">Dashboard</h2>
+
+      <a href="/admin/products/add"
+         class="bg-[#cdd47b] text-white px-6 py-2 rounded-lg">
+        + Add Product
+      </a>
+    </div>
+
+    <!-- STATS -->
+    <div class="grid grid-cols-5 gap-6 mt-8">
+
+      <div class="bg-white p-6 rounded-xl border">
+        <p class="text-xs text-gray-500">Total Sales</p>
+        <p class="text-2xl font-bold mt-2">₹<%= totalSales %></p>
+      </div>
+
+      <div class="bg-white p-6 rounded-xl border">
+        <p class="text-xs text-gray-500">Total Orders</p>
+        <p class="text-2xl font-bold mt-2"><%= totalOrders %></p>
+      </div>
+
+      <div class="bg-white p-6 rounded-xl border">
+        <p class="text-xs text-gray-500">Avg Order Value</p>
+        <p class="text-2xl font-bold mt-2">₹<%= avgOrderValue %></p>
+      </div>
+
+      <div class="bg-white p-6 rounded-xl border">
+        <p class="text-xs text-gray-500">Pending Orders</p>
+        <p class="text-2xl font-bold mt-2"><%= pendingOrders %></p>
+      </div>
+
+      <div class="bg-white p-6 rounded-xl border">
+        <p class="text-xs text-gray-500">Total Products</p>
+        <p class="text-2xl font-bold mt-2"><%= productCount %></p>
+      </div>
+
+    </div>
+    
+
+    <div class="bg-white p-6 rounded-xl border mt-8">
+  <h3 class="font-semibold mb-4">Sales Overview</h3>
+  <canvas id="salesChart" height="100"></canvas>
+</div>
+
+
+
+    <!-- RECENT ORDERS -->
+    <div class="bg-white rounded-xl border mt-8 overflow-hidden">
+
+      <div class="px-6 py-4 border-b">
+        <h3 class="font-semibold">Recent Orders</h3>
+      </div>
+
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-gray-500">
+          <tr>
+            <th class="px-6 py-3 text-left">Order ID</th>
+            <th class="px-6 py-3 text-left">Customer</th>
+            <th class="px-6 py-3 text-left">Date</th>
+            <th class="px-6 py-3 text-left">Status</th>
+            <th class="px-6 py-3 text-left">Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% orders.forEach(order => { %>
+          <tr class="border-t">
+
+            <td class="px-6 py-4"><%= order.orderId %></td>
+
+            <td class="px-6 py-4">
+              <%= order.user?.fullName || "User" %>
+            </td>
+
+            <td class="px-6 py-4 text-gray-500">
+              <%= new Date(order.createdAt).toDateString() %>
+            </td>
+
+            <td class="px-6 py-4">
+              <span class="px-4 py-1 rounded text-xs font-semibold
+                <%= order.status === 'Delivered' ? 'bg-green-600 text-white' :
+                    order.status === 'Shipped' ? 'bg-blue-600 text-white' :
+                    'bg-yellow-500 text-white' %>">
+                <%= order.status %>
+              </span>
+            </td>
+
+            <td class="px-6 py-4">₹<%= order.finalTotal %></td>
+
+          </tr>
+          <% }) %>
+        </tbody>
+
+      </table>
+    </div>
+
+
+    <div class="bg-white rounded-xl border mt-8 overflow-hidden">
+
+  <div class="px-6 py-4 border-b">
+    <h3 class="font-semibold">Recent Users</h3>
+  </div>
+
+  <table class="w-full text-sm">
+    <thead class="bg-gray-50 text-gray-500">
+      <tr>
+        <th class="px-6 py-3 text-left">Name</th>
+        <th class="px-6 py-3 text-left">Email</th>
+        <th class="px-6 py-3 text-left">Joined</th>
+        <th class="px-6 py-3 text-left">Status</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% recentUsers.forEach(user => { %>
+      <tr class="border-t">
+        <td class="px-6 py-4"><%= user.fullName || user.name || "User" %></td>
+        <td class="px-6 py-4"><%= user.email %></td>
+        <td class="px-6 py-4">
+          <%= new Date(user.createdAt).toDateString() %>
+        </td>
+        <td class="px-6 py-4">
+          <span class="px-3 py-1 rounded text-xs font-semibold
+            <%= user.isBlocked ? 'bg-red-600 text-white' : 'bg-green-600 text-white' %>">
+            <%= user.isBlocked ? "Blocked" : "Active" %>
+          </span>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+
+
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+  const labels = <%- JSON.stringify(chartLabels) %>;
+  const data = <%- JSON.stringify(chartData) %>;
+
+  const ctx = document.getElementById('salesChart').getContext('2d');
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Sales (₹)',
+        data: data,
+        borderWidth: 2,
+        tension: 0.3,
+        fill: false
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: true
+        }
+      }
+    }
+  });
+</script>
+
+
+
+
+</body>
+</html>

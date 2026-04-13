@@ -110,7 +110,7 @@ export const verifyWalletPaymentService = async ({
   session
 }) => {
 
-  // ✅ 1. Verify signature
+  
   const body = razorpay_order_id + "|" + razorpay_payment_id;
 
   const expected = crypto
@@ -140,13 +140,13 @@ const exists = wallet.transactions.find(
 
 if (exists) return;
 
-    // 3. Get secure amount
+    
   const amount = session.walletTopupAmount;
 
   if (!amount) throw new Error("Invalid amount");
 
 
-  // ✅ 4. Credit wallet
+  
   await creditWallet(
     userId,
     amount,
@@ -154,6 +154,5 @@ if (exists) return;
     "Wallet Top-up"
   );
 
-  // 5. Clear session
   session.walletTopupAmount = null;
 };

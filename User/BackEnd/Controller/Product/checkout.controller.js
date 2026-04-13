@@ -123,6 +123,15 @@ export const placeOrderController = async (req, res) => {
 
     });
 
+
+    if (result && result.walletError) {
+  return res.json({
+    success: false,
+    message: result.walletError
+
+  });
+}
+
  
   req.session.coupon = null;
 
@@ -142,7 +151,6 @@ export const placeOrderController = async (req, res) => {
 
   
 
-// 🔥 HANDLE WALLET (ADD THIS)
    if (req.body.selectedPaymentMethod === "Wallet") {
   return res.json({
     success: true,
@@ -150,7 +158,6 @@ export const placeOrderController = async (req, res) => {
   });
   }
 
-// ✅ COD fallback
 return res.json({
   success: true,
   orderId: result.order._id

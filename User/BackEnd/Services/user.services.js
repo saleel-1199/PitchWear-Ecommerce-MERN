@@ -8,7 +8,7 @@ export const getUserById = async (userId) => {
   if (!userId) return null;
 
   const user = await User.findById(userId).lean();
-  return user;
+  return user
 };
 
 

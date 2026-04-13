@@ -93,7 +93,15 @@
 
         // Sync hidden input
         const dt = new DataTransfer();
-        files.forEach(f => f && dt.items.add(f));
+
+       files.forEach((f, i) => {
+          if (f) {
+         const newFile = new File([f], `image-${i}.jpg`, {
+      type: f.type
+           });
+         dt.items.add(newFile);
+        }
+        });
         document.getElementById("finalImages").files = dt.files;
 
         cropper.destroy();
@@ -290,9 +298,13 @@
   <a href="/admin/products" class="px-8 py-2 border rounded-lg bg-white font-semibold">
     Cancel
   </a>
-  <button class="px-8 py-2 bg-[#b36890] text-white rounded-lg font-semibold">
-    Save Changes
-  </button>
+
+  <button 
+  class="px-8 py-2 bg-[#6b8e23] hover:bg-[#5a7a1e] text-white 
+         rounded-lg font-semibold transition 
+         shadow-md hover:shadow-lg active:scale-95">
+  Save Changes
+</button>
 </div>
 
 </form>

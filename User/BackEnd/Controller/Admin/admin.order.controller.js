@@ -84,6 +84,6 @@ export const approveReturnController = async (req, res) => {
 
   } catch (error) {
     console.log(error.message);
-    res.redirect("back");
+    res.redirect(`/admin/orders/${req.params.orderId}`);
   }
 };

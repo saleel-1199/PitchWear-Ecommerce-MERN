@@ -19,6 +19,12 @@ import {attachUser} from "./User/BackEnd/Middlewares/attachUser.middleware.js"
 
 import methodOverride from "method-override";
 
+import staticRoutes from "./User/BackEnd/Routes/static.routes.js";
+
+import morgan from "morgan";
+
+
+
 const app = express();
 
 
@@ -58,7 +64,6 @@ app.use(attachUser)
 
 app.set("view engine", "ejs");
 app.set("view cache", false);
-//app.set("views", "User/BackEnd/Views");
 app.set("views", path.join(__dirname, "User/BackEnd/Views")); 
 
 app.get("/", (req, res) => {
@@ -71,11 +76,19 @@ app.use("/",productRoutes);
 
 app.use("/", adminProductRoutes);
 
+app.use("/", staticRoutes);
+
 app.use(cartRoutes);
+
+
+app.use(morgan("dev"));
+
+app.use((req, res) => {
+  res.status(404).render("errors/404");
+});
 
 const PORT = process.env.PORT || 3003;
 
 app.listen(PORT, () => {
   console.log(`Server running on PORT ${PORT}`);
 });
- 

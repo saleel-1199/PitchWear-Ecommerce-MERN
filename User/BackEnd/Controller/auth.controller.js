@@ -1,4 +1,6 @@
 import * as authService from "../Services/auth.service.js";
+import { Team } from "../../BackEnd/Models/team.model.js";
+import { Product } from "../../BackEnd/Models/product.model.js"; 
 
 export const renderSignup = (req, res) => {
 
@@ -33,7 +35,7 @@ export const signup = async (req, res) => {
 
 export const verifyOtp = async (req, res) => {
   try {
-    // ✅ SAFE CHECK
+    
     if (!req.body.otp || !Array.isArray(req.body.otp)) {
       req.session.otpError = "Please enter complete OTP";
       return res.redirect("/VerifyOtp");
@@ -70,10 +72,10 @@ export const resendSignupOtp = async (req, res) => {
 
     req.session.otpResent = true;
 
-    return res.redirect("/VerifyOtp"); // ✅ FIX
+    return res.redirect("/VerifyOtp");
   } catch (error) {
     req.session.otpError = "Failed to resend OTP";
-    return res.redirect("/VerifyOtp"); // ✅ FIX
+    return res.redirect("/VerifyOtp"); 
   }
 };
 
@@ -184,7 +186,17 @@ export const logout = (req, res) => {
 };
 
 
-// Home
-export const renderHome = (req, res) => {
-  res.render("Home");
+export const renderHome = async (req, res) => {
+  try {
+    const products = await Product.find().sort({createdAt:-1}).limit(8);
+
+
+    res.render("Home", {
+      products
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Server Error");
+  }
 };

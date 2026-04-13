@@ -30,7 +30,6 @@ export const createWalletTopupController = async (req, res) => {
     const userId = req.session.userId;
     const { amount } = req.body;
 
-    // ✅ store amount securely
     req.session.walletTopupAmount = Number(amount);
 
     const order = await createWalletTopupOrderService(

@@ -177,13 +177,22 @@ const subtotal = items.reduce((sum, i) => sum + i.subtotal, 0);
  subtotal + tax + deliveryFee - discount;
 
 
- if(paymentMethod === "Wallet"){
+if (paymentMethod === "Wallet") {
+  const wallet = await Wallet.findOne({ user: userId });
 
- const wallet = await Wallet.findOne({user:userId})
+  if (!wallet || wallet.balance <= 0) {
+    return {
+      success: false,
+      walletError: "Wallet balance is zero"
+    };
+  }
 
- if(!wallet || wallet.balance < finalTotal)
-  throw new Error("Insufficient wallet balance")
-
+  if (wallet.balance < finalTotal) {
+    return {
+      success: false,
+      walletError: "Insufficient wallet balance"
+    };
+  }
 }
 
 
@@ -396,7 +405,6 @@ export const handlePaymentFailureService = async (orderId) => {
 
   let order;
 
-  // ✅ if it's a valid Mongo ObjectId
   if (mongoose.Types.ObjectId.isValid(orderId)) {
 
     order = await Order.findOne({
@@ -405,7 +413,6 @@ export const handlePaymentFailureService = async (orderId) => {
 
   } else {
 
-    // ✅ otherwise treat as Razorpay ID
     order = await Order.findOne({
       razorpayOrderId: orderId
     });
@@ -451,7 +458,6 @@ if (!order) throw new Error("Order not found");
   if (order.paymentMethod !== "Razorpay")
     throw new Error("Invalid payment method");
 
-  // 🔥 Razorpay logic HERE
   const razorpayOrder = await razorpay.orders.create({
     amount: order.finalTotal * 100,
     currency: "INR",

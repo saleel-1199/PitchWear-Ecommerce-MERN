@@ -181,31 +181,31 @@
 
           <div class="flex justify-between">
             <span class="text-gray-500">Subtotal</span>
-            <span>$<%= cart.subtotal?.toFixed(2) || "0.00" %></span>
+            <span>₹<%= cart.subtotal?.toFixed(2) || "0.00" %></span>
           </div>
 
           <div class="flex justify-between">
             <span class="text-gray-500">Delivery Fee</span>
-            <span>$<%= cart.deliveryFee?.toFixed(2) || "0.00" %></span>
+            <span>₹<%= cart.deliveryFee?.toFixed(2) || "0.00" %></span>
           </div>
 
           <div class="flex justify-between">
             <span class="text-gray-500">Discount</span>
             <span class="text-red-500">
-              -$<%= cart.discount?.toFixed(2) || "0.00" %>
+              -₹<%= cart.discount?.toFixed(2) || "0.00" %>
             </span>
           </div>
 
           <div class="flex justify-between">
             <span class="text-gray-500">Tax</span>
-            <span>$<%= cart.tax?.toFixed(2) || "0.00" %></span>
+            <span>₹<%= cart.tax?.toFixed(2) || "0.00" %></span>
           </div>
 
           <hr>
 
           <div class="flex justify-between font-semibold">
             <span>Total</span>
-            <span>$<%= cart.finalTotal?.toFixed(2) || "0.00" %></span>
+            <span>₹<%= cart.finalTotal?.toFixed(2) || "0.00" %></span>
           </div>
 
         </div>
