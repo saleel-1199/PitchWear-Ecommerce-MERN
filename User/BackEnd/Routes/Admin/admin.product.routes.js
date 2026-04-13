@@ -45,7 +45,7 @@ import {
 
 import { salesReportPage } from "../../Controller/admin/admin.report.controller.js";
 
-import { adminAuth } from "../../Middlewares/admin/adminauth.middleware.js";
+import { adminAuth } from "../../Middlewares/Admin/adminauth.middleware.js";
 
 import uploadProducts from "../../Middlewares/uploadProducts.js";
 
