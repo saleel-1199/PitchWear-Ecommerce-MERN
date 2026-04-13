@@ -39,7 +39,7 @@ export const adminOrderDetailPage = async (req, res) => {
 
   } catch (error) {
     console.log("Order Detail Error:", error.message);
-    res.redirect("/admin/orders");
+    res.redirect("/admin/Orders");
   }
 };
 
@@ -48,7 +48,7 @@ export const updateOrderStatusController = async (req, res) => {
 
     await updateOrderStatusService(req.params.id, req.body.status);
 
-    res.redirect(`/admin/orders/${req.params.id}`);
+    res.redirect(`/admin/Orders/${req.params.id}`);
 
   } catch (error) {
     console.log("Status Update Error:", error.message);
@@ -64,7 +64,7 @@ export const updateItemStatusController = async (req, res) => {
       req.body.status
     );
 
-    res.redirect(`/admin/orders/${req.params.orderId}`);
+    res.redirect(`/admin/Orders/${req.params.orderId}`);
 
   } catch (error) {
     console.log(error.message);
@@ -80,10 +80,10 @@ export const approveReturnController = async (req, res) => {
       req.params.itemId
     );
 
-    res.redirect(`/admin/orders/${req.params.orderId}`);
+    res.redirect(`/admin/Orders/${req.params.orderId}`);
 
   } catch (error) {
     console.log(error.message);
-    res.redirect(`/admin/orders/${req.params.orderId}`);
+    res.redirect(`/admin/Orders/${req.params.orderId}`);
   }
 };
