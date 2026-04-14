@@ -116,6 +116,11 @@ export const updateOrderStatusService = async (orderId, status) => {
     order.status = "Partially Completed";
   }
 
+  if (status === "Delivered" && order.paymentMethod === "COD") {
+  order.paymentStatus = "Paid";
+}
+
+
   await order.save();
   return order;
 };
@@ -146,18 +151,26 @@ if (item.status === "Cancelled") {
   throw new Error("Item already cancelled");
 }
 
-  item.status = status;
 
-  if (status === "Cancelled" && order.paymentMethod === "Razorpay") {
+item.status = status;
 
-  const refundAmount = item.price * item.quantity;
+if (status === "Cancelled") {
 
- await creditWallet(
-  order.user,
-  refundAmount,
-  `${order.orderId}_${item._id}`, // 🔥 unique
-  "Order Cancel Refund"
-);
+  if (
+    order.paymentMethod === "Razorpay" ||
+    order.paymentMethod === "Wallet" ||
+    (order.paymentMethod === "COD" && order.status === "Delivered")
+  ) {
+
+    const refundAmount = item.price * item.quantity;
+
+    await creditWallet(
+      order.user,
+      refundAmount,
+      `${order.orderId}_${item._id}`,
+      "Order Cancel Refund"
+    );
+  }
 }
 
 
@@ -181,6 +194,7 @@ if (item.status === "Cancelled") {
 
 
 export const approveReturnService = async (orderId, itemId) => {
+
 
   const order = await Order.findById(orderId);
   if (!order) throw new Error("Order not found");
@@ -218,7 +232,11 @@ export const approveReturnService = async (orderId, itemId) => {
 
   await order.save();
 
-  if (["Razorpay", "Wallet"].includes(order.paymentMethod)) {
+  if (
+  order.paymentMethod === "Razorpay" ||
+  order.paymentMethod === "Wallet" ||
+  (order.paymentMethod === "COD" && order.status === "Paid")
+) {
 
     if (order.paymentStatus !== "Paid") return;
 
