@@ -6,17 +6,29 @@ import {
 
 export const walletPage = async (req, res) => {
   try {
-    const userId = req.session.userId; 
+    const userId = req.session.userId;
 
-     if (!userId) {
-      return res.redirect("/login");
-    }
+    if (!userId) return res.redirect("/login");
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5; 
+    const skip = (page - 1) * limit;
 
     const wallet = await getWalletService(userId);
 
+    const totalTransactions = wallet.transactions.length;
+
+    const paginatedTransactions = wallet.transactions
+      .slice()
+      .reverse()
+      .slice(skip, skip + limit);
+
     res.render("products/Wallet", {
       wallet,
-      user:req.user
+      user: req.user,
+      transactions: paginatedTransactions,
+      currentPage: page,
+      totalPages: Math.ceil(totalTransactions / limit)
     });
 
   } catch (error) {

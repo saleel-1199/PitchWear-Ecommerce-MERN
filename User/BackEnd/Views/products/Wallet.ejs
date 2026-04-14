@@ -140,7 +140,7 @@ style="background-color:#1e3a8a">
 
 <tbody>
 
-<% wallet.transactions.slice().reverse().forEach(txn => { %>
+<% transactions.forEach(txn => { %>
 
 <tr class="border-b">
 
@@ -173,6 +173,28 @@ style="background-color:#1e3a8a">
 </tbody>
 
 </table>
+
+<div class="flex justify-center mt-6 gap-2">
+
+  <% if (currentPage > 1) { %>
+    <a href="?page=<%= currentPage - 1 %>" 
+       class="px-3 py-1 border rounded">Prev</a>
+  <% } %>
+
+  <% for (let i = 1; i <= totalPages; i++) { %>
+    <a href="?page=<%= i %>" 
+       class="px-3 py-1 border rounded 
+       <%= i === currentPage ? 'bg-primary text-white' : '' %>">
+       <%= i %>
+    </a>
+  <% } %>
+
+  <% if (currentPage < totalPages) { %>
+    <a href="?page=<%= currentPage + 1 %>" 
+       class="px-3 py-1 border rounded">Next</a>
+  <% } %>
+
+</div>
 
 </section>
 
