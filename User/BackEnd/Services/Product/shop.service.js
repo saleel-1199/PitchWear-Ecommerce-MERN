@@ -31,17 +31,22 @@ export const fetchShopProductsService = async ({
     match.team = { $in: selectedTeamIds };
   }
 
- if (selectedTypes.length) {
-  match.type = {
-    $in: selectedTypes.map(t => new RegExp(`^${t}$`, "i"))
-  };
-}
+
+
 
 if (selectedKits.length) {
   match.kitType = {
-    $in: selectedKits.map(k => new RegExp(`^${k}$`, "i"))
+    $in: selectedKits.map(k => new RegExp(`^${k.trim()}$`, "i"))
   };
 }
+
+if (selectedTypes.length) {
+  match.type = {
+    $in: selectedTypes.map(t => new RegExp(`^${t.trim()}$`, "i"))
+  };
+}
+
+
   let sortStage = { createdAt: -1 };
   if (sort === "az") sortStage = { name: 1 };
   if (sort === "za") sortStage = { name: -1 };

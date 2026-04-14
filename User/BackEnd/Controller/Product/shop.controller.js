@@ -10,8 +10,24 @@ export const shopPageController = async (req, res) => {
     const sort = req.query.sort || "latest";
 
     const selectedTeams = [].concat(req.query.teams || []);
-    const selectedTypes = [].concat(req.query.types || []);
-    const selectedKits = [].concat(req.query.kits || []);
+
+   const selectedKits = [].concat(req.query.kits || []).map(k =>
+  decodeURIComponent(k)
+    .replace(/\+/g, " ")
+    .trim()              // ✅ ADD THIS
+    .toLowerCase()
+);
+
+const selectedTypes = [].concat(req.query.types || []).map(t =>
+  decodeURIComponent(t)
+    .replace(/\+/g, " ")
+    .trim()              // ✅ ADD THIS
+    .toLowerCase()
+);
+
+console.log("RAW QUERY:", req.query.kits);
+console.log("PROCESSED:", selectedKits);
+
 
     const minPrice = req.query.minPrice || "";
     const maxPrice = req.query.maxPrice || "";

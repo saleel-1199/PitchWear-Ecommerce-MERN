@@ -246,9 +246,7 @@ class="dropdown hidden mt-2 bg-white border border-borderTone rounded-xl p-4 spa
       type="checkbox"
       name="types"
       value="<%= t %>"
-      <%= (selectedTypes || []).includes(t) ? "checked" : "" %>
-      class="accent-[#5f7550] w-4 h-4"
-    />
+<%= (selectedTypes || []).includes(t.toLowerCase()) ? "checked" : "" %>    />
 
     <span><%= t %></span> 
   </div>
@@ -275,8 +273,7 @@ class="dropdown hidden mt-2 bg-white border border-borderTone rounded-xl p-4 spa
                     type="checkbox"
                     name="kits"
                     value="<%= k %>"
-                    <%= (selectedKits || []).includes(k) ? "checked" : "" %>
-                    class="w-4 h-4"
+<%= (selectedKits || []).includes(k.toLowerCase()) ? "checked" : "" %>                    class="w-4 h-4"
                   />
                   <span><%= k %></span>
                 </label>
