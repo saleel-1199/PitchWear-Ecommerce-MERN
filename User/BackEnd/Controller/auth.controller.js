@@ -113,11 +113,14 @@ export const login = async (req, res) => {
   try {
    const user = await authService.loginUser(req.body);
     req.session.userId =  user._id;
-           
-     logger.info(`User logged in: ${req.session.userId}`);
+    logger.info(`User logged in: ${req.session.userId}`);
+
+    
+    const redirectTo = req.session.redirectTo || "/Home";
+    req.session.redirectTo = null;
+    res.redirect(redirectTo);
 
 
-    res.redirect("/Home");
   } catch (error) {
       console.log("LOGIN ERROR:", error.message);
     res.render("Login",{

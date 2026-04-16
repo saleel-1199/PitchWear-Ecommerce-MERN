@@ -33,6 +33,7 @@ export const getCartPageController = async (req, res) => {
 export const addToCartController = async (req, res) => {
   try {
     if (!req.session.userId) {
+      req.session.redirectTo = req.originalUrl;
       return res.redirect("/login");
     }
 
