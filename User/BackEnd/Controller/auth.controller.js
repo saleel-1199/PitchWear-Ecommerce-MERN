@@ -109,26 +109,38 @@ export const renderLogin = (req, res) => {
   });
 };
 
+
+
+
 export const login = async (req, res) => {
   try {
-   const user = await authService.loginUser(req.body);
-    req.session.userId =  user._id;
-    logger.info(`User logged in: ${req.session.userId}`);
+    const user = await authService.loginUser(req.body);
 
-    
-    const redirectTo = req.session.redirectTo || "/Home";
+    req.session.userId = user._id;
+
+    const redirectTo = req.session.redirectTo;
+
+    console.log("RedirectTo:", redirectTo);
+
     req.session.redirectTo = null;
-    res.redirect(redirectTo);
 
+    if (redirectTo) {
+      return res.redirect(redirectTo); 
+    }
+
+    return res.redirect("/Home"); 
 
   } catch (error) {
-      console.log("LOGIN ERROR:", error.message);
-    res.render("Login",{
-      message:error.message,
-      successMessage:null
-    })
+    console.log("LOGIN ERROR:", error.message);
+
+    return res.render("Login", {
+      message: error.message,
+      successMessage: null
+    });
   }
 };
+
+
 
 //forgot
 

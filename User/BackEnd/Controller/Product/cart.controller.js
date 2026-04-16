@@ -1,3 +1,4 @@
+import { Product } from "../../Models/product.model.js";
 import {
   getUserCartService,
   addToCartService,
@@ -33,8 +34,12 @@ export const getCartPageController = async (req, res) => {
 export const addToCartController = async (req, res) => {
   try {
     if (!req.session.userId) {
-      req.session.redirectTo = req.originalUrl;
-      return res.redirect("/login");
+      const { slug } = req.body;
+      req.session.redirectTo = `/product/${slug}`;
+      return req.session.save(() => {
+    res.redirect("/login");
+  });
+
     }
 
     const { productId, size, quantity } = req.body;
@@ -54,9 +59,9 @@ export const addToCartController = async (req, res) => {
 
   } 
   catch (error) {
-    console.log("Add To Cart Error:", error.message);
-    res.redirect(`/Shop?error=${encodeURIComponent(error.message)}`);
-  }
+  console.log("Add To Cart Error:", error.message);
+   return res.redirect(`/product/${product.slug}?error=${encodeURIComponent(error.message)}`);
+}
 };
 
 

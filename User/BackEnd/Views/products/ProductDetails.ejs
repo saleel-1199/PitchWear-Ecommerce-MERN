@@ -156,10 +156,14 @@
     <!-- ACTIONS -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
   
-      <!-- ✅ ADD TO CART FORM -->
+      <!--  ADD TO CART FORM -->
     <form action="/cart" method="POST" onsubmit="return validateCartForm()">
 
     <input type="hidden" name="productId" value="<%= product._id %>">
+    
+    <!-- new -->
+  <input type="hidden" name="slug" value="<%= product.slug %>">
+
 
     <input type="hidden" name="size" id="selectedSize" required>
 
