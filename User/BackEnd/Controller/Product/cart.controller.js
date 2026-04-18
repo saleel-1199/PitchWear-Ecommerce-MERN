@@ -6,7 +6,6 @@ import {
   removeCartItemService,
 } from "../../Services/Product/cart.service.js";
 
-
 export const getCartPageController = async (req, res) => {
   try {
     if (!req.session.userId) {

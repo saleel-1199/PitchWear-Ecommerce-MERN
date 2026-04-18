@@ -15,7 +15,9 @@ export const getWishlistPageController = async (req, res) => {
 
 
 export const addToWishlistController = async (req, res) => {
-  if (!req.session.userId) return res.redirect("/login");
+  if (!req.session.userId){
+    return res.redirect("/login")
+  }
 
   try {
     await addToWishlistService({

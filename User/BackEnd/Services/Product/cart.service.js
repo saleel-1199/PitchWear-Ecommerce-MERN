@@ -16,7 +16,6 @@ export const getUserCartService = async (userId) => {
       },
     });
 
-
   if (!cart) return { items: [] };
   const validItems = cart.items.filter(item => item.product);
 
@@ -24,12 +23,8 @@ export const getUserCartService = async (userId) => {
     cart.items = validItems;
     await cart.save();
   }
-
   const leanCart = cart.toObject();
-
-
-
-  leanCart.items = await Promise.all(
+ leanCart.items = await Promise.all(
  leanCart.items.map(async(item)=>{
 
   const originalPrice = item.price;
@@ -66,7 +61,6 @@ export const getUserCartService = async (userId) => {
 
   return leanCart;
 };
-
 
 export const addToCartService = async ({
   userId,

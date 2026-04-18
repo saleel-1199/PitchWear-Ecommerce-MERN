@@ -38,6 +38,7 @@ export const teamsPage = async (req, res) => {
 
 
 
+
 export const addTeam = async (req, res) => {
   try {
     await createTeam(req.body.name);

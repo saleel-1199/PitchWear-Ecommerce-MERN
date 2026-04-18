@@ -1,3 +1,4 @@
+import Razorpay from "razorpay";
 import {
   getCheckoutDataService,
   placeOrderService,
@@ -7,9 +8,6 @@ import {
   handlePaymentFailureService,
   retryPaymentService
 } from "../../Services/Product/checkout.service.js";
-
-import Razorpay from "razorpay";
-
 
 export const getCheckoutPageController = async (req, res) => {
   console.log(req.session);
@@ -53,10 +51,6 @@ export const getCheckoutPageController = async (req, res) => {
 
   }
 };
-
-
-
-
 export const applyCouponController = async (req,res)=>{
 
   try{
@@ -104,9 +98,6 @@ export const removeCouponController = async(req,res)=>{
 
 };
 
-
-
-
 export const placeOrderController = async (req, res) => {
 
   try {
@@ -131,11 +122,7 @@ export const placeOrderController = async (req, res) => {
 
   });
 }
-
- 
   req.session.coupon = null;
-
-  
     if(req.body.selectedPaymentMethod === "Razorpay"){
 
       return res.json({
@@ -148,9 +135,6 @@ export const placeOrderController = async (req, res) => {
       });
 
     }
-
-  
-
    if (req.body.selectedPaymentMethod === "Wallet") {
   return res.json({
     success: true,
@@ -171,10 +155,6 @@ return res.json({
 });
   }
 };
-
-
-
-
 export const verifyPaymentController = async (req, res) => {
   try {
 
