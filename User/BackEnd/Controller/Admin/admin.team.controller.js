@@ -68,7 +68,7 @@ export const editTeamPage = async (req, res) => {
   const team = await getTeamById(req.params.id);
   if (!team) return res.redirect("/admin/teams");
 
-  res.render("Admin/TeamsEdit", {
+  res.render("admin/TeamsEdit", {
     team,
     page: req.query.page || 1,
     search: req.query.search || "",
@@ -100,7 +100,7 @@ export const updateTeamName = async (req, res) => {
 
     const team = await getTeamById(req.params.id);
 
-    res.render("Admin/TeamsEdit", {
+    res.render("admin/TeamsEdit", {
       team: {
         ...team.toObject(),
         name: req.body.name 
