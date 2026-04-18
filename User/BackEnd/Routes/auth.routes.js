@@ -37,17 +37,24 @@ router.route("/Home")
 
 
 router.get("/auth/google", (req, res, next) => {
-  const protocol = req.headers["x-forwarded-proto"] || req.protocol;
+  const callbackURL = "https://pitchwear.online/auth/google/callback";
 
-  console.log("Protocol detected:", protocol);
+  return passport.authenticate("google", {
+    scope: ["profile", "email"],
+    callbackURL: callbackURL, // 🔥 FORCE HERE
+  })(req, res, next);
+});
 
-  next();
-}, passport.authenticate("google", {
-  scope: ["profile", "email"]
-}));
-
-router.get("/auth/google/callback",passport.authenticate("google", { failureRedirect: "/login" }),googleAuthController.googleCallbackController);
-
+router.get(
+  "/auth/google/callback",
+  (req, res, next) => {
+    return passport.authenticate("google", {
+      failureRedirect: "/login",
+      callbackURL: "https://pitchwear.online/auth/google/callback", // 🔥 FORCE AGAIN
+    })(req, res, next);
+  },
+  googleCallbackController
+);
 
 router.get("/profile",isAuth,userController.renderUserProfile);
 
