@@ -36,7 +36,18 @@ router.route("/Home")
         .get(authController.renderHome)
 
 
-router.get("/auth/google",passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get("/auth/google", (req, res, next) => {
+  console.log("🔥 Google Auth Triggered");
+  console.log("Protocol:", req.protocol);
+  console.log("Host:", req.get("host"));
+  console.log("Full URL:", `${req.protocol}://${req.get("host")}/auth/google/callback`);
+
+  next();
+}, passport.authenticate("google", {
+  scope: ["profile", "email"]
+}));
+
+
 router.get("/auth/google/callback",passport.authenticate("google", { failureRedirect: "/login" }),googleAuthController.googleCallbackController);
 
 

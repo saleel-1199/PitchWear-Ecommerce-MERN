@@ -27,6 +27,7 @@ import morgan from "morgan";
 
 const app = express();
 
+app.set("trust proxy", 1);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -66,7 +67,7 @@ app.set("view engine", "ejs");
 app.set("view cache", false);
 app.set("views", path.join(__dirname, "User/BackEnd/Views")); 
 
-app.set("trust proxy", 1);
+
 
 
 app.get("/", (req, res) => {
