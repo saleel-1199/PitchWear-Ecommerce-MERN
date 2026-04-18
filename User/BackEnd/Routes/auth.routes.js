@@ -37,16 +37,14 @@ router.route("/Home")
 
 
 router.get("/auth/google", (req, res, next) => {
-  console.log("🔥 Google Auth Triggered");
-  console.log("Protocol:", req.protocol);
-  console.log("Host:", req.get("host"));
-  console.log("Full URL:", `${req.protocol}://${req.get("host")}/auth/google/callback`);
+  const protocol = req.headers["x-forwarded-proto"] || req.protocol;
+
+  console.log("Protocol detected:", protocol);
 
   next();
 }, passport.authenticate("google", {
   scope: ["profile", "email"]
 }));
-
 
 router.get("/auth/google/callback",passport.authenticate("google", { failureRedirect: "/login" }),googleAuthController.googleCallbackController);
 
