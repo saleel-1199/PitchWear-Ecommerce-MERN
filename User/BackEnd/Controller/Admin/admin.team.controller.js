@@ -53,7 +53,7 @@ export const addTeam = async (req, res) => {
       Number(limit)
     );
 
-    res.render("Admin/Teams", {
+    res.render("admin/Teams", {
       teams: data.teams,
       currentPage: data.currentPage,
       totalPages: data.totalPages,
