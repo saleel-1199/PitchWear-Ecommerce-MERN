@@ -1,4 +1,9 @@
 import 'dotenv/config' 
+
+
+console.log("CLIENT ID:", process.env.GOOGLE_CLIENT_ID);
+
+
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";

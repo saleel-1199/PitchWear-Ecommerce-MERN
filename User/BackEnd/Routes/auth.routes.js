@@ -53,7 +53,7 @@ router.get(
       callbackURL: "https://pitchwear.online/auth/google/callback", // 🔥 FORCE AGAIN
     })(req, res, next);
   },
-  googleCallbackController
+  googleAuthController.googleCallbackController
 );
 
 router.get("/profile",isAuth,userController.renderUserProfile);
