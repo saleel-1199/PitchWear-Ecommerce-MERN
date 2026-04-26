@@ -8,6 +8,7 @@ import {
 } from "../../Services/Admin/admin.product.service.js";
 
 import { Team } from "../../Models/team.model.js";
+import { STATUS_CODES } from "../../Utils/statusCodes.js";
 
 export const productsPage = async (req, res) => {
   try {
@@ -26,7 +27,7 @@ export const productsPage = async (req, res) => {
     });
   } catch (error) {
     console.log("productsPage error:", error);
-    res.status(500).send("Server Error");
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send("Server Error");
   }
 };
 
@@ -43,7 +44,7 @@ export const addProductPage = async (req, res) => {
 export const addProduct = async (req, res) => {
   try {
     await createProduct(req.body, req.files);
-    return res.redirect("/admin/products");
+    return res.redirect("/admin/Products");
   } catch (err) {
     console.error("Add product error:", err.message);
 
@@ -59,7 +60,7 @@ export const addProduct = async (req, res) => {
 
     const teams = await Team.find({ isDeleted: false }).lean();
 
-    return res.status(400).render("Admin/ProductAdd", {
+    return res.status(STATUS_CODES.BAD_REQUEST).render("Admin/ProductAdd", {
       title: "Add Product",
       error: errorMessage, 
       teams,
@@ -69,7 +70,7 @@ export const addProduct = async (req, res) => {
 
 export const editProductPage = async (req, res) => {
   const product = await getProductById(req.params.id);
-  if (!product) return res.redirect("/admin/products");
+  if (!product) return res.redirect("/admin/Products");
 
   const teams = await Team.find({ isDeleted: false }).lean();  
 
@@ -83,7 +84,7 @@ export const editProductPage = async (req, res) => {
 
 export const editProduct = async (req, res) => {
   const product = await getProductById(req.params.id);
-  if (!product) return res.redirect("/admin/products");
+  if (!product) return res.redirect("/admin/Products");
 
   await updateProductBasic(product, req.body, req.files);
   res.redirect("/admin/products");
@@ -91,7 +92,7 @@ export const editProduct = async (req, res) => {
 
 export const inventoryPage = async (req, res) => {
   const product = await getProductById(req.params.id);
-  if (!product) return res.redirect("/admin/products");
+  if (!product) return res.redirect("/admin/Products");
 
   res.render("admin/ProductInventory", {
     title: "Add Stock",
@@ -101,7 +102,7 @@ export const inventoryPage = async (req, res) => {
 
 export const saveInventory = async (req, res) => {
   const product = await getProductById(req.params.id);
-  if (!product) return res.redirect("/admin/products");
+  if (!product) return res.redirect("/admin/Products");
 
   const incomingVariants = Object.values(req.body.variants || {});
   await updateInventory(product, incomingVariants);
@@ -111,5 +112,5 @@ export const saveInventory = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
   await softDeleteProduct(req.params.id);
-  res.redirect("/admin/products");
+  res.redirect("/admin/Products");
 };

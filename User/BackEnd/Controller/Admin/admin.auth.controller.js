@@ -1,3 +1,8 @@
+import bcrypt from "bcrypt";
+import { Admin } from "../../Models/admin.model.js";
+import { STATUS_CODES } from "../../Utils/statusCodes.js";
+
+
 export const renderAdminLogin = (req, res) => {
   return res.render("admin/AdminLogin", {
     title: "Admin Login",
@@ -8,25 +13,34 @@ export const renderAdminLogin = (req, res) => {
 export const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
-    if (
-      email === process.env.ADMIN_EMAIL &&
-      password === process.env.ADMIN_PASSWORD
-    ) {
-      
-      req.session.adminId = "superadmin";
-      req.session.adminEmail = email;
 
-      return res.redirect("/admin/Dashboard");
+    const admin = await Admin.findOne({ email });
+
+    if (!admin) {
+      return res.render("admin/AdminLogin", {
+        title: "Admin Login",
+        error: "Admin not found"
+      });
     }
 
-    return res.render("admin/AdminLogin", {
-      title: "Admin Login",
-      error: "Invalid admin email or password"
-    });
+    const isMatch = await bcrypt.compare(password, admin.password);
+
+    if (!isMatch) {
+      return res.render("admin/AdminLogin", {
+        title: "Admin Login",
+        error: "Invalid credentials"
+      });
+    }
+
+    // ✅ session
+    req.session.adminId = admin._id;
+    req.session.adminEmail = admin.email;
+
+    return res.redirect("/admin/Dashboard");
+
   } catch (err) {
     console.log("Admin Login Error:", err);
-    return res.status(500).send("Server Error");
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send("Server Error");
   }
 };
 

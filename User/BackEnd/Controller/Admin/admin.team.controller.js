@@ -5,6 +5,7 @@ import {
   updateTeamNameService,
   softDeleteTeam
 } from "../../Services/Admin/admin.team.service.js";
+import { STATUS_CODES } from "../../Utils/statusCodes.js";
 
 
 export const teamsPage = async (req, res) => {
@@ -31,7 +32,7 @@ export const teamsPage = async (req, res) => {
     });
   } catch (error) {
     console.error("Teams Page Error:", error);
-    res.status(500).send("Internal Server Error");
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send("Internal Server Error");
   }
 };
 

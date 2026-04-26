@@ -8,6 +8,7 @@ import {
 import path from "path";
 
 import { generateInvoiceService } from "../../Services/Product/order.service.js";
+import { STATUS_CODES } from "../../Utils/statusCodes.js";
 
 export const getUserOrdersController = async (req, res) => {
   try {
@@ -90,7 +91,7 @@ export const returnOrderController = async (req, res) => {
 
   } catch (error) {
     console.error("Return Order Error:", error.message);
-    res.status(400).render("errorPage", { message: error.message });
+    res.status(STATUS_CODES.BAD_REQUEST).render("errorPage", { message: error.message });
   }
 };
 

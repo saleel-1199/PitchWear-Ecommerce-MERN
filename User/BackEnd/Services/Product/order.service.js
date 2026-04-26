@@ -20,6 +20,7 @@ export const getUserOrdersService = async (userId, search = "") => {
   return orders;
 };
 
+
 export const getOrderDetailService = async (orderId, userId) => {
 
   let order;
@@ -116,8 +117,6 @@ if (!order) throw new Error("Order not found");
     }
 
     refundAmount = Math.max(refundAmount, 0);
-
-   
     let wallet = await Wallet.findOne({ user: order.user });
 
     if (!wallet) {

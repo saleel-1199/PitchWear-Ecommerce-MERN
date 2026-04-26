@@ -1,4 +1,5 @@
 import * as addressService from "../Services/address.service.js";
+import { STATUS_CODES } from "../Utils/statusCodes.js";
 
 
 export const addressBookPage = async (req, res) => {
@@ -23,7 +24,7 @@ export const addressBookPage = async (req, res) => {
     });
   } catch (err) {
     console.log("AddressBook Error:", err);
-    return res.status(500).send("Server Error");
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send("Server Error");
   }
 };
 
@@ -46,7 +47,7 @@ export const createAddressController = async (req, res) => {
 
   } catch (err) {
     console.log("Create Address Error:", err);
-    return res.status(500).json({ success:false });
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success:false });
   }
 };
 
@@ -56,7 +57,7 @@ export const editAddressPage = async (req, res) => {
     const address = await addressService.getAddressById(req.params.id, req.user._id);
      
     if (!address) {
-      return res.status(404).send("Address not found");
+      return res.status(STATUS_CODES.NOT_FOUND).send("Address not found");
     }
 
     return res.render("EditAddress", {
@@ -65,7 +66,7 @@ export const editAddressPage = async (req, res) => {
     });
   } catch (err) {
     console.log("Edit Address Page Error:", err);
-    return res.status(500).send("Server Error");
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send("Server Error");
   }
 };
 
@@ -79,13 +80,13 @@ export const updateAddressController = async (req, res) => {
     );
 
     if (!updated) {
-      return res.status(404).send("Address not found");
+      return res.status(STATUS_CODES.NOT_FOUND).send("Address not found");
     }
 
     return res.redirect("/address");
   } catch (err) {
     console.log("Update Address Error:", err);
-    return res.status(500).send("Server Error");
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send("Server Error");
   }
 };
 
@@ -96,6 +97,6 @@ export const deleteAddressController = async (req, res) => {
     return res.redirect("/address");
   } catch (err) {
     console.log("Delete Address Error:", err);
-    return res.status(500).send("Server Error");
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send("Server Error");
   }
 };

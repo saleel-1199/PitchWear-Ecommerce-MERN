@@ -1,9 +1,5 @@
 import 'dotenv/config' 
-
-
 console.log("CLIENT ID:", process.env.GOOGLE_CLIENT_ID);
-
-
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -28,6 +24,7 @@ import staticRoutes from "./User/BackEnd/Routes/static.routes.js";
 
 import morgan from "morgan";
 
+import { STATUS_CODES } from "../PitchWear/User/BackEnd/Utils/statusCodes.js";
 
 
 const app = express();
@@ -93,7 +90,7 @@ app.use(cartRoutes);
 app.use(morgan("dev"));
 
 app.use((req, res) => {
-  res.status(404).render("errors/404");
+  res.status(STATUS_CODES.NOT_FOUND).render("errors/404");
 });
 
 const PORT = process.env.PORT || 3003;

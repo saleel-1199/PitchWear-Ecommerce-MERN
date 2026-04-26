@@ -4,6 +4,7 @@ import {
   fetchUsersService,
   toggleBlockUserService,
 } from "../../Services/Admin/admin.user.services.js";
+import { STATUS_CODES } from "../../Utils/statusCodes.js";
 
 export const renderUserManagement = async (req, res) => {
   try {
@@ -44,12 +45,12 @@ export const toggleBlockUser = async (req, res) => {
     const { id } = req.params;
 
     const user = await toggleBlockUserService(id);
-    if (!user) return res.status(404).send("User not found");
+    if (!user) return res.status(STATUS_CODES.NOT_FOUND).send("User not found");
 
     return res.redirect("/admin/users");
   } catch (err) {
     console.log("toggleBlockUser error:", err);
-    return res.status(500).send("Server Error");
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send("Server Error");
   }
 };
 
@@ -58,7 +59,7 @@ export const renderConfirmBlockPage = async (req, res) => {
     const { id } = req.params;
 
     const user = await User.findById(id).lean();
-    if (!user) return res.status(404).send("User not found");
+    if (!user) return res.status(STATUS_CODES.NOT_FOUND).send("User not found");
 
     return res.render("admin/ConfirmBlock", {
       title: "Confirm Action",
@@ -66,7 +67,7 @@ export const renderConfirmBlockPage = async (req, res) => {
       active: "users"
     });
   } catch (err) {
-    return res.status(500).send("Server Error");
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send("Server Error");
   }
 };
 

@@ -1,4 +1,5 @@
 import * as userService from "../Services/user.services.js";
+import { STATUS_CODES } from "../Utils/statusCodes.js";
 
 
 export const renderUserProfile = async (req, res) => {
@@ -9,7 +10,7 @@ export const renderUserProfile = async (req, res) => {
       user
     });
   } catch (error) {
-    res.status(500).send("Something went wrong");
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send("Something went wrong");
   }
 };
 

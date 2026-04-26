@@ -1,6 +1,7 @@
 import * as authService from "../Services/auth.service.js";
 import { logger } from "../Utils/logger.js";
 import { Product } from "../../BackEnd/Models/product.model.js"; 
+import { STATUS_CODES } from "../Utils/statusCodes.js";
 
 export const renderSignup = (req, res) => {
 
@@ -199,7 +200,7 @@ export const resetPassword = async (req, res) => {
 export const logout = (req, res) => {
   req.session.destroy(err => {
     if (err) {
-      return res.status(500).send("Logout failed");
+      return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send("Logout failed");
     }
 
     res.clearCookie("connect.sid"); 
@@ -219,6 +220,6 @@ export const renderHome = async (req, res) => {
 
   } catch (err) {
     console.log(err);
-    res.status(500).send("Server Error");
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send("Server Error");
   }
 };

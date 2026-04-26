@@ -1,5 +1,7 @@
 import { fetchShopProductsService } from "../../Services/Product/shop.service.js";
 import { Team } from "../../Models/team.model.js";
+import { STATES } from "mongoose";
+import { STATUS_CODES } from "../../Utils/statusCodes.js";
 
 export const shopPageController = async (req, res) => {
   try {
@@ -77,6 +79,6 @@ console.log("PROCESSED:", selectedKits);
 
   } catch (err) {
     console.log(err);
-    res.status(500).send("Server Error");
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send("Server Error");
   }
 };

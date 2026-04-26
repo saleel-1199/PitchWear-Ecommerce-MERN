@@ -1,4 +1,5 @@
 import * as dashboardService from "../../Services/Admin/admin.dashboard.service.js";
+import { STATUS_CODES } from "../../Utils/statusCodes.js";
 
 export const getDashboard = async (req, res) => {
   try {
@@ -10,6 +11,6 @@ export const getDashboard = async (req, res) => {
 
   } catch (error) {
     console.log(error);
-    res.status(500).send("Dashboard Error");
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).send("Dashboard Error");
   }  
 };
