@@ -24,7 +24,7 @@ import staticRoutes from "./User/BackEnd/Routes/static.routes.js";
 
 import morgan from "morgan";
 
-import { STATUS_CODES } from "../PitchWear/User/BackEnd/Utils/statusCodes.js";
+import { STATUS_CODES } from "./User/BackEnd/Utils/statusCodes.js";
 
 
 const app = express();
