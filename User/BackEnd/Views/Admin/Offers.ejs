@@ -213,7 +213,9 @@ No offers found
 <%= offer.expiryDate ? new Date(offer.expiryDate).toDateString() : "No Expiry" %>
 
 </td>
-
+<td>
+  sample checkining
+</td>
 <td class="px-6 py-4 text-center">
 
   <button onclick="openEditModal(
@@ -225,7 +227,7 @@ No offers found
  '<%= offer.team?._id || "" %>',
  '<%= offer.expiryDate ? offer.expiryDate.toISOString().split("T")[0] : "" %>'
 )" class="text-blue-600 font-medium">
-Edit
+Edittt
 </button>
 
 
