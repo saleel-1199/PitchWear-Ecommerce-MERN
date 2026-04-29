@@ -88,17 +88,25 @@
                     method="POST"
                     class="flex gap-2 items-center">
 
-                <select name="status" class="border px-2 py-1 text-sm rounded">
+                <select name="status">
 
-                  <option value="Pending" <%= item.status === "Pending" ? "selected" : "" %>>Pending</option>
-                  <option value="Shipped" <%= item.status === "Shipped" ? "selected" : "" %>>Shipped</option>
-                  <option value="Out for Delivery" <%= item.status === "Out for Delivery" ? "selected" : "" %>>Out for Delivery</option>
-                  <option value="Delivered" <%= item.status === "Delivered" ? "selected" : "" %>>Delivered</option>
-                  <option value="Cancelled" <%= item.status === "Cancelled" ? "selected" : "" %>>Cancelled</option>
-                  <option value="Return Requested" <%= item.status === "Return Requested" ? "selected" : "" %>>Return Requested</option>
-                  <option value="Returned" <%= item.status === "Returned" ? "selected" : "" %>>Returned</option>
+  <% if (order.status === "Cancelled") { %>
 
-                </select>
+     <option value="Cancelled">Cancelled</option>
+
+  <% } else { %>
+
+    <option value="Pending">Pending</option>
+    <option value="Shipped">Shipped</option>
+    <option value="Out for Delivery">Out for Delivery</option>
+    <option value="Delivered">Delivered</option>
+    <option value="Cancelled">Cancelled</option>
+    <option value="Return Requested">Return Requested</option>
+    <option value="Returned">Returned</option>
+
+  <% } %>
+
+</select>
 
                 <button class="bg-green-500 text-white px-3 py-1 text-xs rounded">
                   Update

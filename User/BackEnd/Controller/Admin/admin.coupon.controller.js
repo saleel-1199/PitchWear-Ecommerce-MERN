@@ -1,27 +1,57 @@
-import { Coupon } from "../../Models/coupon.model.js";
+import {
+  getAllCouponsService,
+  createCouponService,
+  updateCouponService,
+  deleteCouponService,
+} from "../../Services/Admin/admin.coupon.service.js";
 
-export const couponsPage = async (req,res)=>{
+// Page
+export const couponsPage = async (req, res) => {
+  const coupons = await getAllCouponsService();
 
- const coupons = await Coupon.find().sort({createdAt:-1})
+  res.render("admin/Coupons", {
+    coupons,
+    error: req.query.error || null,
+    editError: null,
+    editData: null,
+    openModal: false,
 
- res.render("admin/Coupons",{
-  coupons
- })
+  });
+};
 
-}
+// Create
+export const createCouponController = async (req, res) => {
+  try {
+    await createCouponService(req.body);
+    res.redirect("/admin/coupons");
+  } catch (err) {
+    res.redirect(`/admin/coupons?error=${encodeURIComponent(err.message)}`);
+  }
+};
 
-export const createCouponController = async(req,res)=>{
+export const updateCouponController = async (req, res) => {
+  try {
+    await updateCouponService(req.params.id, req.body);
+    res.redirect("/admin/coupons");
+  } catch (err) {
+    const coupons = await getAllCouponsService();
 
- await Coupon.create(req.body)
+    res.render("admin/Coupons", {
+      coupons,
+      error:null,
+      editError: err.message,
+      editData: {
+        ...req.body,
+        _id: req.params.id,
+      },
+      openModal: true,
+    });
+  }
+};
 
- res.redirect("/admin/coupons")
 
-}
-
-export const deleteCouponController = async(req,res)=>{
-
- await Coupon.findByIdAndDelete(req.params.id)
-
- res.redirect("/admin/coupons")
-
-}
+// Delete
+export const deleteCouponController = async (req, res) => {
+  await deleteCouponService(req.params.id);
+  res.redirect("/admin/coupons");
+};

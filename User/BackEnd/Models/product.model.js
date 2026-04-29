@@ -93,12 +93,11 @@ const productSchema = new mongoose.Schema(
 );
 
 
-productSchema.pre("save", function (next) {
+productSchema.pre("save",async function () {
   this.totalStock = this.variants.reduce(
     (sum, v) => sum + (v.stock || 0),
     0
   );
-  next();
 });
 
 export const Product = mongoose.model("Product", productSchema);

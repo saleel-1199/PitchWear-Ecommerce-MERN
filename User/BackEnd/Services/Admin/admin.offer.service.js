@@ -53,6 +53,48 @@ if(type === "Team"){
 };
 
 
+export const updateOfferService = async (id, data) => {
+
+ const { name, discountPercent, type, product, team, expiryDate } = data;
+
+ const offer = await Offer.findById(id);
+ if (!offer) throw new Error("Offer not found");
+
+ if (!name) throw new Error("Offer name required");
+
+ if (!discountPercent || discountPercent <= 0 || discountPercent > 90)
+  throw new Error("Discount must be between 1 - 90");
+
+ if (!expiryDate) throw new Error("Expiry date required");
+
+ if (type === "Product" && !product)
+  throw new Error("Please select product");
+
+ if (type === "Team" && !team)
+  throw new Error("Please select team");
+
+ // update fields
+ offer.name = name;
+ offer.discountPercent = discountPercent;
+ offer.type = type;
+ offer.expiryDate = expiryDate;
+
+ if (type === "Product") {
+  offer.product = product;
+  offer.team = undefined;
+ }
+
+ if (type === "Team") {
+  offer.team = team;
+  offer.product = undefined;
+ }
+
+ await offer.save();
+
+ return offer;
+};
+
+
 export const deleteOfferService = async(id)=>{
 
  const offer = await Offer.findById(id);

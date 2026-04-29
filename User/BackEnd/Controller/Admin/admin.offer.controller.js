@@ -1,7 +1,8 @@
 import {
  getOffersDataService,
  createOfferService,
- deleteOfferService
+ deleteOfferService,
+ updateOfferService
 } from "../../Services/Admin/admin.offer.service.js";
 
 import { Product } from "../../Models/product.model.js";
@@ -66,7 +67,28 @@ export const createOfferController = async(req,res)=>{
 
 };
 
+export const updateOfferController = async (req, res) => {
+ try {
 
+  await updateOfferService(req.params.id, req.body);
+
+  res.redirect("/admin/offers");
+
+ } catch (err) {
+
+  const products = await Product.find();
+  const teams = await Team.find();
+  const offers = await getOffersDataService();
+
+  res.render("admin/Offers", {
+   offers,
+   products,
+   teams,
+   error: err.message
+  });
+
+ }
+};
 
 export const deleteOfferController = async(req,res)=>{
 

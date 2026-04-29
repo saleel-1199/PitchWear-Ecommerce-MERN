@@ -4,6 +4,8 @@ import {
   removeFromWishlistService,
 } from "../../Services/Product/wishlist.service.js";
 
+import { MESSAGES } from "../../utils/messages.js";
+
 
 export const getWishlistPageController = async (req, res) => {
   if (!req.session.userId) return res.redirect("/login");
@@ -28,7 +30,7 @@ export const addToWishlistController = async (req, res) => {
     req.session.message = "Added to wishlist ❤️";
 
   } catch (err) {
-    req.session.message = err.message || "Something went wrong";
+    req.session.message = err.message || MESSAGES.COMMON.SOMETHING_WENT_WRONG;
   }
 
   res.redirect("/Shop");

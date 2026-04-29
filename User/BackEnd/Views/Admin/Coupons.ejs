@@ -37,6 +37,13 @@ Coupon Management
 
 <h3 class="font-semibold mb-4">Create Coupon</h3>
 
+<% if (error) { %>
+  <div class="bg-red-100 text-red-700 px-4 py-3 rounded mb-4">
+    <%= error %>
+  </div>
+<% } %>
+
+
 <form action="/admin/coupons" method="POST" class="grid grid-cols-2 gap-4">
 
 <input
@@ -147,10 +154,29 @@ No coupons found
 
 <td class="px-6 py-4 text-center">
 
-<form action="/admin/coupons/<%= coupon._id %>?_method=DELETE" method="POST">
+<!-- EDIT -->
+<button
+  type="button"
+  onclick="openEditModal(
+    '<%= coupon._id %>',
+    '<%= coupon.code %>',
+    <%= coupon.discountPercent %>,
+    <%= coupon.minPurchase %>,
+    '<%= coupon.expiryDate.toISOString().split('T')[0] %>'
+  )"
+  class="text-blue-600 font-medium mr-3">
+  Edit
+</button>
 
-<button class="text-red-600 font-medium">
-Delete
+<!-- DELETE -->
+<form action="/admin/coupons/<%= coupon._id %>?_method=DELETE"
+      method="POST"
+      style="display:inline;">
+<button 
+  type="button"
+  onclick="openDeleteModal('<%= coupon._id %>')"
+  class="text-red-600 font-medium">
+  Delete
 </button>
 
 </form>
@@ -170,6 +196,145 @@ Delete
 </section>
 
 </main>
+
+
+<script>
+function openEditModal(id, code, discount, minPurchase, expiry) {
+  document.getElementById("editModal").classList.remove("hidden");
+
+  document.getElementById("editForm").action = `/admin/coupons/${id}`;
+
+  document.getElementById("editCode").value = code;
+  document.getElementById("editDiscount").value = discount;
+  document.getElementById("editMinPurchase").value = minPurchase;
+  document.getElementById("editExpiry").value = expiry;
+}
+
+function closeModal() {
+  document.getElementById("editModal").classList.add("hidden");
+}
+</script>
+
+
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="fixed inset-0 bg-black/40 hidden flex items-center justify-center">
+
+  <div class="bg-white rounded-xl p-6 w-[400px]">
+
+    <h3 class="font-semibold mb-4">Edit Coupon</h3>
+
+    <form id="editForm" method="POST">
+
+      <% if (typeof editError !== "undefined" && editError) { %>
+  <div class="bg-red-100 text-red-700 px-3 py-2 rounded mb-3">
+    <%= editError %>
+  </div>
+<% } %>
+
+      <!-- Coupon Code -->
+<label class="text-sm font-medium text-gray-600">Coupon Code</label>
+<input name="code" id="editCode"
+value="<%= editData?.code || '' %>"
+class="border w-full px-3 py-2 rounded mb-3" />
+
+
+
+<!-- Discount -->
+<label class="text-sm font-medium text-gray-600">Discount Percentage</label>
+<input name="discountPercent" id="editDiscount"
+value="<%= editData?.discountPercent || '' %>"
+type="number"
+class="border w-full px-3 py-2 rounded mb-3" />
+
+
+
+<!-- Minimum Purchase -->
+<label class="text-sm font-medium text-gray-600">Minimum Purchase</label>
+<input name="minPurchase" id="editMinPurchase"
+value="<%= editData?.minPurchase || '' %>"
+type="number"
+class="border w-full px-3 py-2 rounded mb-3" />
+
+
+
+<!-- Expiry -->
+<label class="text-sm font-medium text-gray-600">Expiry Date</label>
+<input name="expiryDate" id="editExpiry"
+value="<%= editData?.expiryDate ? new Date(editData.expiryDate).toISOString().split('T')[0] : '' %>"
+type="date"
+class="border w-full px-3 py-2 rounded mb-3" />
+
+
+
+      <div class="flex justify-end gap-3">
+        <button type="button" onclick="closeModal()">Cancel</button>
+        <button class="bg-[#cdd47b] px-4 py-2 rounded">Update</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+
+<!-- DELETE CONFIRM MODAL -->
+<div id="deleteModal"
+class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
+
+  <div class="bg-white rounded-xl p-6 w-[350px] text-center">
+
+    <h3 class="text-lg font-semibold mb-3">Confirm Delete</h3>
+
+    <p class="text-sm text-gray-600 mb-5">
+      Are you sure you want to delete this coupon? This action cannot be undone.
+    </p>
+
+    <form id="deleteForm" method="POST">
+      <input type="hidden" name="_method" value="DELETE" />
+
+      <div class="flex justify-center gap-3">
+        <button type="button"
+          onclick="closeDeleteModal()"
+          class="px-4 py-2 border rounded">
+          Cancel
+        </button>
+
+        <button class="px-4 py-2 bg-red-500 text-white rounded">
+          Delete
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<script>
+<% if (openModal) { %>
+  document.getElementById("editModal").classList.remove("hidden");
+<% } %>
+</script>
+
+
+<script>
+
+function openDeleteModal(id){
+  const modal = document.getElementById("deleteModal");
+  const form = document.getElementById("deleteForm");
+
+  form.action = `/admin/coupons/${id}?_method=DELETE`;
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function closeDeleteModal(){
+  const modal = document.getElementById("deleteModal");
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+
+</script>
 
 </body>
 </html>

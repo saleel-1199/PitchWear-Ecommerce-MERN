@@ -181,6 +181,7 @@ if (status === "Cancelled") {
   }
   else if (statuses.every(s => s === "Delivered")) {
     order.status = "Delivered";
+    order.paymentStatus="Paid"
   }
   else if (statuses.some(s => s === "Pending")) {
     order.status = "Pending";
@@ -192,9 +193,7 @@ if (status === "Cancelled") {
   await order.save();
 };
 
-
 export const approveReturnService = async (orderId, itemId) => {
-
 
   const order = await Order.findById(orderId);
   if (!order) throw new Error("Order not found");
@@ -205,6 +204,30 @@ export const approveReturnService = async (orderId, itemId) => {
   if (item.status !== "Return Requested")
     throw new Error("Invalid return state");
 
+  // ✅ Check payment status
+  const isPaid = ["Paid", "Success", "Completed"].includes(order.paymentStatus);
+
+  if (
+    order.paymentMethod === "Razorpay" ||
+    order.paymentMethod === "Wallet" ||
+    (order.paymentMethod === "COD" && isPaid)
+  ) {
+
+    if (!isPaid) return;
+
+    const refundAmount = order.finalTotal;
+
+    const txnId = `${order.orderId}_${item._id}`;
+
+    await creditWallet(
+      order.user,
+      refundAmount,
+      txnId,
+      "Return Refund"
+    );
+  }
+
+  // ✅ Restore stock
   const product = await Product.findById(item.product);
   const variant = product.variants.find(v => v.size === item.size);
 
@@ -213,42 +236,20 @@ export const approveReturnService = async (orderId, itemId) => {
     await product.save();
   }
 
+  // ✅ Update status AFTER refund
   item.status = "Returned";
 
   const statuses = order.items.map(i => i.status);
 
-  if (statuses.every(s => s === "Cancelled")) {
-    order.status = "Cancelled";
-  }
-  else if (statuses.every(s => s === "Returned")) {
+  if (statuses.every(s => s === "Returned")) {
     order.status = "Returned";
-  }
-  else if (statuses.every(s => s === "Delivered")) {
+  } else if (statuses.every(s => s === "Cancelled")) {
+    order.status = "Cancelled";
+  } else if (statuses.every(s => s === "Delivered")) {
     order.status = "Delivered";
-  }
-  else {
+  } else {
     order.status = "Pending";
   }
 
   await order.save();
-
-  if (
-  order.paymentMethod === "Razorpay" ||
-  order.paymentMethod === "Wallet" ||
-  (order.paymentMethod === "COD" && order.status === "Paid")
-) {
-
-    if (order.paymentStatus !== "Paid") return;
-
-    const refundAmount = order.finalTotal; 
-
-    const txnId = `${order.orderId}_${item._id}`; 
-
-    await creditWallet(
-      order.user,
-      refundAmount,
-      txnId,
-      "Return Full Refund"
-    );
-  }
 };

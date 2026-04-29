@@ -35,12 +35,14 @@ import {
   offersPage,
   createOfferController,
   deleteOfferController,
+  updateOfferController
 } from "../../Controller/Admin/admin.offer.controller.js";
 
 import {
   couponsPage,
   createCouponController,
   deleteCouponController,
+  updateCouponController
 } from "../../Controller/Admin/admin.coupon.controller.js";
 
 import { salesReportPage } from "../../Controller/Admin/admin.report.controller.js";
@@ -97,15 +99,18 @@ router.patch(
 
 router.patch(
   "/admin/orders/:orderId/item/:itemId/approve-return",
+  adminAuth,
   approveReturnController,
 );
 
 router.get("/admin/offers", adminAuth, offersPage);
 router.post("/admin/offers", adminAuth, createOfferController);
+router.put("/admin/offers/:id", adminAuth, updateOfferController);
 router.delete("/admin/offers/:id", adminAuth, deleteOfferController);
 
 router.get("/admin/coupons", adminAuth, couponsPage);
 router.post("/admin/coupons", adminAuth, createCouponController);
+router.post("/admin/coupons/:id", adminAuth, updateCouponController);
 router.delete("/admin/coupons/:id", adminAuth, deleteCouponController);
 
 router.get("/admin/sales-report", adminAuth, salesReportPage);
@@ -113,3 +118,4 @@ router.get("/sales-report/excel", adminAuth, downloadExcelReportController);
 router.get("/sales-report/pdf", adminAuth, downloadPDFReportController);
 
 export default router;
+ 
