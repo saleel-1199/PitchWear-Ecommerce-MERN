@@ -4,7 +4,7 @@ import {
   removeFromWishlistService,
 } from "../../Services/Product/wishlist.service.js";
 
-import { MESSAGES } from "../../utils/messages.js";
+import { MESSAGES } from "../../Utils/messages.js";
 
 
 export const getWishlistPageController = async (req, res) => {
