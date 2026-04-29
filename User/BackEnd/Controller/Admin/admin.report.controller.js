@@ -62,8 +62,6 @@ export const salesReportPage = async (req,res)=>{
  })
 
 }
-
-
 export const downloadExcelReportController = async (req,res)=>{
 
 const { filter, startDate, endDate } = req.query;

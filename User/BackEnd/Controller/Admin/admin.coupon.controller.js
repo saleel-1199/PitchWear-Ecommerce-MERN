@@ -5,7 +5,7 @@ import {
   deleteCouponService,
 } from "../../Services/Admin/admin.coupon.service.js";
 
-// Page
+
 export const couponsPage = async (req, res) => {
   const coupons = await getAllCouponsService();
 
@@ -19,7 +19,7 @@ export const couponsPage = async (req, res) => {
   });
 };
 
-// Create
+
 export const createCouponController = async (req, res) => {
   try {
     await createCouponService(req.body);
@@ -50,8 +50,8 @@ export const updateCouponController = async (req, res) => {
 };
 
 
-// Delete
-export const deleteCouponController = async (req, res) => {
+
+export const deleteCouponController = async (req,res) => {
   await deleteCouponService(req.params.id);
   res.redirect("/admin/coupons");
 };

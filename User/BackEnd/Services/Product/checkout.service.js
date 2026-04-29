@@ -117,7 +117,7 @@ export const placeOrderService = async ({
 
  if (!address) throw new Error("Invalid address");
 
- //STOCK
+ 
 
  for (const item of cart.items) {
 
@@ -136,7 +136,7 @@ export const placeOrderService = async ({
 
  }
 
- // PRICE 
+ 
 
  const items = await Promise.all(
  cart.items.map(async (item) => {
