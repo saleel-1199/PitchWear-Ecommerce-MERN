@@ -50,7 +50,7 @@ export const getUserCartService = async (userId) => {
   );
 
   leanCart.deliveryFee = 5;
-  leanCart.tax = 5;
+  leanCart.tax = 7.5;
   leanCart.discount = 0;
 
   leanCart.finalTotal =

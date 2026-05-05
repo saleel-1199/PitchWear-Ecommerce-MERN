@@ -114,21 +114,17 @@
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-3">
 
-                    <!-- DECREMENT -->
-                    <form action="/cart/<%= item.product._id %>?_method=PATCH" method="POST">
-                      <input type="hidden" name="size" value="<%= item.size %>">
-                      <input type="hidden" name="action" value="dec">
-                      <button class="text-gray-400 hover:text-black">−</button>
-                    </form>
 
-                    <span><%= item.quantity %></span>
+                   
 
                     <!-- INCREMENT -->
-                    <form action="/cart/<%= item.product._id %>?_method=PATCH" method="POST">
-                      <input type="hidden" name="size" value="<%= item.size %>">
-                      <input type="hidden" name="action" value="inc">
-                      <button class="text-gray-400 hover:text-black">+</button>
-                    </form>
+                    <button onclick="updateQty('<%= item.product._id %>', '<%= item.size %>', 'dec')">−</button>
+
+<span id="qty-<%= item.product._id %>-<%= item.size %>">
+  <%= item.quantity %>
+</span>
+
+<button onclick="updateQty('<%= item.product._id %>', '<%= item.size %>', 'inc')">+</button>
 
                   </div>
                 </td>
@@ -180,8 +176,11 @@
 
           <div class="flex justify-between">
             <span class="text-gray-500">Subtotal</span>
-            <span>₹<%= cart.subtotal?.toFixed(2) || "0.00" %></span>
-          </div>
+<!-- SUBTOTAL -->
+<span id="subtotal">
+  ₹<%= cart.subtotal?.toFixed(2) || "0.00" %>
+</span>          
+</div>
 
           <div class="flex justify-between">
             <span class="text-gray-500">Delivery Fee</span>
@@ -204,7 +203,10 @@
 
           <div class="flex justify-between font-semibold">
             <span>Total</span>
-            <span>₹<%= cart.finalTotal?.toFixed(2) || "0.00" %></span>
+<!-- TOTAL -->
+<span id="total">
+  ₹<%= cart.finalTotal?.toFixed(2) || "0.00" %>
+</span>
           </div>
 
         </div>
@@ -219,6 +221,42 @@
   <% } %>
 
 </main>
+
+<script>
+async function updateQty(productId, size, action) {
+
+  try {
+    const res = await fetch(`/cart/${productId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ size, action })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      alert(data.message || "Error");
+      return;
+    }
+
+    // 🔥 Update UI WITHOUT reload
+    data.cart.items.forEach(item => {
+      const id = `qty-${item.product._id}-${item.size}`;
+      const el = document.getElementById(id);
+      if (el) el.innerText = item.quantity;
+    });
+
+    // 🔥 Update totals
+    document.getElementById("subtotal").innerText = data.cart.subtotal.toFixed(2);
+    document.getElementById("total").innerText = data.cart.finalTotal.toFixed(2);
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+</script>
 
 </body>
 </html>

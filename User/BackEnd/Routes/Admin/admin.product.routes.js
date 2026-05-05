@@ -8,6 +8,7 @@ import {
   inventoryPage,
   saveInventory,
   deleteProduct,
+  restoreProductController
 } from "../../Controller/Admin/admin.product.controller.js";
 
 import {
@@ -75,6 +76,7 @@ router.get("/admin/products/:id/inventory", adminAuth, inventoryPage);
 router.post("/admin/products/:id/inventory", adminAuth, saveInventory);
 
 router.delete("/admin/products/:id", adminAuth, deleteProduct);
+router.patch("/admin/products/:id/restore", restoreProductController);
 
 router.get("/admin/teams", adminAuth, teamsPage);
 router.post("/admin/teams/add", adminAuth, addTeam);

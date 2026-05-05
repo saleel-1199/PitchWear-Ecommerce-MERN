@@ -9,7 +9,6 @@ export const getAllProducts = async (search = "", page = 1, limit = 4) => {
   const activeTeamIds = activeTeams.map(t => t._id);   
 
   const query = { 
-    isDeleted: false,
     team: { $in: activeTeamIds }  
   };
 
@@ -47,51 +46,78 @@ export const getAllProducts = async (search = "", page = 1, limit = 4) => {
 
 
 export const createProduct = async (data, files) => {
- 
-  if (!files || files.length < 3) {
-    throw new Error("MIN_IMAGES");
-  }
-  
+
+  const errors = {};
+
   if (!data.name || !data.name.trim()) {
-    throw new Error("INVALID_NAME");
+    errors.name = "Product name is required";
+  } else if (data.name.trim().length < 3) {
+    errors.name = "Product name must be at least 3 characters";
   }
 
-  const productName = data.name.trim();
-  const teamId = data.team;   
-
-  if (!teamId) {
-    throw new Error("INVALID_TEAM");
+  if (!data.team) {
+    errors.team = "Please select a team";
+  } else {
+    const teamExists = await Team.findById(data.team);
+    if (!teamExists || teamExists.isDeleted) {
+      errors.team = "Invalid team selected";
+    }
   }
 
-  const teamExists = await Team.findById(teamId);   
-  if (!teamExists || teamExists.isDeleted) {
-    throw new Error("INVALID_TEAM");
+  if (!files || files.length < 3) {
+    errors.images = "At least 3 images are required";
   }
 
-  const images = await saveProductImages(files);
+  if (!data.type) {
+    errors.type = "Please select product type";
+  }
+
+  if (!data.kitType) {
+    errors.kitType = "Please select kit type";
+  }
 
   const incomingVariants = Object.values(data.variants || []);
 
-  
+  if (!incomingVariants.length) {
+    errors.variants = "At least one variant is required";
+  }
+
+  incomingVariants.forEach((v, i) => {
+    if (!v.size) {
+      errors[`size_${i}`] = "Size is required";
+    }
+
+    if (!v.price || Number(v.price) <= 0) {
+      errors[`price_${i}`] = "Price must be greater than 0";
+    }
+
+    if (v.stock === "" || Number(v.stock) < 0) {
+      errors[`stock_${i}`] = "Stock cannot be negative";
+    }
+  });
+
+  // 🔥 If any error → throw object
+  if (Object.keys(errors).length > 0) {
+    throw { type: "VALIDATION", errors };
+  }
+
+  // ✅ continue normal logic
+  const productName = data.name.trim();
+
+  const images = await saveProductImages(files);
 
   const variants = incomingVariants.map(v => ({
     size: v.size,
-    price: Number(v.price || 0),
-    stock: Number(v.stock || 0)
+    price: Number(v.price),
+    stock: Number(v.stock)
   }));
-  
 
-  
-
-  const totalStock = variants.reduce(
-    (sum, v) => sum + v.stock,
-    0
-  );
+  const totalStock = variants.reduce((sum, v) => sum + v.stock, 0);
 
   return Product.create({
     name: productName,
     slug: slugify(productName, { lower: true, strict: true }),
-    team: teamId,   
+    team: data.team,
     description: data.description?.trim() || "",
     type: data.type,
     kitType: data.kitType,
@@ -100,7 +126,8 @@ export const createProduct = async (data, files) => {
     totalStock
   });
 };
- 
+
+
 export const getProductById = async (id) => {
   return Product.findById(id).populate("team");   
 };
@@ -197,4 +224,8 @@ export const updateInventory = async (product, incomingVariants) => {
 
 export const softDeleteProduct = async (id) => {
   return Product.findByIdAndUpdate(id, { isDeleted: true });
+};
+
+export const restoreProduct = async (id) => {
+  return Product.findByIdAndUpdate(id, { isDeleted: false });
 };

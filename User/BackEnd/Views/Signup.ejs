@@ -55,7 +55,6 @@
         name="fullName"
         placeholder="Enter your full name"
         value="<%= formData.fullName || '' %>"
-        required
         class="mb-3 rounded-md border border-gray-300 px-4 py-3 text-sm lg:text-lg
                focus:outline-none focus:border-[#d6c37a]"
       />
@@ -73,7 +72,6 @@
         name="username"
         placeholder="Choose a username"
         value="<%= formData.username || '' %>"
-        required
         class="mb-3 rounded-md border border-gray-300 px-4 py-3 text-sm lg:text-lg
                focus:outline-none focus:border-[#d6c37a]"
       />
@@ -91,7 +89,6 @@
         name="email"
         placeholder="Enter your email"
         value="<%= formData.email || '' %>"
-        required
         class="mb-3 rounded-md border border-gray-300 px-4 py-3 text-sm lg:text-lg
                focus:outline-none focus:border-[#d6c37a]"
       />
@@ -126,11 +123,12 @@
         oncut="return false"
         onpaste="return false"
         placeholder="Create a password"
-        required
         class="w-full rounded-md border border-gray-300 px-4 py-3 pr-12 text-sm lg:text-lg
            focus:outline-none focus:border-[#d6c37a]"
       />
        
+      <p id="passwordError" class="text-red-500 text-xs lg:text-sm mb-5 hidden"></p>
+
       <button
     type="button"
     onclick="togglePassword('password', this)"
@@ -156,10 +154,12 @@
         oncut="return false"
         onpaste="return false"
         placeholder="Confirm your password"
-        required
         class="w-full rounded-md border border-gray-300 px-4 py-3 pr-12 text-sm lg:text-lg
            focus:outline-none focus:border-[#d6c37a]"
       />
+
+      <p id="confirmPasswordError" class="text-red-500 text-xs lg:text-sm mb-5 hidden"></p>
+
        <button
     type="button"
     onclick="togglePassword('confirmPassword', this)"
@@ -194,84 +194,92 @@
   <script>
     const form = document.getElementById("signupForm");
 
-    const fullNameInput = document.getElementById("fullName");
-    const fullNameError = document.getElementById("fullNameError");
+const fullNameInput = document.getElementById("fullName");
+const fullNameError = document.getElementById("fullNameError");
 
-    const usernameInput = document.getElementById("username");
-    const usernameError = document.getElementById("usernameError");
+const usernameInput = document.getElementById("username");
+const usernameError = document.getElementById("usernameError");
 
-    const emailInput = document.getElementById("email");
-    const emailError = document.getElementById("emailError");
+const emailInput = document.getElementById("email");
+const emailError = document.getElementById("emailError");
 
-    // ✅ Full Name Regex:
-    // Allows letters + spaces + hyphen (-)
-    // Must contain at least one letter (so "----" not allowed)
-    const fullNameRegex = /^(?=.*[A-Za-z])[A-Za-z -]{3,30}$/;
+const passwordInput = document.getElementById("password");
+const passwordError = document.getElementById("passwordError");
 
-    // ✅ Username Regex
-    const usernameRegex = /^(?=.*[a-zA-Z0-9])[a-zA-Z0-9_-]{3,15}$/;
+const confirmPasswordInput = document.getElementById("confirmPassword");
+const confirmPasswordError = document.getElementById("confirmPasswordError");
 
-    // ✅ Email Regex
-     const emailRegex = /^[a-zA-Z0-9](?!.*\.\.)[a-zA-Z0-9._%+-]{2,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const fullNameRegex = /^(?=.*[A-Za-z])[A-Za-z -]{3,30}$/;
+const usernameRegex = /^(?=.*[a-zA-Z0-9])[a-zA-Z0-9_-]{3,15}$/;
+const emailRegex = /^[a-zA-Z0-9](?!.*\.\.)[a-zA-Z0-9._%+-]{2,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const strongPasswordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/;
 
-     
-    form.addEventListener("submit", (e) => {
-      const fullName = fullNameInput.value.trim();
-      const username = usernameInput.value.trim();
-      const email = emailInput.value.trim();
+form.addEventListener("submit", (e) => {
 
-      // ✅ Full Name validation
-      if (!fullNameRegex.test(fullName)) {
-        e.preventDefault();
-        fullNameError.classList.remove("hidden");
-        fullNameError.textContent =
-          "Full name must be 3-30 chars, can contain letters, spaces and hyphen (-). Only '----' is not allowed.";
-        fullNameInput.focus();
-        return;
-      }
+  const fullName = fullNameInput.value.trim();
+  const username = usernameInput.value.trim();
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+  const confirmPassword = confirmPasswordInput.value.trim();
 
-      fullNameError.classList.add("hidden");
-      fullNameError.textContent = "";
+  if (!fullNameRegex.test(fullName)) {
+    e.preventDefault();
+    fullNameError.classList.remove("hidden");
+    fullNameError.textContent = "Full name must be 3-30 chars and valid";
+    fullNameInput.focus();
+    return;
+  }
+  fullNameError.classList.add("hidden");
 
-      // ✅ Username validation
-      if (!usernameRegex.test(username)) {
-        e.preventDefault();
-        usernameError.classList.remove("hidden");
-        usernameError.textContent =
-          "Username must be 3-15 chars and can contain only letters, numbers, underscore (_) and hyphen (-). It must include at least one letter/number.";
-        usernameInput.focus();
-        return;
-      }
+  if (!usernameRegex.test(username)) {
+    e.preventDefault();
+    usernameError.classList.remove("hidden");
+    usernameError.textContent = "Invalid username format";
+    usernameInput.focus();
+    return;
+  }
+  usernameError.classList.add("hidden");
 
-      usernameError.classList.add("hidden");
-      usernameError.textContent = "";
+  if (!emailRegex.test(email)) {
+    e.preventDefault();
+    emailError.classList.remove("hidden");
+    emailError.textContent = "Invalid email address";
+    emailInput.focus();
+    return;
+  }
+  emailError.classList.add("hidden");
 
-      // ✅ Email validation
-      if (!emailRegex.test(email)) {
-        e.preventDefault();
-        emailError.classList.remove("hidden");
-        emailError.textContent =
-          "Please enter a valid email address (example: abc@gmail.com)";
-        emailInput.focus();
-        return;
-      }
+  if (!strongPasswordRegex.test(password)) {
+    e.preventDefault();
+    passwordError.classList.remove("hidden");
+    passwordError.textContent = "Enter password";
+    passwordInput.focus();
+    return;
+  }
+  passwordError.classList.add("hidden");
 
-      emailError.classList.add("hidden");
-      emailError.textContent = "";
-    });
+  if (password !== confirmPassword) {
+    e.preventDefault();
+    confirmPasswordError.classList.remove("hidden");
+    confirmPasswordError.textContent = "Passwords do not match";
+    confirmPasswordInput.focus();
+    return;
+  }
+  confirmPasswordError.classList.add("hidden");
 
-    function togglePassword(inputId, button) {
+});
+
+function togglePassword(inputId, button) {
   const input = document.getElementById(inputId);
 
   if (input.type === "password") {
     input.type = "text";
-    button.textContent = "🙈"; // hide icon
+    button.textContent = "🙈";
   } else {
     input.type = "password";
-    button.textContent = "👁️"; // show icon
+    button.textContent = "👁️";
   }
 }
-
   </script>
 
 </body>

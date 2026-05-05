@@ -9,12 +9,12 @@ import { loggedIn } from "../Middlewares/loggedin.middleware.js";
 import passport from "passport";
 import { blockGoogleEdit } from "../Middlewares/blockGoogleEdit.middleware.js";
 import * as googleAuthController from "../Controller/googleAuth.controller.js";
-
+import { noCache } from "../Middlewares/noCache.middleware.js";
 
 const router = express.Router();
 
 router.route("/signup")
-          .get(loggedIn,authController.renderSignup)
+          .get(noCache,loggedIn,authController.renderSignup)
           .post(loggedIn,authController.signup);
 
 router.post("/VerifyOtp",authController.verifyOtp);
@@ -30,10 +30,10 @@ router.post("/ResetPassword",authController.resetPassword);
 
 
 router.route("/login")
-        .get(loggedIn,authController.renderLogin)
+        .get(noCache,loggedIn,authController.renderLogin)
         .post(loggedIn,authController.login)
-router.route("/Home")
-        .get(authController.renderHome)
+router.get("/Home", noCache, authController.renderHome);
+        
 
 
 router.get("/auth/google", (req, res, next) => {

@@ -376,27 +376,25 @@ if (mongoose.Types.ObjectId.isValid(orderId)) {
   await order.save();
 
 
-  const cart = await Cart.findOne({ user: order.user });
+  // 🔥 Reduce stock using ORDER ITEMS (correct way)
+for (const item of order.items) {
 
-  if (cart && cart.items.length) {
+  const product = await Product.findById(item.product);
 
-    for (const item of cart.items) {
-      const product = await Product.findById(item.product);
+  const variant = product.variants.find(
+    v => v.size === item.size
+  );
 
-      const variant = product.variants.find(
-        v => v.size === item.size
-      );
+  if (!variant) continue;
 
-      if (variant) {
-        variant.stock -= item.quantity;
-      }
-
-      await product.save();
-    }
-
-    cart.items = [];
-    await cart.save();
+  if (variant.stock < item.quantity) {
+    throw new Error("Stock not available");
   }
+
+  variant.stock -= item.quantity;
+
+  await product.save();
+}
 
   return order;
 };

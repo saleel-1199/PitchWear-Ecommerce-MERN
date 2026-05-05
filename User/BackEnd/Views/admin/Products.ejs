@@ -143,18 +143,40 @@
      class="bg-blue-600 text-white px-6 py-2 rounded-lg text-xs font-semibold">
     Add Stock
   </a>
-<form id="deleteForm-<%= p._id %>"
-      action="/admin/products/<%= p._id %>?_method=DELETE"
-      method="POST"
-      class="inline">
 
-  <button type="button"
-          onclick="openDeleteModal('<%= p._id %>')"
-          class="bg-red-600 text-white px-6 py-2 rounded-lg text-xs font-semibold">
-    Delete
-  </button>
 
-</form>
+<% if (!p.isDeleted) { %>
+
+  <!-- DELETE FORM -->
+  <form id="deleteForm-<%= p._id %>"
+        action="/admin/products/<%= p._id %>?_method=DELETE"
+        method="POST"
+        class="inline">
+
+    <button type="button"
+            onclick="openDeleteModal('<%= p._id %>')"
+            class="bg-red-600 text-white px-6 py-2 rounded-lg text-xs font-semibold">
+      Delete
+    </button>
+
+  </form>
+
+<% } else { %>
+
+  <!-- RESTORE FORM -->
+  <form action="/admin/products/<%= p._id %>/restore?_method=PATCH"
+        method="POST"
+        class="inline">
+
+    <button class="bg-green-600 text-white px-6 py-2 rounded-lg text-xs font-semibold">
+      Restore
+    </button>
+
+  </form>
+
+<% } %>
+
+
 </td>
 
             </tr>

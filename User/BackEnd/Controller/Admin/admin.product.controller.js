@@ -5,6 +5,7 @@ import {
   updateProductBasic,
   updateInventory,
   softDeleteProduct,
+  restoreProduct
 } from "../../Services/Admin/admin.product.service.js";
 
 import { Team } from "../../Models/team.model.js";
@@ -112,5 +113,10 @@ export const saveInventory = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
   await softDeleteProduct(req.params.id);
+  res.redirect("/admin/Products");
+};
+
+export const restoreProductController = async (req, res) => {
+  await restoreProduct(req.params.id);
   res.redirect("/admin/Products");
 };

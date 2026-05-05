@@ -47,7 +47,11 @@ export const createAddressController = async (req, res) => {
 
   } catch (err) {
     console.log("Create Address Error:", err);
-    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({ success:false });
+
+    return res.status(STATUS_CODES.BAD_REQUEST).json({
+  success: false,
+  message: err.message
+});
   }
 };
 

@@ -6,6 +6,8 @@ export const loggedIn = (req, res, next) => {
 
     return res.redirect("/Home");
   }
-
+  if (req.session.adminId) {
+    return res.redirect("/admin/dashboard");
+  }
   next();
 };

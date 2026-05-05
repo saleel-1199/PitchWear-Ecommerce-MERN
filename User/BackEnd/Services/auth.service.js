@@ -14,7 +14,7 @@ const generateReferralCode = (username) => {
 
 
 export const signupUser = async (data) => {
-  const {
+  let {
     fullName,
     username,
     email,
@@ -23,20 +23,48 @@ export const signupUser = async (data) => {
     confirmPassword
   } = data;
 
+  
+  fullName = fullName?.trim();
+  username = username?.trim();
+  email = email?.trim().toLowerCase();
+
+
   if (!fullName || !username || !email || !password || !confirmPassword) {
-    throw new Error("All required fields are required");
+    throw new Error("All fields are required");
+  }
+
+
+  const fullNameRegex = /^(?=.*[A-Za-z])[A-Za-z -]{3,30}$/;
+  if (!fullNameRegex.test(fullName)) {
+    throw new Error("Invalid full name");
+  }
+
+  const usernameRegex = /^(?=.*[a-zA-Z0-9])[a-zA-Z0-9_-]{3,15}$/;
+  if (!usernameRegex.test(username)) {
+    throw new Error("Invalid username");
+  }
+
+  const emailRegex = /^[a-zA-Z0-9](?!.*\.\.)[a-zA-Z0-9._%+-]{2,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(email)) {
+    throw new Error("Invalid email format");
+  }
+
+  if (password.length < 6) {
+    throw new Error("Password must be at least 6 characters");
+  }
+
+  const strongPasswordRegex =
+    /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/;
+
+  if (!strongPasswordRegex.test(password)) {
+    throw new Error(
+      "Password must include uppercase, lowercase, number and special character"
+    );
   }
 
   if (password !== confirmPassword) {
     throw new Error("Passwords do not match");
   }
-
-  console.log(fullName)
-    console.log(username)
-
-      console.log(email) 
-
-
 
   const userExists = await User.findOne({
     $or: [{ email }, { username }]
@@ -56,7 +84,6 @@ export const signupUser = async (data) => {
 
   return true;
 };
-
 
 export const verifyOtp = async (email, otp) => {
   const record = await Otp.findOne({ email });
@@ -88,24 +115,35 @@ console.log("Entered referral:", record.signupData.referralCode);
 console.log("Referrer found:", referrer);
 console.log("New user created:", newUser._id);
 
-if(referrer){
+if (referrer) {
 
- await Referral.create({
-  referrer: referrer._id,
-  referredUser: newUser._id,
-  reward: 100,
-  status: "Completed"
- });
+  // save referral record
+  await Referral.create({
+    referrer: referrer._id,
+    referredUser: newUser._id,
+    reward: 100,
+    status: "Completed"
+  });
 
- await creditWallet(
-  
-  referrer._id,
-  100,
-  null,
-  "Referral Reward",
-  newUser.username
- );
-console.log("Referral reward credited");
+  // ✅ Reward referrer
+  await creditWallet(
+    referrer._id,
+    100,
+    null,
+    "Referral Reward",
+    newUser.username
+  );
+
+  // ✅ Reward NEW USER (IMPORTANT FIX)
+  await creditWallet(
+    newUser._id,
+    100,
+    null,
+    "Referral Bonus",
+    referrer.username
+  );
+
+  console.log("Referral rewards given to both users");
 }
 
   await Otp.deleteOne({ email });

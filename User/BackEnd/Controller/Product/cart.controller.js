@@ -67,7 +67,9 @@ export const addToCartController = async (req, res) => {
 
 export const updateCartQuantityController = async (req, res) => {
   try {
-    if (!req.session.userId) return res.redirect("/login");
+    if (!req.session.userId) {
+      return res.json({ success: false, redirect: "/login" });
+    }
 
     const { productId } = req.params;
     const { size, action } = req.body;
@@ -79,11 +81,18 @@ export const updateCartQuantityController = async (req, res) => {
       action,
     });
 
-    res.redirect("/cart");
+    const cart = await getUserCartService(req.session.userId);
+
+    res.json({
+      success: true,
+      cart
+    });
 
   } catch (error) {
-    console.log("Qty Update Error:", error.message);
-    res.redirect("/cart");
+    res.json({
+      success: false,
+      message: error.message
+    });
   }
 };
 
