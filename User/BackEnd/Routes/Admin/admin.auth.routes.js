@@ -12,7 +12,7 @@ const router = express.Router();
 
 
 router.route("/admin/login")
-  .get(noCache,adminAuthController.renderAdminLogin)
+  .get(noCache,loggedIn,adminAuthController.renderAdminLogin)
   .post(adminAuthController.adminLogin);
 
 router.get("/admin/logout", adminAuthController.adminLogout);

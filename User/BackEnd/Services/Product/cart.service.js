@@ -17,7 +17,9 @@ export const getUserCartService = async (userId) => {
     });
 
   if (!cart) return { items: [] };
-  const validItems = cart.items.filter(item => item.product);
+  const validItems = cart.items.filter(item => item.product  && !item.product.isDeleted && item.product.status === "Active");
+  
+  
 
   if (validItems.length !== cart.items.length) {
     cart.items = validItems;

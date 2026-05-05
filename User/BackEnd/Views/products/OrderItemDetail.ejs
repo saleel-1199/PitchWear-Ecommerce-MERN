@@ -77,11 +77,13 @@
   <!-- LOOP ALL ITEMS -->
   <% order.items.forEach(item => { %>
 
-  <div class="border rounded-xl p-6 mb-10 bg-white">
+<div class="border rounded-xl p-6 mb-10 bg-white"
+     data-item-id="<%= item._id %>">
 
     <!-- ITEM STATUS -->
-    <p class="text-sm mb-2 font-medium"><%= item.status %></p>
-
+<p class="text-sm mb-2 font-medium item-status">
+  <%= item.status %>
+</p>
     <!-- PROGRESS BAR -->
     <div class="w-full h-2 bg-pink-200 rounded-full mb-6">
       <div class="h-2 bg-pink-500 rounded-full"
@@ -120,7 +122,7 @@
     </div>
 
     <!-- ACTION BUTTONS -->
-<div class="flex gap-4 mt-6">
+<div class="flex gap-4 mt-6 action-box">
 
 
  
@@ -144,7 +146,7 @@
 ) { %>
 
   <button onclick="openCancelModal('<%= order._id %>','<%= item._id %>')"
-          class="bg-red-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-red-700">
+        class="bg-red-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-red-700 cancel-btn">
       Cancel
   </button>
 
@@ -211,7 +213,7 @@
     <h3 class="font-semibold text-lg mb-4">Cancel Item</h3>
     <p class="text-sm mb-4">Are you sure you want to cancel this item?</p>
 
-    <form id="cancelForm" method="POST">
+    <form id="cancelForm" >
       <div class="flex justify-end gap-3">
         <button type="button" onclick="closeCancelModal()"
                 class="bg-gray-300 px-4 py-2 rounded">
@@ -366,12 +368,35 @@ async function retryPayment(orderId){
 
 <script>
 document.getElementById("cancelForm")
-.addEventListener("submit", function () {
+.addEventListener("submit", async function (e) {
 
-  // small delay to allow backend redirect
-  setTimeout(() => {
-    window.location.reload();
-  }, 200);
+  e.preventDefault();
+
+  const form = e.target;
+  const action = form.action;
+
+  try {
+    const res = await fetch(action, {
+      method: "POST"
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      showAlertModal("Cancel failed");
+      return;
+    }
+
+  const itemId = action.match(/item\/([^/?]+)/)[1];
+   
+  lastCancelledItemId = itemId;
+
+showAlertModal("Item cancelled successfully");
+    closeCancelModal();
+
+  } catch (err) {
+    console.log(err);
+  }
 
 });
 </script>
@@ -380,6 +405,7 @@ document.getElementById("cancelForm")
 
 <script>
 let redirectAfterClose = null;
+let lastCancelledItemId = null;
 
 function showAlertModal(message, redirect = null) {
   document.getElementById("modalMessage").innerText = message;
@@ -396,6 +422,30 @@ function closeAlertModal() {
 
   modal.classList.add("hidden");
   modal.classList.remove("flex");
+
+  // 🔥 UPDATE UI AFTER CLICKING OK
+  if (lastCancelledItemId) {
+
+    const itemBox = document.querySelector(
+      `[data-item-id="${lastCancelledItemId}"]`
+    );
+
+    if (itemBox) {
+      const status = itemBox.querySelector(".item-status");
+      if (status) status.innerText = "Cancelled";
+
+      const actionBox = itemBox.querySelector(".action-box");
+      if (actionBox) {
+        actionBox.innerHTML = `
+          <span class="text-gray-500 text-sm font-medium">Cancelled</span>
+        `;
+      }
+
+      itemBox.classList.add("opacity-50");
+    }
+
+    lastCancelledItemId = null;
+  }
 
   if (redirectAfterClose) {
     window.location.href = redirectAfterClose;

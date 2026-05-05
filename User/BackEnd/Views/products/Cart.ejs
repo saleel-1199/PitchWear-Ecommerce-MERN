@@ -111,23 +111,23 @@
 </td>
 
                 <!-- QUANTITY -->
-                <td class="px-6 py-4">
-                  <div class="flex items-center gap-3">
+               <td class="px-6 py-4">
+  <div class="flex items-center gap-3">
 
+    <button onclick="updateQty('<%= item.product._id %>', '<%= item.size %>', 'dec')">−</button>
 
-                   
+    <span id="qty-<%= item.product._id %>-<%= item.size %>">
+      <%= item.quantity %>
+    </span>
 
-                    <!-- INCREMENT -->
-                    <button onclick="updateQty('<%= item.product._id %>', '<%= item.size %>', 'dec')">−</button>
+    <button onclick="updateQty('<%= item.product._id %>', '<%= item.size %>', 'inc')">+</button>
 
-<span id="qty-<%= item.product._id %>-<%= item.size %>">
-  <%= item.quantity %>
-</span>
+  </div>
 
-<button onclick="updateQty('<%= item.product._id %>', '<%= item.size %>', 'inc')">+</button>
-
-                  </div>
-                </td>
+  
+  <p id="err-<%= item.product._id %>-<%= item.size %>" 
+     class="text-red-500 text-xs mt-1 hidden"></p>
+</td>
 
                 <!-- SUBTOTAL -->
                 <td class="px-6 py-4 font-semibold">
@@ -225,6 +225,9 @@
 <script>
 async function updateQty(productId, size, action) {
 
+  const errId = `err-${productId}-${size}`;
+  const errEl = document.getElementById(errId);
+
   try {
     const res = await fetch(`/cart/${productId}`, {
       method: "PATCH",
@@ -236,12 +239,21 @@ async function updateQty(productId, size, action) {
 
     const data = await res.json();
 
+    // ❌ STOCK ERROR
     if (!data.success) {
-      alert(data.message || "Error");
+      if (errEl) {
+        errEl.textContent = data.message;
+        errEl.classList.remove("hidden");
+      }
       return;
     }
 
-    // 🔥 Update UI WITHOUT reload
+    // ✅ CLEAR ERROR WHEN SUCCESS
+    if (errEl) {
+      errEl.classList.add("hidden");
+    }
+
+    // 🔥 Update quantity
     data.cart.items.forEach(item => {
       const id = `qty-${item.product._id}-${item.size}`;
       const el = document.getElementById(id);

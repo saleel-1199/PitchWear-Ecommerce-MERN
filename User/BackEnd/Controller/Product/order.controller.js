@@ -68,8 +68,10 @@ export const cancelOrderController = async (req, res) => {
       req.params.itemId
     );
 
-    res.redirect(`/orders/${req.params.orderId}`);
-
+    res.json({
+  success: true,
+  message: "Item cancelled"
+     }); 
   } catch (error) {
 
     console.log("CANCEL ERROR:", error.message);
