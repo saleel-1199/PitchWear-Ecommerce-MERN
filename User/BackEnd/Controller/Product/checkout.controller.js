@@ -151,7 +151,7 @@ return res.json({
     res.json({
   success: false,
   message: error.message,
-  redirect: "/cart" 
+  redirect: "/shop" 
 });
   }
 };

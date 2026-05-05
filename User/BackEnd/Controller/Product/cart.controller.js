@@ -20,7 +20,8 @@ export const getCartPageController = async (req, res) => {
     res.render("products/Cart", {
       cart,
       cartCount: cart.items.length,
-      errorMessage
+        removedItems: cart.removedItems || [],
+         errorMessage
     });
 
   } catch (error) {

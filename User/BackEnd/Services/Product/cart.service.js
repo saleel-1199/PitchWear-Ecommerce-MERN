@@ -17,6 +17,11 @@ export const getUserCartService = async (userId) => {
     });
 
   if (!cart) return { items: [] };
+  
+  const removedItems = cart.items.filter(
+  item => !item.product || item.product.isDeleted || item.product.status !== "Active"
+);
+
   const validItems = cart.items.filter(item => item.product  && !item.product.isDeleted && item.product.status === "Active");
   
   
@@ -61,7 +66,10 @@ export const getUserCartService = async (userId) => {
     leanCart.tax -
     leanCart.discount;
 
-  return leanCart;
+  return {
+    ...leanCart,
+    removedItems   
+  }
 };
 
 export const addToCartService = async ({
