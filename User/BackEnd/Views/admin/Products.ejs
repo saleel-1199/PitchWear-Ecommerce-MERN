@@ -164,15 +164,18 @@
 <% } else { %>
 
   <!-- RESTORE FORM -->
-  <form action="/admin/products/<%= p._id %>/restore?_method=PATCH"
-        method="POST"
-        class="inline">
+  <form id="restoreForm-<%= p._id %>"
+      action="/admin/products/<%= p._id %>/restore?_method=PATCH"
+      method="POST"
+      class="inline">
 
-    <button class="bg-green-600 text-white px-6 py-2 rounded-lg text-xs font-semibold">
-      Restore
-    </button>
+  <button type="button"
+          onclick="openRestoreModal('<%= p._id %>')"
+          class="bg-green-600 text-white px-6 py-2 rounded-lg text-xs font-semibold">
+    Restore
+  </button>
 
-  </form>
+</form>
 
 <% } %>
 
@@ -264,6 +267,27 @@ function confirmDelete() {
 }
 </script>
 
+<script>
+let selectedRestoreId = null;
+
+function openRestoreModal(id) {
+  selectedRestoreId = id;
+  document.getElementById("restoreModal").classList.remove("hidden");
+}
+
+function closeRestoreModal() {
+  selectedRestoreId = null;
+  document.getElementById("restoreModal").classList.add("hidden");
+}
+
+function confirmRestore() {
+  if (selectedRestoreId) {
+    document.getElementById(`restoreForm-${selectedRestoreId}`).submit();
+  }
+}
+</script>
+
+
 
 <div id="deleteModal"
      class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -290,6 +314,34 @@ function confirmDelete() {
 
   </div>
 </div>
+
+
+<div id="restoreModal"
+     class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+  <div class="bg-white rounded-xl p-6 w-[350px] shadow-lg">
+
+    <h3 class="text-lg font-semibold mb-3">Confirm Restore</h3>
+
+    <p class="text-sm text-gray-600 mb-6">
+      Are you sure you want to restore this product?
+    </p>
+
+    <div class="flex justify-end gap-3">
+      <button onclick="closeRestoreModal()"
+              class="px-4 py-2 rounded-lg bg-gray-200 text-sm">
+        Cancel
+      </button>
+
+      <button onclick="confirmRestore()"
+              class="px-4 py-2 rounded-lg bg-green-600 text-white text-sm">
+        Yes, Restore
+      </button>
+    </div>
+
+  </div>
+</div>
+
 
 
 </body>

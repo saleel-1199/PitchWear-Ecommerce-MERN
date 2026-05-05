@@ -35,6 +35,10 @@ export const getCheckoutDataService = async (userId, sessionCoupon) => {
 
     const product = await Product.findById(item.product);
 
+    console.log(product)
+
+    
+
     const discountPercent = await getBestOffer(product);
 
     const originalPrice = item.price;

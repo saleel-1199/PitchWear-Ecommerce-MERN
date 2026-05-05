@@ -54,7 +54,7 @@
   <p class="text-sm mb-2">
   Payment: 
   <span class="<%= order.paymentStatus === 'Failed' ? 'text-red-600' : 'text-green-600' %>">
-    <%= order.paymentStatus %>
+    <%= order.paymentStatus %>  
   </span>
 </p>
   
@@ -445,7 +445,7 @@ function closeAlertModal() {
     }
 
     lastCancelledItemId = null;
-    
+
     location.reload();
   }
 
