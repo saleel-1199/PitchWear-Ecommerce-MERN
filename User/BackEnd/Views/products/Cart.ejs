@@ -10,21 +10,11 @@
 <body class="bg-[#f8f8f4] text-gray-800">
 
 <!-- ================= HEADER ================= -->
-<header class="bg-white px-16 py-4 flex justify-between items-center">
-  <h1 class="text-xl font-semibold">PitchWear</h1>
-
-  <nav class="flex gap-8 text-sm">
-    <a href="/home" class="hover:text-primary">Home</a>
-    <a href="/shop" class="hover:text-primary">Shop</a>
-    <a href="/about" class="hover:text-primary">About</a>
-  </nav>
-
-  <div class="flex items-center gap-4 text-lg">
-    <a href="/wishlist" class="hover:scale-110 transition">♡</a>
-    <a href="/cart" class="hover:scale-110 transition">🛒</a>
-    <a href="/profile" class="hover:scale-110 transition">👤</a>
-  </div>
-</header>
+<%- include("../partials/header", {
+  activePage: "shop",
+  user,
+  cartCount
+}) %>
 
 <!-- ✅ PAGE CONTENT -->
 <main class="px-10 py-10">
@@ -253,12 +243,31 @@ async function updateQty(productId, size, action) {
       errEl.classList.add("hidden");
     }
 
-    // 🔥 Update quantity
-    data.cart.items.forEach(item => {
-      const id = `qty-${item.product._id}-${item.size}`;
-      const el = document.getElementById(id);
-      if (el) el.innerText = item.quantity;
-    });
+// if cart item removed
+const stillExists = data.cart.items.some(
+  item =>
+    item.product._id === productId &&
+    item.size === size
+);
+
+if (!stillExists) {
+  location.reload();
+  return;
+}
+
+// update quantities
+data.cart.items.forEach(item => {
+
+  const id =
+    `qty-${item.product._id}-${item.size}`;
+
+  const el = document.getElementById(id);
+
+  if (el) {
+    el.innerText = item.quantity;
+  }
+
+});
 
     // 🔥 Update totals
     document.getElementById("subtotal").innerText = data.cart.subtotal.toFixed(2);

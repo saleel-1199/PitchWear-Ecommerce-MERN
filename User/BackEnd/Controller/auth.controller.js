@@ -97,6 +97,8 @@ export const renderVerifyOtp = (req, res) => {
   });
 };
 
+
+
 export const renderLogin = (req, res) => {
 
   const successMessage = req.session.successMessage;
@@ -157,13 +159,36 @@ export const forgotPassword = async (req, res) => {
     await authService.sendForgotPasswordOtp(req.body.email, req.session);
     res.render("VerifyForgotOtp", {
       email: req.session.resetEmail,
-      error:null
+      error:null,
+      otpResent: false
     });
   } catch (err) {
     res.render("ForgotPassword", {
       error: err.message
     });
   }
+};
+
+export const renderVerifyForgotOtp = (
+  req,
+  res
+) => {
+
+  if (!req.session.resetEmail) {
+    return res.redirect("/ForgotPassword");
+  }
+
+  const forgotOtpResent =
+    req.session.forgotOtpResent || false;
+
+  req.session.forgotOtpResent = null;
+
+  res.render("VerifyForgotOtp", {
+    email: req.session.resetEmail,
+    error: null,
+    otpResent: forgotOtpResent
+  });
+
 };
 
 
@@ -177,14 +202,88 @@ export const verifyForgotOtp = async (req, res) => {
   } catch (err) {
     res.render("VerifyForgotOtp", {
       email: req.session.resetEmail,
-      error: err.message
+      error: err.message,
+      otpResent: false
     });
   }
 };
 
+export const resendForgotPasswordOtp = async (
+  req,
+  res
+) => {
 
+  try {
 
+    await authService.resendForgotPasswordOtp(
+      req.session
+    );
 
+    req.session.forgotOtpResent = true;
+
+    return res.redirect("/VerifyForgotOtp");
+
+  } catch (err) {
+
+    return res.render("VerifyForgotOtp", {
+      email: req.session.resetEmail,
+      error: err.message,
+      otpResent: false
+    });
+
+  }
+
+};
+
+export const verifyOldPasswordController = async (
+  req,
+  res
+) => {
+
+  try {
+
+    await authService.verifyOldPassword(
+      req.session.userId,
+      req.body.oldPassword,
+      req.session
+    );
+
+    return res.redirect(
+      "/profile/reset-password"
+    );
+
+  } catch (error) {
+
+   const user =
+  await authService.getUserByIdService(
+    req.session.userId
+  );
+    return res.render(
+      "EditProfile",
+      {
+        user,
+        error: error.message
+      }
+    );
+
+  }
+
+};
+
+export const renderProfileResetPassword = (
+  req,
+  res
+) => {
+
+  if (!req.session.isPasswordVerified) {
+    return res.redirect("/profile/edit");
+  }
+
+  res.render("ResetPassword", {
+    error: null
+  });
+
+};
 
 export const resetPassword = async (req, res) => {
   try {

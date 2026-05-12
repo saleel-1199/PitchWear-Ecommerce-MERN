@@ -8,26 +8,11 @@
 
 <body class="bg-[#f8f8f4] text-gray-800">
 
-<header class="bg-[#eff2c8] px-10 py-5 flex justify-between items-center">
-  <h1 class="font-bold text-lg">PitchWear</h1>
-  <nav class="flex gap-8 text-sm">
-    <a href="/">Home</a>
-    <a href="/shop">Shop</a>
-    <a href="/about">About</a>
-  </nav>
-
-  <div class="flex gap-4 text-lg">
-
-    <!-- CART -->
-    <a href="/cart" title="Cart">🛒</a>
-
-    <!-- PROFILE -->
-    <a href="/profile" title="Profile">👤</a>
-
-  </div>
-
-
-</header>
+<%- include("../partials/header", {
+  activePage: "profile",
+  user,
+  cartCount
+}) %>
 
 <div class="px-10 mt-3">
   <a href="/orders"
@@ -128,7 +113,7 @@
  
 
  
-  <% if (order.status === "Delivered" || order.status === "Partially Completed" ) { %>
+  <% if ( item.status === "Delivered"  ) { %>
 
     <button onclick="openReturnModal('<%= order._id %>','<%= item._id %>')"
             class="bg-yellow-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-yellow-700">
@@ -139,9 +124,10 @@
 
  
   <% if (
-  order.status !== "Delivered" &&
+  item.status !== "Delivered" &&
   item.status !== "Cancelled" &&
   item.status !== "Returned" &&
+  item.status !== "Return Requested" &&
   order.paymentStatus !== "Failed"
 ) { %>
 

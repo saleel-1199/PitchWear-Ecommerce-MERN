@@ -1,0 +1,105 @@
+<header class="w-full bg-[#fbfaf7] border-b border-[#d9d6c8]">
+
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
+
+    <!-- LOGO -->
+    <a href="/home"
+       class="font-bold text-lg tracking-wide">
+      PitchWear
+    </a>
+
+    <!-- NAV -->
+    <nav class="hidden md:flex gap-10 text-sm text-gray-700">
+
+      <a href="/home"
+         class="<%= activePage === 'home'
+           ? 'font-medium underline'
+           : 'hover:underline' %>">
+        Home
+      </a>
+
+      <a href="/shop"
+         class="<%= activePage === 'shop'
+           ? 'font-medium underline'
+           : 'hover:underline' %>">
+        Shop
+      </a>
+
+      <a href="/about"
+         class="<%= activePage === 'about'
+           ? 'font-medium underline'
+           : 'hover:underline' %>">
+        About
+      </a>
+
+    </nav>
+
+    <!-- RIGHT -->
+    <div class="flex items-center gap-5 text-lg">
+
+      <!-- WISHLIST -->
+      <a href="/wishlist"
+         title="Wishlist"
+         class="hover:opacity-70 transition">
+        ♡
+      </a>
+
+      <!-- CART -->
+      <a href="/cart"
+         title="Cart"
+         class="relative hover:opacity-70 transition">
+
+        🛒
+
+        <% if (cartCount && cartCount > 0) { %>
+          <span class="absolute -top-2 -right-2
+                       bg-green-700 text-white
+                       text-[10px] px-1.5 py-[1px]
+                       rounded-full">
+            <%= cartCount %>
+          </span>
+        <% } %>
+
+      </a>
+
+      <!-- PROFILE -->
+      <% if (user && user.profileImage) { %>
+
+        <a href="/profile">
+          <img
+            src="<%= user.profileImage %>"
+            class="w-8 h-8 rounded-full object-cover border"
+            alt="User"
+          />
+        </a>
+
+      <% } else if (user) { %>
+
+        <a href="/profile">
+
+          <div
+            class="w-8 h-8 rounded-full
+                   flex items-center justify-center
+                   text-white text-sm font-semibold"
+            style="background-color:#1e3a8a"
+          >
+            <%= user.fullName.charAt(0).toUpperCase() %>
+          </div>
+
+        </a>
+
+      <% } else { %>
+
+        <a href="/profile"
+           title="Account"
+           class="hover:opacity-70 transition">
+          👤
+        </a>
+
+      <% } %>
+
+    </div>
+
+  </div>
+
+</header>

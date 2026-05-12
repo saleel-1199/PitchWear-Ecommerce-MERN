@@ -2,6 +2,34 @@ import { Order } from "../../Models/order.model.js";
 import { Product } from "../../Models/product.model.js";
 import { creditWallet } from "../Product/wallet.service.js"
 
+const updateMainOrderStatus = (order) => {
+
+  const statuses = order.items.map(item => item.status);
+
+  if (statuses.every(s => s === "Cancelled")) {
+    order.status = "Cancelled";
+  }
+
+
+  else if (statuses.every(s => s === "Returned")) {
+    order.status = "Returned";
+  }
+
+  else if (
+    statuses.every(
+      s => s === "Delivered"
+    )
+  ) {
+    order.status = "Delivered";
+    order.paymentStatus = "Paid";
+  }
+
+  else {
+    order.status = "Partially Completed";
+  }
+};
+
+
 export const getAdminOrdersService = async ({
   search = "",
   status = "",
@@ -101,20 +129,8 @@ export const updateOrderStatusService = async (orderId, status) => {
     }
   });
 
-  const statuses = order.items.map(i => i.status);
+   updateMainOrderStatus(order);
 
-  if (statuses.every(s => s === "Cancelled")) {
-    order.status = "Cancelled";
-  }
-  else if (statuses.every(s => s === "Delivered")) {
-    order.status = "Delivered";
-  }
-  else if (statuses.some(s => s === "Pending")) {
-    order.status = "Pending";
-  }
-  else {
-    order.status = "Partially Completed";
-  }
 
   if (status === "Delivered" && order.paymentMethod === "COD") {
   order.paymentStatus = "Paid";
@@ -174,21 +190,8 @@ if (status === "Cancelled") {
 }
 
 
-  const statuses = order.items.map(i => i.status);
+ updateMainOrderStatus(order);
 
-  if (statuses.every(s => s === "Cancelled")) {
-    order.status = "Cancelled";
-  }
-  else if (statuses.every(s => s === "Delivered")) {
-    order.status = "Delivered";
-    order.paymentStatus="Paid"
-  }
-  else if (statuses.some(s => s === "Pending")) {
-    order.status = "Pending";
-  }
-  else {
-    order.status = "Partially Completed";
-  }
 
   await order.save();
 };
@@ -204,30 +207,73 @@ export const approveReturnService = async (orderId, itemId) => {
   if (item.status !== "Return Requested")
     throw new Error("Invalid return state");
 
-  // ✅ Check payment status
-  const isPaid = ["Paid", "Success", "Completed"].includes(order.paymentStatus);
+if (item.status === "Returned") {
+  throw new Error("Already refunded");
+}
 
-  if (
-    order.paymentMethod === "Razorpay" ||
-    order.paymentMethod === "Wallet" ||
-    (order.paymentMethod === "COD" && isPaid)
-  ) {
 
-    if (!isPaid) return;
 
-    const refundAmount = order.finalTotal;
+const isRefundable =
+  order.paymentMethod === "Razorpay" ||
+  order.paymentMethod === "Wallet" ||
+  order.paymentMethod === "COD";
 
-    const txnId = `${order.orderId}_${item._id}`;
 
-    await creditWallet(
-      order.user,
-      refundAmount,
-      txnId,
-      "Return Refund"
+
+if (isRefundable) {
+
+  const itemTotal =
+    item.price * item.quantity;
+
+
+  const totalItemAmount =
+    order.items.reduce(
+      (sum, i) => sum + (i.price * i.quantity),
+      0
     );
-  }
 
-  // ✅ Restore stock
+
+
+  const proportionalDiscount =
+    totalItemAmount > 0
+      ? (itemTotal / totalItemAmount) * (order.discount || 0)
+      : 0;
+
+
+
+  let refundAmount =
+    itemTotal - proportionalDiscount;
+
+
+
+  const remainingRefund =
+    order.finalTotal - (order.refundedAmount || 0);
+
+
+
+  refundAmount =
+    Math.min(refundAmount, remainingRefund);
+
+
+
+  order.refundedAmount =
+    (order.refundedAmount || 0) + refundAmount;
+
+
+
+  const txnId =
+    `${order.orderId}_${item._id}_RETURN`;
+
+
+
+  await creditWallet(
+    order.user,
+    refundAmount,
+    txnId,
+    "Return Refund"
+  );
+}
+
   const product = await Product.findById(item.product);
   const variant = product.variants.find(v => v.size === item.size);
 
@@ -236,20 +282,11 @@ export const approveReturnService = async (orderId, itemId) => {
     await product.save();
   }
 
-  // ✅ Update status AFTER refund
   item.status = "Returned";
 
   const statuses = order.items.map(i => i.status);
 
-  if (statuses.every(s => s === "Returned")) {
-    order.status = "Returned";
-  } else if (statuses.every(s => s === "Cancelled")) {
-    order.status = "Cancelled";
-  } else if (statuses.every(s => s === "Delivered")) {
-    order.status = "Delivered";
-  } else {
-    order.status = "Pending";
-  }
+  updateMainOrderStatus(order);
 
   await order.save();
 };

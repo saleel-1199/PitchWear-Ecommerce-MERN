@@ -67,7 +67,73 @@
 
     </form>
 
+    <div class="text-center mt-6">
+
+  <p
+    id="timerText"
+    class="text-sm text-gray-500"
+  >
+    Resend OTP in 1 min
+  </p>
+
+  <form
+    id="resendForm"
+    action="/ForgotPassword/ResendOtp"
+    method="POST"
+    class="hidden"
+  >
+
+    <button
+      type="submit"
+      class="text-blue-600 text-sm hover:underline"
+    >
+      Resend OTP
+    </button>
+
+  </form>
+
+  <p class="text-xs text-gray-400 mt-2 text-center">
+    OTP expires in 2 minutes
+  </p>
+
+</div>
+
+
+
   </div>
+
+
+
+  <script>
+
+let seconds = 60;
+
+const timerText =
+  document.getElementById("timerText");
+
+const resendForm =
+  document.getElementById("resendForm");
+
+const timer = setInterval(() => {
+
+  seconds--;
+
+  timerText.innerText =
+    `Resend OTP in ${seconds}s`;
+
+  if (seconds <= 0) {
+
+    clearInterval(timer);
+
+    timerText.classList.add("hidden");
+
+    resendForm.classList.remove("hidden");
+
+  }
+
+}, 1000);
+
+</script>
 
 </body>
 </html>

@@ -35,8 +35,18 @@ export const getCheckoutDataService = async (userId, sessionCoupon) => {
 
     const product = await Product.findById(item.product);
 
-    console.log(product)
+   
+    
+    
+ console.log(product)
 
+
+ if(product.isDeleted){
+       throw new Error("This product no longer vailable")
+       console.log("hello",product)
+    }
+
+    
     
 
     const discountPercent = await getBestOffer(product);
@@ -71,7 +81,6 @@ let subtotal = items.reduce(
  if(sessionCoupon){
    discount = sessionCoupon.discount;
  }
-
 
 
  const finalTotal =

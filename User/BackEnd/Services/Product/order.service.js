@@ -78,8 +78,101 @@ if (!order) throw new Error("Order not found");
     await product.save();
   }
 
+
+
+ if (["Razorpay", "Wallet"].includes(order.paymentMethod)) {
+
+  if (order.paymentStatus === "Paid") {
+
+    const itemTotal =
+      item.price * item.quantity;
+
+    const activeItems =
+      order.items.filter(
+        i => i.status !== "Cancelled"
+      );
+
+    const activeSubtotal =
+      activeItems.reduce(
+        (sum, i) =>
+          sum + (i.price * i.quantity),
+        0
+      );
+
+    let refundAmount = 0;
+
+    // full order cancel
+    if (activeItems.length === 1) {
+
+      refundAmount =
+        order.finalTotal -
+        order.refundedAmount;
+
+    } else {
+
+      refundAmount = Math.round(
+        (itemTotal / activeSubtotal)
+        *
+        (
+          order.finalTotal -
+          order.refundedAmount
+        )
+      );
+
+    }
+
+    refundAmount =
+      Math.max(refundAmount, 0);
+
+    let wallet =
+      await Wallet.findOne({
+        user: order.user
+      });
+
+    if (!wallet) {
+
+      wallet = await Wallet.create({
+        user: order.user,
+        balance: 0,
+        transactions: []
+      });
+
+    }
+
+    const refundReference =
+      `${order.orderId}-${item._id}`;
+
+    const alreadyRefunded =
+      wallet.transactions.some(
+        t =>
+          t.orderId === refundReference &&
+          t.type === "Credit"
+      );
+
+    if (
+      !alreadyRefunded &&
+      refundAmount > 0
+    ) {
+
+      await creditWallet(
+        order.user,
+        refundAmount,
+        refundReference,
+        "Order Cancel Refund"
+      );
+
+      order.refundedAmount +=
+        refundAmount;
+
+    }
+
+  }
+
+}
+ 
   item.status = "Cancelled";
 
+  
   const allStatuses = order.items.map(i => i.status);
 
   if (allStatuses.every(s => s === "Cancelled")) {
@@ -92,57 +185,7 @@ if (!order) throw new Error("Order not found");
     order.status = "Partially Completed";
   }
 
- 
-  if (["Razorpay", "Wallet"].includes(order.paymentMethod)) {
-
-    if (order.paymentStatus !== "Paid") {
-      await order.save();
-      return order;
-    }
-
-    let refundAmount;
-
-    if (order.items.length === 1) {
-      refundAmount = order.finalTotal; 
-    } else {
-      const totalItemsPrice = order.items.reduce(
-        (sum, i) => sum + (i.price * i.quantity),
-        0
-      );
-
-      const itemTotal = item.price * item.quantity;
-      const ratio = itemTotal / totalItemsPrice;
-
-      refundAmount = Math.round(order.finalTotal * ratio);
-    }
-
-    refundAmount = Math.max(refundAmount, 0);
-    let wallet = await Wallet.findOne({ user: order.user });
-
-    if (!wallet) {
-      wallet = await Wallet.create({
-        user: order.user,
-        balance: 0,
-        transactions: []
-      });
-    }
-
-    const alreadyRefunded = wallet.transactions.some(
-      t =>
-        t.orderId === order.orderId &&
-        t.type === "credit"
-    );
-
-    if (!alreadyRefunded && refundAmount > 0) {
-      await creditWallet(
-        order.user,
-        refundAmount,
-        order.orderId,
-        "Order Cancel Refund"
-      );
-    }
-  }
-
+  
   await order.save();
 
   return order;

@@ -30,30 +30,11 @@
 
 
   <!-- HEADER -->
-  <header class="w-full bg-bg border-b border-borderTone">
-       <div class="max-w-6xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
-      <a href="/home" class="font-bold text-lg tracking-wide">PitchWear</a>
-
-      <nav class="hidden md:flex gap-10 text-sm text-gray-700">
-        <a href="/home" class="hover:underline">Home</a>
-        <a href="/shop" class="hover:underline font-medium">Shop</a>
-        <a href="/about" class="hover:underline">About</a>
-      </nav>
-      
-      <div class="flex items-center gap-5 text-lg">
-        <a href="/wishlist" title="Wishlist" class="hover:opacity-70">♡</a>
-        <a href="/cart" title="Cart" class="relative hover:opacity-70">
-          🛒
-          <% if (cartCount && cartCount > 0) { %>
-            <span class="absolute -top-2 -right-2 bg-green-700 text-white text-[10px] px-1.5 py-[1px] rounded-full">
-              <%= cartCount %>
-            </span>
-          <% } %>
-        </a>
-        <a href="/profile" title="Account" class="hover:opacity-70">👤</a>
-      </div>
-    </div>
-  </header>
+ <%- include("../partials/header", {
+  activePage: "shop",
+  user,
+  cartCount
+}) %>
 
   <% if (message) { %>
   <div class="w-full flex justify-center mt-4">

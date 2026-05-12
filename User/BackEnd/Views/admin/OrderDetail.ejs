@@ -88,23 +88,28 @@
                     method="POST"
                     class="flex gap-2 items-center">
 
-                <select name="status">
+<select name="status" class="border rounded px-2 py-1">
 
-  <% if (order.status === "Cancelled") { %>
+  <% const statuses = [
+    "Pending",
+    "Shipped",
+    "Out for Delivery",
+    "Delivered",
+    "Cancelled",
+    "Return Requested",
+    "Returned"
+  ]; %>
 
-     <option value="Cancelled">Cancelled</option>
+  <% statuses.forEach(status => { %>
 
-  <% } else { %>
+    <option
+      value="<%= status %>"
+      <%= item.status === status ? "selected" : "" %>
+    >
+      <%= status %>
+    </option>
 
-    <option value="Pending">Pending</option>
-    <option value="Shipped">Shipped</option>
-    <option value="Out for Delivery">Out for Delivery</option>
-    <option value="Delivered">Delivered</option>
-    <option value="Cancelled">Cancelled</option>
-    <option value="Return Requested">Return Requested</option>
-    <option value="Returned">Returned</option>
-
-  <% } %>
+  <% }) %>
 
 </select>
 

@@ -140,7 +140,6 @@ style="background-color:#1e3a8a">
 <tbody>
 
 <% transactions.forEach(txn => { %>
-
 <tr class="border-b">
 
 <td class="py-3">
@@ -158,8 +157,10 @@ style="background-color:#1e3a8a">
 </td>
 
 <td>
-  <% if (txn.description === "Referral Reward" && txn.referredUser) { %>
+  <% if (txn.description === "Referral Reward" && txn.referredUser ) { %>
     Referral Reward (<%= txn.referredUser %>)
+  <% } else if (txn.description === "Return Refund" || txn.description === "Order Cancel Refund") { %> 
+    <%= txn.description %> (<%= txn. orderId %>)
   <% } else { %>
     <%= txn.description %>
   <% } %>

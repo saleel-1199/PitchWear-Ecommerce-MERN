@@ -227,10 +227,43 @@ export const resendSignupOtp = async(email) =>{
 
      return true;
 }
+
+export const resendForgotPasswordOtp = async (session) => {
+
+  const email = session.resetEmail;
+
+  if (!email) {
+    throw new Error("Session expired");
+  }
+
+  const record = await Otp.findOne({ email });
+
+  if (!record) {
+    throw new Error("OTP session not found");
+  }
+
+  const otp =
+    Math.floor(100000 + Math.random() * 900000)
+    .toString();
+
+  record.otp = otp;
+
+  record.expiresAt =
+    Date.now() + 2 * 60 * 1000;
+
+  await record.save();
+
+  await sendOtpMail(email, otp);
+
+  return true;
+};
+
+
 export const resetPassword = async (data, session) => {
   const { password, confirmPassword } = data;
 
-  if (!session.isResetVerified)
+  if (!session.isResetVerified &&   !session.isPasswordVerified
+)
     throw new Error("Unauthorized password reset");
 
   if (!password || !confirmPassword)
@@ -249,6 +282,60 @@ export const resetPassword = async (data, session) => {
   
   session.resetEmail = null;
   session.isResetVerified = null;
+  session.isPasswordVerified = null;
 
   return true;
+};
+
+
+export const verifyOldPassword = async (
+  userId,
+  oldPassword,
+  session
+) => {
+
+  if (!oldPassword) {
+    throw new Error(
+      "Old password is required"
+    );
+  }
+
+  const user = await User.findById(
+    userId
+  );
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const isMatch = await bcrypt.compare(
+    oldPassword,
+    user.password
+  );
+
+  if (!isMatch) {
+    throw new Error(
+      "Entered old password is incorrect"
+    );
+  }
+
+  session.isPasswordVerified = true;
+  session.resetEmail = user.email;
+
+  return true;
+
+};
+
+export const getUserByIdService = async (
+  userId
+) => {
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
+
 };

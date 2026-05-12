@@ -11,23 +11,11 @@
 <body class="bg-[#fbfaf7] text-gray-800">
 
 <!-- HEADER -->
-<header class="border-b bg-[#fbfaf7]">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-5 flex justify-between items-center">
-    <a href="/home" class="font-bold text-lg">PitchWear</a>
-
-    <nav class="hidden md:flex gap-8 text-sm">
-      <a href="/home">Home</a>
-      <a href="/shop" class="font-medium">Shop</a>
-      <a href="/about">About</a>
-    </nav>
-
-    <div class="flex gap-4 text-lg">
-      <a href="/wishlist">♡</a>
-      <a href="/cart">🛒</a>
-      <a href="/profile">👤</a>
-    </div>
-  </div>
-</header> 
+<%- include("../partials/header", {
+  activePage: "shop",
+  user,
+  cartCount
+}) %> 
 
 <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
 <!-- BREADCRUMB -->
@@ -79,11 +67,17 @@
 
 <div class="flex items-center gap-3">
 
-<span class="text-gray-400 line-through text-lg">
+<span
+  id="actualPrice"
+  class="text-gray-400 line-through text-lg"
+>
 ₹<%= product.displayPrice %>
 </span>
 
-<span id="priceText" class="text-2xl font-bold text-red-600">
+<span
+  id="priceText"
+  class="text-2xl font-bold text-red-600"
+>
 ₹<%= product.offerPrice %>
 </span>
 
@@ -100,9 +94,13 @@
 </span>
 
 <% } %>
-      <span class="text-green-700 text-sm">
-        In Stock: <%= product.totalStock %>
-      </span>
+      <span
+  id="stockText"
+  class="text-green-700 text-sm"
+>
+  In Stock: <%= product.variants[0]?.stock || 0 %>
+</span>
+
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm mb-6">
@@ -125,20 +123,28 @@
 
       <div class="flex gap-3 flex-wrap">
         <% product.variants.forEach((v) => { %>
+
           <button
-            type="button"
-            data-price="<%= v.price %>"
-            class="
-              size-btn px-4 py-2 rounded-lg text-sm border transition
-              <%= v.stock > 0
-                ? 'bg-white shadow-md border-green-600 text-gray-800'
-                : 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed'
-              %>
-            "
-            <%= v.stock > 0 ? '' : 'disabled' %>
-          >
-            <%= v.size %>
-          </button>
+  type="button"
+
+  data-size="<%= v.size %>"
+  data-price="<%= v.price %>"
+  data-actualprice="<%= v.price %>"
+  data-stock="<%= v.stock %>"
+
+  class="
+    size-btn px-4 py-2 rounded-lg text-sm border transition
+    <%= v.stock > 0
+      ? 'bg-white shadow-md border-green-600 text-gray-800'
+      : 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed'
+    %>
+  "
+  <%= v.stock > 0 ? '' : 'disabled' %>
+>
+  <%= v.size %>
+</button>
+
+
         <% }) %>
       </div>
     </div>
@@ -353,30 +359,78 @@
 </div>
 
 <!-- EXISTING SIZE SCRIPT -->
-<script>
-  const priceText = document.getElementById("priceText");
-  const sizeButtons = document.querySelectorAll(".size-btn");
-  const selectedSizeInput = document.getElementById("selectedSize");
+ <script>
 
-  sizeButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
+const priceText =
+  document.getElementById("priceText");
 
-      sizeButtons.forEach(b =>
-        b.classList.remove("ring-2", "ring-green-600")
+const actualPriceText =
+  document.getElementById("actualPrice");
+
+const stockText =
+  document.getElementById("stockText");
+
+const sizeButtons =
+  document.querySelectorAll(".size-btn");
+
+const selectedSizeInput =
+  document.getElementById("selectedSize");
+
+const discountPercent =
+  <%= product.discountPercent || 0 %>;
+
+sizeButtons.forEach(btn => {
+
+  btn.addEventListener("click", () => {
+
+    // ACTIVE BUTTON
+    sizeButtons.forEach(b => {
+      b.classList.remove(
+        "ring-2",
+        "ring-green-600"
       );
-
-      btn.classList.add("ring-2", "ring-green-600");
-
-      // ✅ STORE SIZE
-      selectedSizeInput.value = btn.innerText.trim();
-
-      // ✅ UPDATE PRICE
-      const price = btn.dataset.price;
-      if (price && Number(price) > 0) {
-        priceText.innerText = "₹" + price;
-      }
     });
+
+    btn.classList.add(
+      "ring-2",
+      "ring-green-600"
+    );
+
+    // SIZE
+    const size =
+      btn.dataset.size;
+
+    selectedSizeInput.value = size;
+
+    // PRICES
+    const sellingPrice =
+      Number(btn.dataset.price);
+
+    const actualPrice =
+      Number(btn.dataset.actualprice);
+
+    const stock =
+      Number(btn.dataset.stock);
+
+    // OFFER PRICE
+    const finalPrice =
+      sellingPrice -
+      (sellingPrice * discountPercent) / 100;
+
+    // UPDATE UI
+    priceText.innerText =
+      `₹${finalPrice.toFixed(2)}`;
+
+    actualPriceText.innerText =
+      `₹${actualPrice.toFixed(2)}`;
+
+    stockText.innerText =
+      `In Stock: ${stock}`;
+
   });
+
+});
+
 </script>
 
 

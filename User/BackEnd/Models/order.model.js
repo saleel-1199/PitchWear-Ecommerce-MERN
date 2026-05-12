@@ -41,7 +41,16 @@ const orderSchema = new mongoose.Schema({
   tax: Number,
   deliveryFee: Number,
   discount: Number,
-  finalTotal: Number,
+
+  finalTotal: {
+  type: Number,
+  required: true
+},
+  
+  refundedAmount: {
+  type: Number,
+  default: 0
+},
 
   paymentMethod: {
     type: String,

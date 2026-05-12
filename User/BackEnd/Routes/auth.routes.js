@@ -25,6 +25,8 @@ router.route("/ForgotPassword")
          .post(authController.forgotPassword)
 
 router.post("/VerifyForgotOtp",authController.verifyForgotOtp);
+router.post("/ForgotPassword/ResendOtp",authController.resendForgotPasswordOtp);
+router.get( "/VerifyForgotOtp",authController.renderVerifyForgotOtp);
 
 router.post("/ResetPassword",authController.resetPassword);
 
@@ -65,6 +67,10 @@ router.route("/profile/edit")
 router.route("/profile/change-email") 
        .get(isAuth,attachUser,blockGoogleEdit,userController.renderChangeEmail)
        .post(isAuth,attachUser,blockGoogleEdit,userController.sendEmailOtp);
+
+router.post("/profile/verify-password",isAuth,blockGoogleEdit,authController.verifyOldPasswordController);
+router.get("/profile/reset-password",isAuth,blockGoogleEdit,authController.renderProfileResetPassword);
+
 
 router.route("/profile/verify-email-otp") 
         .get(isAuth,userController.renderVerifyEmailOtp)

@@ -30,9 +30,8 @@
 
   <nav class="flex items-center gap-10 text-sm">
     <a href="/Home" class="hover:text-primary">Home</a>
-    <a href="#" class="hover:text-primary">Shop</a>
-    <a href="#" class="hover:text-primary">About</a>
-    <a href="#" class="hover:text-primary">Contact</a>
+    <a href="/Shop" class="hover:text-primary">Shop</a>
+    <a href="/About" class="hover:text-primary">About</a>
   </nav>
 </header>
 
@@ -140,6 +139,17 @@
           </button>
         </form>
 
+        
+         <a
+  href="#"
+  onclick="openPasswordModal()"
+  class="px-6 py-2 rounded-md text-sm text-center border border-gray-300
+         bg-headerTone hover:bg-primary hover:text-white transition"
+>
+  Change Password
+</a>
+
+
       </div>
     </div>
 
@@ -158,26 +168,6 @@
         />
       </div>
 
-      <div>
-        <label class="text-sm">New Password</label>
-        <input
-          type="password"
-          name="password"
-          class="w-full border border-softGray rounded-md px-4 py-2 mt-1
-                 focus:outline-none focus:border-primary"
-        />
-      </div>
-
-      <div>
-        <label class="text-sm">Confirm Password</label>
-        <input
-          type="password"
-          name="confirmPassword"
-          class="w-full border border-softGray rounded-md px-4 py-2 mt-1
-                 focus:outline-none focus:border-primary"
-        />
-      </div>
-
       <!-- ACTIONS -->
       <div class="flex gap-4 pt-4">
         <button
@@ -193,6 +183,7 @@
         >
           Cancel
         </a>
+
       </div>
 
     </form>
@@ -201,5 +192,87 @@
 
 </main>
 
+<!-- PASSWORD VERIFY MODAL -->
+<div
+  id="passwordModal"
+  class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+>
+
+  <div class="bg-white w-full max-w-md rounded-2xl p-8">
+
+    <h2 class="text-xl font-semibold mb-2">
+      Verify Password
+    </h2>
+
+    <p class="text-sm text-gray-500 mb-6">
+      Enter your current password to continue
+    </p>
+
+    <!-- ERROR -->
+    <p
+      id="passwordError"
+      class="text-red-500 text-sm mb-4 hidden"
+    ></p>
+
+    <form
+      action="/profile/verify-password"
+      method="POST"
+      class="space-y-5"
+    >
+
+      <div>
+        <label class="text-sm block mb-2">
+          Current Password
+        </label>
+
+        <input
+          type="password"
+          name="oldPassword"
+          required
+          class="w-full border rounded-lg px-4 py-3 outline-none focus:border-primary"
+        />
+      </div>
+
+      <div class="flex gap-3 pt-2">
+
+        <button
+          type="submit"
+          class="flex-1 bg-primary text-white py-3 rounded-lg"
+        >
+          Continue
+        </button>
+
+        <button
+          type="button"
+          onclick="closePasswordModal()"
+          class="flex-1 bg-gray-200 py-3 rounded-lg"
+        >
+          Cancel
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<script>
+
+function openPasswordModal() {
+  document
+    .getElementById("passwordModal")
+    .classList.remove("hidden");
+}
+
+function closePasswordModal() {
+  document
+    .getElementById("passwordModal")
+    .classList.add("hidden");
+}
+
+</script>
 </body>
 </html>
