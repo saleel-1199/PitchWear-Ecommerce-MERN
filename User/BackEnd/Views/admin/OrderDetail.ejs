@@ -82,43 +82,55 @@
             <td class="px-6 py-3">₹<%= item.price %></td>
             <td class="px-6 py-3">₹<%= item.price * item.quantity %></td>
 
-            <!-- Status Dropdown -->
-            <td class="px-6 py-3">
-              <form action="/admin/orders/<%= order._id %>/item/<%= item._id %>/status?_method=PATCH"
-                    method="POST"
-                    class="flex gap-2 items-center">
+           <!-- Status Dropdown -->
+<td class="px-6 py-3">
 
-<select name="status" class="border rounded px-2 py-1">
+  <% if (item.status === "Cancelled") { %>
 
-  <% const statuses = [
-    "Pending",
-    "Shipped",
-    "Out for Delivery",
-    "Delivered",
-    "Cancelled",
-    "Return Requested",
-    "Returned"
-  ]; %>
+    <span class="text-red-500 font-medium">
+      Cancelled
+    </span>
 
-  <% statuses.forEach(status => { %>
+  <% } else { %>
 
-    <option
-      value="<%= status %>"
-      <%= item.status === status ? "selected" : "" %>
-    >
-      <%= status %>
-    </option>
+    <form action="/admin/orders/<%= order._id %>/item/<%= item._id %>/status?_method=PATCH"
+          method="POST"
+          class="flex gap-2 items-center">
 
-  <% }) %>
+      <select name="status" class="border rounded px-2 py-1">
 
-</select>
+        <% const statuses = [
+          "Pending",
+          "Shipped",
+          "Out for Delivery",
+          "Delivered",
+          "Cancelled",
+          "Return Requested",
+          "Returned"
+        ]; %>
 
-                <button class="bg-green-500 text-white px-3 py-1 text-xs rounded">
-                  Update
-                </button>
+        <% statuses.forEach(status => { %>
 
-              </form>
-            </td>
+          <option
+            value="<%= status %>"
+            <%= item.status === status ? "selected" : "" %>
+          >
+            <%= status %>
+          </option>
+
+        <% }) %>
+
+      </select>
+
+      <button class="bg-green-500 text-white px-3 py-1 text-xs rounded">
+        Update
+      </button>
+
+    </form>
+
+  <% } %>
+
+</td>
 
             <!-- Return Reason -->
             <td class="px-6 py-3 text-sm break-words whitespace-pre-wrap max-w-xs">
