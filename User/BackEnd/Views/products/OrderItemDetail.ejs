@@ -97,6 +97,13 @@
         <p class="text-sm mt-3 font-medium text-pink-600">
           ₹<%= (item.price * item.quantity).toFixed(2) %>
         </p>
+        
+        <% if(order.couponCode) { %>
+         <p class="text-sm mt-3 font-medium text-pink-600">
+          Coupon Used : <%= order.couponCode %>(<%= order.couponCodePercent %>% off)
+        </p>
+    <% } %>
+
       </div>
 
       <div>

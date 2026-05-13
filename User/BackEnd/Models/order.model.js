@@ -63,6 +63,7 @@ const orderSchema = new mongoose.Schema({
   default: "Pending"
 },
 couponCode: String,
+couponCodePercent:Number,
 razorpayOrderId: String,
 razorpayPaymentId: String,
 

@@ -46,7 +46,7 @@ export const getCheckoutDataService = async (userId, sessionCoupon) => {
        console.log("hello",product)
     }
 
-    
+
     
 
     const discountPercent = await getBestOffer(product);
@@ -244,6 +244,7 @@ if (paymentMethod === "Wallet") {
 
 
  couponCode: coupon?.code,
+ couponCodePercent: coupon?.discountPercent,
 
  addressSnapshot:{
  fullName:address.full_name,
@@ -362,7 +363,8 @@ export const applyCouponCheckoutService = async(code,subtotal)=>{
 
  return {
   code: coupon.code,
-  discount
+  discount,
+  discountPercent: coupon.discountPercent
  };
 
 };  

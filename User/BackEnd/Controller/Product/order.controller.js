@@ -253,8 +253,6 @@ order.items.forEach(item => {
     .stroke();
 });
 
-
-
 /* ===== TOTAL SECTION ===== */
 
 y += 20;
@@ -262,6 +260,7 @@ y += 20;
 doc
   .font("regular")
   .fontSize(11)
+  .fillColor("black")
   .text(`Subtotal: ₹ ${order.subtotal}`, 400, y);
 
 y += 18;
@@ -274,6 +273,35 @@ y += 18;
 doc
   .text(`Tax: ₹ ${order.tax}`, 400, y);
 
+
+/* ===== COUPON DETAILS ===== */
+
+if (order.discount > 0) {
+
+  y += 18;
+
+  doc
+    .fillColor("green")
+    .text(
+      `Coupon (${order.couponCode || "Applied"})`,
+      400,
+      y
+    );
+
+  y += 15;
+
+  doc
+    .text(
+      `Discount (${order.couponCodePercent || 0}%): -₹ ${order.discount}`,
+      400,
+      y
+    );
+
+  doc.fillColor("black");
+
+}
+
+
 y += 22;
 
 doc
@@ -283,6 +311,7 @@ doc
 
 
 
+  
 /* ===== FOOTER ===== */
 
 doc

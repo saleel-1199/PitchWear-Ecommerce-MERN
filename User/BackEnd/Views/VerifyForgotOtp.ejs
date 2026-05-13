@@ -6,26 +6,82 @@
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const inputs = document.querySelectorAll(".otp-input");
+  const inputs =
+    document.querySelectorAll(".otp-input");
 
-      inputs.forEach((input, index) => {
-        input.addEventListener("input", () => {
-          if (input.value.length === 1 && index < inputs.length - 1) {
-            inputs[index + 1].focus();
-          }
-        });
+  inputs.forEach((input, index) => {
 
-        input.addEventListener("keydown", (e) => {
-          if (e.key === "Backspace" && !input.value && index > 0) {
-            inputs[index - 1].focus();
-          }
-        });
-      });
+    input.addEventListener("input", () => {
+
+      if (
+        input.value.length === 1 &&
+        index < inputs.length - 1
+      ) {
+
+        inputs[index + 1].focus();
+
+      }
+
     });
-  </script>
+
+    input.addEventListener("keydown", (e) => {
+
+      if (
+        e.key === "Backspace" &&
+        !input.value &&
+        index > 0
+      ) {
+
+        inputs[index - 1].focus();
+
+      }
+
+    });
+
+  });
+
+
+  // Paste Support
+  const otpContainer =
+    document.querySelector("form");
+
+  otpContainer.addEventListener(
+    "paste",
+    (e) => {
+
+      e.preventDefault();
+
+      const pastedData =
+        e.clipboardData
+          .getData("text")
+          .trim();
+
+      if (!/^\d{6}$/.test(pastedData))
+        return;
+
+      pastedData
+        .split("")
+        .forEach((digit, index) => {
+
+          if (inputs[index]) {
+
+            inputs[index].value =
+              digit;
+
+          }
+
+        });
+
+      inputs[5].focus();
+
+    }
+  );
+
+});
+</script>
 </head>
 
 <body class="bg-[#faf9f6] min-h-screen flex items-center justify-center">
@@ -104,9 +160,7 @@
 
 
 
-  <script>
-
-let seconds = 60;
+<script>
 
 const timerText =
   document.getElementById("timerText");
@@ -114,14 +168,35 @@ const timerText =
 const resendForm =
   document.getElementById("resendForm");
 
+
+const OTP_DURATION = 60;
+
+
+let otpExpiry =
+  localStorage.getItem("forgotOtpExpiry");
+
+
+if (!otpExpiry) {
+
+  otpExpiry =
+    Date.now() + OTP_DURATION * 1000;
+
+  localStorage.setItem(
+    "forgotOtpExpiry",
+    otpExpiry
+  );
+
+}
+
+
 const timer = setInterval(() => {
 
-  seconds--;
+  const remainingSeconds =
+    Math.floor(
+      (otpExpiry - Date.now()) / 1000
+    );
 
-  timerText.innerText =
-    `Resend OTP in ${seconds}s`;
-
-  if (seconds <= 0) {
+  if (remainingSeconds <= 0) {
 
     clearInterval(timer);
 
@@ -129,7 +204,15 @@ const timer = setInterval(() => {
 
     resendForm.classList.remove("hidden");
 
+    localStorage.removeItem(
+      "forgotOtpExpiry"
+    );
+
+    return;
   }
+
+  timerText.innerText =
+    `Resend OTP in ${remainingSeconds}s`;
 
 }, 1000);
 

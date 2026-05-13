@@ -7,9 +7,10 @@ export const salesReportPage = async (req,res)=>{
  const { filter, startDate, endDate } = req.query
 
  let query = {
-  status:"Delivered"
+  status:{
+    $in: ["Delivered", "Partially Completed"]
+  }
  }
-
 
  const now = new Date()
 
@@ -51,9 +52,23 @@ export const salesReportPage = async (req,res)=>{
   }
 
  }
+const orders = await Order.find(query)
+.sort({ createdAt: -1 });
 
- const reports = await Order.find(query)
- .sort({createdAt:-1})
+
+const reports = orders.map(order => {
+
+  const deliveredItems =
+    order.items.filter(
+      item => item.status === "Delivered"
+    );
+
+  return {
+    ...order.toObject(),
+    items: deliveredItems
+  };
+
+});
 
  res.render("admin/SalesReport",{
   reports,
