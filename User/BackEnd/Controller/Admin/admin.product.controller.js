@@ -47,28 +47,36 @@ export const addProduct = async (req, res) => {
     await createProduct(req.body, req.files);
     return res.redirect("/admin/Products");
   } catch (err) {
-    console.error("Add product error:", err.message);
 
-    let errorMessage = "Something went wrong.Please try again.";
+  console.error("Add product error:", err);
 
-    if (err.message === "INVALID_NAME") { 
-      errorMessage = "Product name cannot be empty or spaces only.";
-    } else if (err.message === "INVALID_TEAM") {
-      errorMessage = "Please select a valid team.";
-    } else if (err.message === "MIN_IMAGES") {
-      errorMessage = "Please upload at least 3 product images.";
-    }
+  let errorMessage =
+    "Something went wrong. Please try again.";
 
-    const teams = await Team.find({ isDeleted: false }).lean();
+  if (err.type === "VALIDATION") {
 
-    return res.status(STATUS_CODES.BAD_REQUEST).render("Admin/ProductAdd", {
-      title: "Add Product",
-      error: errorMessage, 
-      teams,
-    });
+    errorMessage =
+      Object.values(err.errors)[0];
+
   }
-};
 
+  const teams =
+    await Team.find({
+      isDeleted: false
+    }).lean();
+
+  return res
+    .status(STATUS_CODES.BAD_REQUEST)
+    .render("admin/ProductAdd", {
+
+      title: "Add Product",
+      error: errorMessage,
+      teams,
+
+    });
+
+};
+}
 export const editProductPage = async (req, res) => {
   const product = await getProductById(req.params.id);
   if (!product) return res.redirect("/admin/Products");

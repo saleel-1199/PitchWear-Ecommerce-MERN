@@ -87,21 +87,27 @@ export const createProduct = async (data, files) => {
       errors[`size_${i}`] = "Size is required";
     }
 
-    if (!v.price || Number(v.price) <= 0) {
-      errors[`price_${i}`] = "Price must be greater than 0";
-    }
+   if (
+  v.price !== "" &&
+  Number(v.price) < 0
+) {
+  errors[`price_${i}`] =
+    "Price cannot be negative";
+}
 
-    if (v.stock === "" || Number(v.stock) < 0) {
-      errors[`stock_${i}`] = "Stock cannot be negative";
-    }
+if (
+  v.stock !== "" &&
+  Number(v.stock) < 0
+) {
+  errors[`stock_${i}`] =
+    "Stock cannot be negative";
+}
   });
 
-  // 🔥 If any error → throw object
   if (Object.keys(errors).length > 0) {
     throw { type: "VALIDATION", errors };
   }
 
-  // ✅ continue normal logic
   const productName = data.name.trim();
 
   const images = await saveProductImages(files);
@@ -143,13 +149,12 @@ if (files && files.length > 0) {
 
     const saved = await saveProductImages([file]);
 
-    // 🔥 extract index from filename
     const match = file.originalname.match(/image-(\d+)/);
 
     const index = match ? parseInt(match[1]) : null;
 
     if (index !== null) {
-      images[index] = saved[0];   // ✅ correct position
+      images[index] = saved[0];   
     }
   }
 }

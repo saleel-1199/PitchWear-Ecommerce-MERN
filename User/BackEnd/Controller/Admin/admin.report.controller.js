@@ -10,6 +10,7 @@ export const salesReportPage = async (req,res)=>{
   status:"Delivered"
  }
 
+
  const now = new Date()
 
  if(filter === "daily"){

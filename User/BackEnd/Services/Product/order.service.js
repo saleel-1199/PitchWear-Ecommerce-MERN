@@ -101,7 +101,7 @@ if (!order) throw new Error("Order not found");
 
     let refundAmount = 0;
 
-    // full order cancel
+  
     if (activeItems.length === 1) {
 
       refundAmount =
@@ -185,7 +185,7 @@ if (!order) throw new Error("Order not found");
     order.status = "Partially Completed";
   }
 
-  
+
   await order.save();
 
   return order;

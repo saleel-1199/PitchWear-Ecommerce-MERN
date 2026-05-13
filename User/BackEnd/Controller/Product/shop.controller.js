@@ -16,14 +16,14 @@ export const shopPageController = async (req, res) => {
    const selectedKits = [].concat(req.query.kits || []).map(k =>
   decodeURIComponent(k)
     .replace(/\+/g, " ")
-    .trim()              // ✅ ADD THIS
+    .trim()             
     .toLowerCase()
 );
 
 const selectedTypes = [].concat(req.query.types || []).map(t =>
   decodeURIComponent(t)
     .replace(/\+/g, " ")
-    .trim()              // ✅ ADD THIS
+    .trim()              
     .toLowerCase()
 );
 
