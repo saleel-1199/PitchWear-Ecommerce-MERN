@@ -58,14 +58,32 @@ const orders = await Order.find(query)
 
 const reports = orders.map(order => {
 
-  const deliveredItems =
-    order.items.filter(
-      item => item.status === "Delivered"
-    );
+  const deliveredItems = order.items.filter(
+    item => item.status === "Delivered"
+  );
+
+  const deliveredSubtotal = deliveredItems.reduce((sum, item) => {
+    return sum + (item.price * item.quantity);
+  }, 0);
+
+  const deliveredDiscount =
+    order.subtotal > 0
+      ? (deliveredSubtotal / order.subtotal) * order.discount
+      : 0;
+
+  const deliveredFinalTotal =
+    deliveredSubtotal - deliveredDiscount;
 
   return {
     ...order.toObject(),
-    items: deliveredItems
+
+    items: deliveredItems,
+
+    subtotal: deliveredSubtotal,
+
+    discount: deliveredDiscount,
+
+    finalTotal: deliveredFinalTotal
   };
 
 });
