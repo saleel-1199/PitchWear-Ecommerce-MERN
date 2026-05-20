@@ -94,11 +94,12 @@
 </span>
 
 <% } %>
-      <span
+
+     <span
   id="stockText"
   class="text-green-700 text-sm"
 >
-  In Stock: <%= product.variants[0]?.stock || 0 %>
+  In Stock: 0
 </span>
 
     </div>
@@ -358,8 +359,7 @@
 />
 </div>
 
-<!-- EXISTING SIZE SCRIPT -->
- <script>
+<script>
 
 const priceText =
   document.getElementById("priceText");
@@ -379,57 +379,64 @@ const selectedSizeInput =
 const discountPercent =
   <%= product.discountPercent || 0 %>;
 
-sizeButtons.forEach(btn => {
+function updateVariant(btn) {
 
-  btn.addEventListener("click", () => {
-
-    // ACTIVE BUTTON
-    sizeButtons.forEach(b => {
-      b.classList.remove(
-        "ring-2",
-        "ring-green-600"
-      );
-    });
-
-    btn.classList.add(
+  sizeButtons.forEach(b => {
+    b.classList.remove(
       "ring-2",
       "ring-green-600"
     );
+  });
 
-    // SIZE
-    const size =
-      btn.dataset.size;
+  btn.classList.add(
+    "ring-2",
+    "ring-green-600"
+  );
 
-    selectedSizeInput.value = size;
+  const size =
+    btn.dataset.size;
 
-    // PRICES
-    const sellingPrice =
-      Number(btn.dataset.price);
+  selectedSizeInput.value = size;
 
-    const actualPrice =
-      Number(btn.dataset.actualprice);
+  const sellingPrice =
+    Number(btn.dataset.price);
 
-    const stock =
-      Number(btn.dataset.stock);
+  const actualPrice =
+    Number(btn.dataset.actualprice);
 
-    // OFFER PRICE
-    const finalPrice =
-      sellingPrice -
-      (sellingPrice * discountPercent) / 100;
+  const stock =
+    Number(btn.dataset.stock);
 
-    // UPDATE UI
-    priceText.innerText =
-      `₹${finalPrice.toFixed(2)}`;
+  const finalPrice =
+    sellingPrice -
+    (sellingPrice * discountPercent) / 100;
 
+  priceText.innerText =
+    `₹${finalPrice.toFixed(2)}`;
+
+  if (actualPriceText) {
     actualPriceText.innerText =
       `₹${actualPrice.toFixed(2)}`;
+  }
 
-    stockText.innerText =
-      `In Stock: ${stock}`;
+  stockText.innerText =
+    `In Stock: ${stock}`;
+}
 
+sizeButtons.forEach(btn => {
+
+  btn.addEventListener("click", () => {
+    updateVariant(btn);
   });
 
 });
+
+const firstEnabledBtn =
+  [...sizeButtons].find(btn => !btn.disabled);
+
+if (firstEnabledBtn) {
+  updateVariant(firstEnabledBtn);
+}
 
 </script>
 

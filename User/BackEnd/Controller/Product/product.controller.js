@@ -22,7 +22,6 @@ export const getProductDetailsController = async (req, res) => {
     relatedProducts = relatedProducts.filter(
       (p) => String(p._id) !== String(product._id)
     );
-
     res.render("products/ProductDetails", {
       title: product.name,
       product,

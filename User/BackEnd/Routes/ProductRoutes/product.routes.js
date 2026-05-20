@@ -49,7 +49,6 @@ const router = express.Router();
 router.get("/shop",shopPageController);
 router.get("/product/:slug",getProductDetailsController);
 
-
 router.get("/cart", getCartPageController);
 router.post("/cart", addToCartController);
 router.patch("/cart/:productId", updateCartQuantityController);
